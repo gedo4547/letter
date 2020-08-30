@@ -1,0 +1,97 @@
+{
+  "format": 1,
+  "restore": {
+    "/Users/guanyedong/Projects/letter-github/src/Letter.IO/Letter.IO.csproj": {}
+  },
+  "projects": {
+    "/Users/guanyedong/Projects/letter-github/src/Letter.IO/Letter.IO.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "/Users/guanyedong/Projects/letter-github/src/Letter.IO/Letter.IO.csproj",
+        "projectName": "Letter.IO",
+        "projectPath": "/Users/guanyedong/Projects/letter-github/src/Letter.IO/Letter.IO.csproj",
+        "packagesPath": "/Users/guanyedong/.nuget/packages/",
+        "outputPath": "/Users/guanyedong/Projects/letter-github/src/Letter.IO/obj/",
+        "projectStyle": "PackageReference",
+        "crossTargeting": true,
+        "fallbackFolders": [
+          "/usr/local/share/dotnet/sdk/NuGetFallbackFolder"
+        ],
+        "configFilePaths": [
+          "/Users/guanyedong/.config/NuGet/NuGet.Config"
+        ],
+        "originalTargetFrameworks": [
+          "net5.0",
+          "netstandard2.0"
+        ],
+        "sources": {
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "netcoreapp5.0": {
+            "projectReferences": {}
+          },
+          "netstandard2.0": {
+            "projectReferences": {}
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        }
+      },
+      "frameworks": {
+        "netcoreapp5.0": {
+          "dependencies": {
+            "System.IO.Pipelines": {
+              "target": "Package",
+              "version": "[4.7.2, )"
+            }
+          },
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "frameworkReferences": {
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/5.0.100-preview.7.20366.6/RuntimeIdentifierGraph.json"
+        },
+        "netstandard2.0": {
+          "dependencies": {
+            "NETStandard.Library": {
+              "suppressParent": "All",
+              "target": "Package",
+              "version": "[2.0.3, )",
+              "autoReferenced": true
+            },
+            "System.IO.Pipelines": {
+              "target": "Package",
+              "version": "[4.7.2, )"
+            }
+          },
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/5.0.100-preview.7.20366.6/RuntimeIdentifierGraph.json"
+        }
+      }
+    }
+  }
+}
