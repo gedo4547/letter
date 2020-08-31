@@ -5,3 +5,5 @@
 /src/Letter/obj
 /src/Letter.IO/obj
 /src/Letter.IO/bin
+/src/Letter.Tcp/obj
+/src/Letter.Tcp/bin
