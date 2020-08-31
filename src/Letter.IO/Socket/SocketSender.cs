@@ -5,7 +5,7 @@ using System.IO.Pipelines;
 
 namespace System.Net.Sockets
 {
-    public class SocketSender : SocketBase
+    public abstract class SocketSender : SocketBase
     {
         public SocketSender(Socket socket, PipeScheduler scheduler) : base(socket, scheduler)
         {
