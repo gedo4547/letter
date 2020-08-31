@@ -1,0 +1,15 @@
+F:\letter-github\src\Letter.Tcp\bin\Debug\net5.0\Letter.Tcp.deps.json
+F:\letter-github\src\Letter.Tcp\bin\Debug\net5.0\Letter.Tcp.dll
+F:\letter-github\src\Letter.Tcp\bin\Debug\net5.0\Letter.Tcp.pdb
+F:\letter-github\src\Letter.Tcp\bin\Debug\net5.0\Letter.dll
+F:\letter-github\src\Letter.Tcp\bin\Debug\net5.0\Letter.IO.dll
+F:\letter-github\src\Letter.Tcp\bin\Debug\net5.0\Letter.IO.pdb
+F:\letter-github\src\Letter.Tcp\bin\Debug\net5.0\Letter.pdb
+F:\letter-github\src\Letter.Tcp\obj\Debug\net5.0\Letter.Tcp.csprojAssemblyReference.cache
+F:\letter-github\src\Letter.Tcp\obj\Debug\net5.0\Letter.Tcp.GeneratedMSBuildEditorConfig.editorconfig
+F:\letter-github\src\Letter.Tcp\obj\Debug\net5.0\Letter.Tcp.AssemblyInfoInputs.cache
+F:\letter-github\src\Letter.Tcp\obj\Debug\net5.0\Letter.Tcp.AssemblyInfo.cs
+F:\letter-github\src\Letter.Tcp\obj\Debug\net5.0\Letter.Tcp.csproj.CoreCompileInputs.cache
+F:\letter-github\src\Letter.Tcp\obj\Debug\net5.0\Letter.Tcp.csproj.CopyComplete
+F:\letter-github\src\Letter.Tcp\obj\Debug\net5.0\Letter.Tcp.dll
+F:\letter-github\src\Letter.Tcp\obj\Debug\net5.0\Letter.Tcp.pdb

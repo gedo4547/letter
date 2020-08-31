@@ -2,7 +2,7 @@
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
-namespace Letter.IO
+namespace Letter
 {
     [EditorBrowsable(EditorBrowsableState.Never)]
     public static class OSPlatformHelper

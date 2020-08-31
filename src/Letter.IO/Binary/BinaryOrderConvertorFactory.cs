@@ -1,9 +1,11 @@
-﻿namespace Letter.IO
+﻿using System.ComponentModel;
+
+namespace Letter.IO
 {
     public static class BinaryOrderConvertorFactory
     {
-        private static OrderConvertorBigEndianImpl bigEndian = new OrderConvertorBigEndianImpl();
-        private static OrderConvertorLittleEndianImpl littleEndian = new OrderConvertorLittleEndianImpl();
+        private static IBinaryOrderConvertor bigEndian = new OrderConvertorBigEndianImpl();
+        private static IBinaryOrderConvertor littleEndian = new OrderConvertorLittleEndianImpl();
         
         public static IBinaryOrderConvertor GetConvertor(BinaryOrder order)
         {

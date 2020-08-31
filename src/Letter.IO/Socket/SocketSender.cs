@@ -11,9 +11,7 @@ namespace System.Net.Sockets
         {
         }
         
-        
         private List<ArraySegment<byte>> _bufferList;
-        
         
         protected List<ArraySegment<byte>> GetBufferList(in ReadOnlySequence<byte> buffer)
         {

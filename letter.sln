@@ -4,6 +4,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Letter", "src\Letter\Letter
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Letter.IO", "src\Letter.IO\Letter.IO.csproj", "{9FAD01C8-872A-4729-AC5C-F05E714D574D}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Letter.Tcp", "src\Letter.Tcp\Letter.Tcp.csproj", "{FC059BFA-2ABD-4C0A-9AA0-34EF48DD817D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -18,5 +20,9 @@ Global
 		{9FAD01C8-872A-4729-AC5C-F05E714D574D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9FAD01C8-872A-4729-AC5C-F05E714D574D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9FAD01C8-872A-4729-AC5C-F05E714D574D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FC059BFA-2ABD-4C0A-9AA0-34EF48DD817D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FC059BFA-2ABD-4C0A-9AA0-34EF48DD817D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FC059BFA-2ABD-4C0A-9AA0-34EF48DD817D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FC059BFA-2ABD-4C0A-9AA0-34EF48DD817D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
