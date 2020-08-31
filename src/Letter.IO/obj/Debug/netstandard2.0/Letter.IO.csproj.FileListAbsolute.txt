@@ -1,4 +1,0 @@
-F:\letter-github\src\Letter.IO\obj\Debug\netstandard2.0\Letter.IO.csprojAssemblyReference.cache
-F:\letter-github\src\Letter.IO\obj\Debug\netstandard2.0\Letter.IO.AssemblyInfoInputs.cache
-F:\letter-github\src\Letter.IO\obj\Debug\netstandard2.0\Letter.IO.AssemblyInfo.cs
-F:\letter-github\src\Letter.IO\obj\Debug\netstandard2.0\Letter.IO.csproj.CoreCompileInputs.cache

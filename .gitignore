@@ -1,3 +1,7 @@
 /.idea
 /.vs
 /.vscode
+/src/Letter/bin
+/src/Letter/obj
+/src/Letter.IO/obj
+/src/Letter.IO/bin
