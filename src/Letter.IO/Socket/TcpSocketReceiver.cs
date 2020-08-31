@@ -1,9 +1,7 @@
-﻿﻿using System.ComponentModel;
-using System.IO.Pipelines;
+﻿using System.IO.Pipelines;
 
 namespace System.Net.Sockets
 {
-     [EditorBrowsable(EditorBrowsableState.Never)]
     public sealed class TcpSocketReceiver : SocketBase
     {
         public TcpSocketReceiver(Socket socket, PipeScheduler scheduler) : base(socket, scheduler)

@@ -1,9 +1,7 @@
-﻿﻿using System.ComponentModel;
-using System.IO.Pipelines;
+﻿using System.IO.Pipelines;
 
 namespace System.Net.Sockets
 {
-     [EditorBrowsable(EditorBrowsableState.Never)]
     public abstract class SocketBase : IDisposable
     {
         protected readonly Socket _socket;

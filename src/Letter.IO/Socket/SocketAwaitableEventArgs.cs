@@ -1,5 +1,4 @@
-﻿﻿using System.ComponentModel;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.IO.Pipelines;
 using System.Runtime.CompilerServices;
 using System.Threading;
@@ -7,7 +6,6 @@ using System.Threading.Tasks;
 
 namespace System.Net.Sockets
 {
-     [EditorBrowsable(EditorBrowsableState.Never)]
     public sealed class SocketAwaitableEventArgs : SocketAsyncEventArgs, ICriticalNotifyCompletion
     {
         private static readonly Action _callbackCompleted = () => { };

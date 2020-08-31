@@ -1,17 +1,11 @@
-﻿﻿using System.Buffers;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Diagnostics;
+﻿using System.Buffers;
 using System.IO.Pipelines;
 using System.Runtime.InteropServices;
 
 namespace System.Net.Sockets
 {
-     [EditorBrowsable(EditorBrowsableState.Never)]
-    public sealed class TcpSocketSender : SocketBase
+    public sealed class TcpSocketSender : SocketSender
     {
-        private List<ArraySegment<byte>> _bufferList;
-
         public TcpSocketSender(Socket socket, PipeScheduler scheduler) : base(socket, scheduler)
         {
         }
@@ -54,29 +48,6 @@ namespace System.Net.Sockets
             }
 
             return _awaitableEventArgs;
-        }
-
-        private List<ArraySegment<byte>> GetBufferList(in ReadOnlySequence<byte> buffer)
-        {
-            Debug.Assert(!buffer.IsEmpty);
-            Debug.Assert(!buffer.IsSingleSegment);
-
-            if (_bufferList == null)
-            {
-                _bufferList = new List<ArraySegment<byte>>();
-            }
-            else
-            {
-                // Buffers are pooled, so it's OK to root them until the next multi-buffer write.
-                _bufferList.Clear();
-            }
-
-            foreach (var b in buffer)
-            {
-                _bufferList.Add(b.GetArray());
-            }
-
-            return _bufferList;
         }
     }
 }
