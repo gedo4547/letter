@@ -1,0 +1,10 @@
+F:\letter-github\src\Letter\bin\Debug\net5.0\Letter.deps.json
+F:\letter-github\src\Letter\bin\Debug\net5.0\Letter.dll
+F:\letter-github\src\Letter\bin\Debug\net5.0\Letter.pdb
+F:\letter-github\src\Letter\obj\Debug\net5.0\Letter.csprojAssemblyReference.cache
+F:\letter-github\src\Letter\obj\Debug\net5.0\Letter.GeneratedMSBuildEditorConfig.editorconfig
+F:\letter-github\src\Letter\obj\Debug\net5.0\Letter.AssemblyInfoInputs.cache
+F:\letter-github\src\Letter\obj\Debug\net5.0\Letter.AssemblyInfo.cs
+F:\letter-github\src\Letter\obj\Debug\net5.0\Letter.csproj.CoreCompileInputs.cache
+F:\letter-github\src\Letter\obj\Debug\net5.0\Letter.dll
+F:\letter-github\src\Letter\obj\Debug\net5.0\Letter.pdb
