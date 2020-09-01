@@ -19,7 +19,17 @@ namespace Letter
         protected ISocketsTrace trace; 
         
         private Action<TOptions> optionsFactory;
-        
+
+
+        public void ConfigureLogger(ISocketsTrace trace)
+        {
+            if (trace == null)
+            {
+                throw new ArgumentNullException(nameof(trace));
+            }
+
+            this.trace = trace;
+        }
 
         public void ConfigureOptions(Action<TOptions> optionsFactory)
         {

@@ -117,7 +117,6 @@ namespace Letter.Tcp
                     {
                         acceptSocket.NoDelay = this.options.NoDelay;
                     }
-
                     
                     var session = new TcpSession(
                         acceptSocket,
@@ -128,8 +127,7 @@ namespace Letter.Tcp
                         options.MaxWriteBufferSize, 
                         options.WaitForDataBeforeAllocatingBuffer);
                     
-                    
-                    
+                    session.Start();
                     
                     this.schedulerIndex = (this.schedulerIndex + 1) % this.numSchedulers;
 
