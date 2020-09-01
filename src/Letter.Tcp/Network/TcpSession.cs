@@ -55,7 +55,20 @@ namespace Letter.Tcp
             Application = pair.Application;
         }
 
-        public string Id { get; }
+        private string id;
+        public string Id
+        {
+            get
+            {
+                if (id == null)
+                {
+                    id = IdGeneratorHelper.GetNextId();
+                }
+
+                return id;
+            }
+        }
+        
         public EndPoint LocalEndPoint { get; private set; }
         public EndPoint RemoteEndPoint { get; private set; }
         public MemoryPool<byte> MemoryPool { get; private set; }
