@@ -15,7 +15,9 @@ namespace Letter
             this.options = options;
         }
 
-        private TOptions options;
+        protected TOptions options;
+        protected ISocketsTrace trace; 
+        
         private Action<TOptions> optionsFactory;
         
 
@@ -29,7 +31,7 @@ namespace Letter
             this.optionsFactory = optionsFactory;
         }
 
-        public void Build()
+        public virtual void Build()
         {
             if(this.optionsFactory == null)
             {

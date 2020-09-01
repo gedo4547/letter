@@ -9,7 +9,7 @@ namespace Letter.Tcp
         void Bind(EndPoint point);
         
         ValueTask<ITcpSession> AcceptAsync(CancellationToken cancellationToken = default);
-        
-        
+
+        ValueTask UnbindAsync(CancellationToken cancellationToken = default);
     }
 }

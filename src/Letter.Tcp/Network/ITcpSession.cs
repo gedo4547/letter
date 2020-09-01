@@ -1,6 +1,6 @@
 ﻿namespace Letter.Tcp
 {
-    public interface ITcpSession
+    public interface ITcpSession : ISession
     {
         
     }
