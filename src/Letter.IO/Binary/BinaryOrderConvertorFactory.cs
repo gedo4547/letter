@@ -1,6 +1,4 @@
-﻿using System.ComponentModel;
-
-namespace Letter.IO
+﻿namespace Letter.IO
 {
     public static class BinaryOrderConvertorFactory
     {
