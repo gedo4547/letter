@@ -9,12 +9,8 @@ namespace Letter.Tcp
         protected void Connected(ITcpSession session)
         {
             List<ITcpChannel> channels = this.GetChannelList();
-            
-            
-            
-            
+            TcpTransport transport = new TcpTransport(session, channels);
         }
-
         
         public override Task StopAsync()
         {
