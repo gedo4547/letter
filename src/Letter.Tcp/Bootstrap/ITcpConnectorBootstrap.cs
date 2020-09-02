@@ -1,6 +1,6 @@
 ﻿namespace Letter.Tcp
 {
-    public interface ITcpConnectorBootstrap : ITcpBootstrap
+    public interface ITcpConnectorBootstrap : ITcpBootstrap<TcpConnectorOptions>
     {
         
     }

@@ -1,6 +1,6 @@
 ﻿namespace Letter.Tcp
 {
-    public interface ITcpListenerBootstrap : ITcpBootstrap
+    public interface ITcpListenerBootstrap : ITcpBootstrap<TcpListenerOptions>
     {
         
     }

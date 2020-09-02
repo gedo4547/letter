@@ -10,7 +10,7 @@ namespace Letter.Tcp
 {
     class TcpConnector : ATcpNetwork<TcpConnectorOptions>, ITcpConnector
     {
-        public TcpConnector(TcpConnectorOptions options) : base(options)
+        public TcpConnector() : base(new TcpConnectorOptions())
         {
         }
         
@@ -40,7 +40,6 @@ namespace Letter.Tcp
             await socket.ConnectAsync(ipEndPoint);
 
             var session = new TcpSession(
-                socket,
                 this.memoryPool,
                 PipeScheduler.ThreadPool,
                 this.trace,
@@ -48,7 +47,7 @@ namespace Letter.Tcp
                 this.options.MaxWriteBufferSize,
                 this.options.WaitForDataBeforeAllocatingBuffer);
 
-            session.Start();
+            session.Start(socket);
             
             return session;
         }

@@ -119,7 +119,6 @@ namespace Letter.Tcp
                     }
                     
                     var session = new TcpSession(
-                        acceptSocket,
                         memoryPool, 
                         schedulers[schedulerIndex],
                         trace,
@@ -127,7 +126,7 @@ namespace Letter.Tcp
                         options.MaxWriteBufferSize, 
                         options.WaitForDataBeforeAllocatingBuffer);
                     
-                    session.Start();
+                    session.Start(acceptSocket);
                     
                     this.schedulerIndex = (this.schedulerIndex + 1) % this.numSchedulers;
 

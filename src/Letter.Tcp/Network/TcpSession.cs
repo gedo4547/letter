@@ -14,7 +14,7 @@ namespace Letter.Tcp
         private static readonly bool IsMacOS = OSPlatformHelper.IsOSX();
         private static readonly bool IsWindows = OSPlatformHelper.IsWindows();
         
-        public TcpSession(Socket socket,
+        public TcpSession(
             MemoryPool<byte> memoryPool,
             PipeScheduler scheduler,
             ISocketsTrace trace,
@@ -22,7 +22,7 @@ namespace Letter.Tcp
             long? maxWriteBufferSize = null,
             bool waitForData = true)
         {
-            _socket = socket;
+            
             MemoryPool = memoryPool;
             _trace = trace;
             _waitForData = waitForData;
@@ -79,7 +79,7 @@ namespace Letter.Tcp
 
         private int MinAllocBufferSize;
         
-        private readonly Socket _socket;
+        private Socket _socket;
         private readonly ISocketsTrace _trace;
         private readonly TcpSocketReceiver _receiver;
         private readonly TcpSocketSender _sender;
@@ -96,8 +96,9 @@ namespace Letter.Tcp
         public PipeWriter Input => Application.Output;
         public PipeReader Output => Application.Input;
         
-        public void Start()
+        public void Start(Socket socket)
         {
+            _socket = socket;
             _processingTask = StartAsync();
         }
 

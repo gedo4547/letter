@@ -9,9 +9,12 @@ namespace Letter.Tcp
     {
         EndPoint LocalEndPoint { get; }
         EndPoint RemoteEndPoint { get; }
+        
         MemoryPool<byte> MemoryPool { get; }
+        
         IDuplexPipe Transport { get; }
         IDuplexPipe Application { get; }
+        
         CancellationToken ConnectionClosed { get; }
     }
 }
