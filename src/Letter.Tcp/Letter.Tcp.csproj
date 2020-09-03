@@ -9,4 +9,8 @@
       <ProjectReference Include="..\Letter\Letter.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="Bootstrap\Transport" />
+    </ItemGroup>
+
 </Project>

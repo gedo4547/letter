@@ -1,4 +1,5 @@
-﻿using System.Net;
+﻿using System;
+using System.Net;
 using System.Threading.Tasks;
 
 namespace Letter.Tcp
@@ -8,16 +9,24 @@ namespace Letter.Tcp
         public TcpConnectorBootstrap()
         {
              this.connector = TcpNetworkFactory.Connector();
+             this.connector.ConfigureOptions((options) =>
+             {
+                 if (this.optionsFactory == null)
+                 {
+                     throw new NullReferenceException(nameof(this.optionsFactory));
+                 }
+                 
+                 this.optionsFactory(options);
+             });
         }
 
         private ITcpConnector connector;
 
-        public override Task StartAsync(EndPoint point)
+        public override async Task StartAsync(EndPoint point)
         {
             this.connector.Build();
-            
-            
-            return Task.CompletedTask;
+            var session = await this.connector.ConnectAsync(point);
+            base.OnConnect(session);
         }
     }
 }

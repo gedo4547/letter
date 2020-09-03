@@ -15,7 +15,8 @@ namespace Letter
         where TChannel : IChannel<TContext, TReader, TWriter>
         where TTransport : ITransport<TSession, TChannel, TContext, TReader, TWriter>
     {
-        private Action<TOptions> optionsFactory;
+        protected Action<TOptions> optionsFactory;
+        
         private Func<TTransport> transportFactory;
         private List<Func<TChannel>> channelFactorys = new List<Func<TChannel>>();
         
@@ -65,7 +66,21 @@ namespace Letter
             }
             return channels;
         }
-        
+
+        protected TTransport GetTransport()
+        {
+            var transport = this.transportFactory();
+            if (transport == null)
+            {
+                throw new NullReferenceException(nameof(transport));
+            }
+
+            return transport;
+        }
+
+
+
+
         public abstract Task StartAsync(EndPoint point);
 
         public virtual Task StopAsync()
