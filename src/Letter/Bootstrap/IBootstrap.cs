@@ -4,16 +4,20 @@ using System.Threading.Tasks;
 
 namespace Letter
 {
-    public interface IBootstrap<TChannel, TSession, TOptions> 
-        where TSession : ISession
+    public interface IBootstrap<TTransport, TContext, TSession, TOptions, TChannel, TReader, TWriter>
+        where TContext : class, IContext
+        where TReader : struct
+        where TWriter : struct
         where TOptions : IOptions
-        where TChannel : IChannel<TSession>
+        where TSession : ISession
+        where TChannel : IChannel<TContext, TReader, TWriter>
+        where TTransport : ITransport<TSession, TChannel, TContext, TReader, TWriter>
     {
-        void Logger(ISocketsTrace trace);
+        void ConfigureOptions(Action<TOptions> optionsFactory);
 
-        void Options(Action<TOptions> optionsFactory);
+        void ConfigureTransport(Func<TTransport> transportFactory);
         
-        void Channel(Func<TChannel> channelFactory);
+        void ConfigureChannel(Func<TChannel> channelFactory);
 
         Task StartAsync(EndPoint point);
         

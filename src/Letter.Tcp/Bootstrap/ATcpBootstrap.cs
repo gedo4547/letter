@@ -1,20 +1,10 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
+﻿using Letter.IO;
 
 namespace Letter.Tcp
 {
-    public abstract class ATcpBootstrap<TTcpOptions> : ABootstrap<ITcpChannel, ITcpSession, TTcpOptions>, ITcpBootstrap<TTcpOptions>
-        where TTcpOptions : ATcpOptions
+    public abstract class ATcpBootstrap<TOptions> : ABootstrap<ITcpTransport, ITcpContext, ITcpSession,TOptions, ITcpChannel, WrappedStreamReader, WrappedStreamWriter>
+        where TOptions : ATcpOptions
     {
-        protected void Connected(ITcpSession session)
-        {
-            List<ITcpChannel> channels = this.GetChannelList();
-            TcpTransport transport = new TcpTransport(session, channels);
-        }
         
-        public override Task StopAsync()
-        {
-            return base.StopAsync();
-        }
     }
 }

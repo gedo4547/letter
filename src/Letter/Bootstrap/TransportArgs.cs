@@ -1,8 +1,8 @@
 ﻿using System.Buffers;
 
-namespace Letter.Box
+namespace Letter
 {
-    public ref struct MessageArgs
+    public ref struct TransportArgs
     {
         public object item;
         public ReadOnlySequence<byte> sequence;

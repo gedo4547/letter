@@ -5,26 +5,21 @@ using System.Threading.Tasks;
 
 namespace Letter
 {
-    public abstract class ABootstrap<TChannel, TSession, TOptions> : IBootstrap<TChannel, TSession, TOptions>
-        where TSession : ISession
+    public abstract class ABootstrap<TTransport, TContext, TSession, TOptions, TChannel, TReader, TWriter>
+        : IBootstrap<TTransport, TContext, TSession, TOptions, TChannel, TReader, TWriter>
+        where TContext : class, IContext
+        where TReader : struct
+        where TWriter : struct
         where TOptions : IOptions
-        where TChannel : IChannel<TSession>
+        where TSession : ISession
+        where TChannel : IChannel<TContext, TReader, TWriter>
+        where TTransport : ITransport<TSession, TChannel, TContext, TReader, TWriter>
     {
-        protected ISocketsTrace trace;
-        protected Action<TOptions> optionsFactory;
-        protected List<Func<TChannel>> channelFactorys = new List<Func<TChannel>>();
+        private Action<TOptions> optionsFactory;
+        private Func<TTransport> transportFactory;
+        private List<Func<TChannel>> channelFactorys = new List<Func<TChannel>>();
         
-        public void Logger(ISocketsTrace trace)
-        {
-            if (trace == null)
-            {
-                throw new ArgumentNullException(nameof(trace));
-            }
-
-            this.trace = trace;
-        }
-
-        public void Options(Action<TOptions> optionsFactory)
+        public void ConfigureOptions(Action<TOptions> optionsFactory)
         {
             if (optionsFactory == null)
             {
@@ -34,7 +29,17 @@ namespace Letter
             this.optionsFactory = optionsFactory;
         }
 
-        public void Channel(Func<TChannel> channelFactory)
+        public void ConfigureTransport(Func<TTransport> transportFactory)
+        {
+            if (transportFactory == null)
+            {
+                throw new ArgumentNullException(nameof(transportFactory));
+            }
+
+            this.transportFactory = transportFactory;
+        }
+
+        public void ConfigureChannel(Func<TChannel> channelFactory)
         {
             if (channelFactory == null)
             {
@@ -44,43 +49,36 @@ namespace Letter
             this.channelFactorys.Add(channelFactory);
         }
 
-        protected List<TChannel> GetChannelList()
+        protected List<TChannel> GetChannels()
         {
             List<TChannel> channels = new List<TChannel>();
             for (int i = 0; i < this.channelFactorys.Count; i++)
             {
-                var factory = this.channelFactorys[i];
-                var channel = factory();
+                var channelFactory = this.channelFactorys[i];
+                var channel = channelFactory();
                 if (channel == null)
                 {
                     throw new NullReferenceException("channel is null");
                 }
-                
+
                 channels.Add(channel);
             }
             return channels;
         }
-
+        
         public abstract Task StartAsync(EndPoint point);
 
         public virtual Task StopAsync()
         {
-            if (this.trace != null)
-            {
-                this.trace = null;
-            }
-
-            if (this.optionsFactory != null)
-            {
-                this.optionsFactory = null;
-            }
-
+            this.optionsFactory = null;
+            this.transportFactory = null;
+            
             if (this.channelFactorys != null)
             {
                 this.channelFactorys.Clear();
                 this.channelFactorys = null;
             }
-            
+
             return Task.CompletedTask;
         }
     }

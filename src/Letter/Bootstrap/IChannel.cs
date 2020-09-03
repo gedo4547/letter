@@ -2,10 +2,19 @@
 
 namespace Letter
 {
-    public interface IChannel<TSession> where TSession : ISession
+    public interface IChannel<TContext, TReader, TWriter>
+        where TReader : struct
+        where TWriter : struct
+        where TContext : class, IContext
     {
-        void OnTransportActive(TSession session);
-        void OnTransportInactive(TSession session);
-        void OnTransportException(TSession session, Exception ex);
+        void OnTransportActive(TContext context);
+        
+        void OnTransportInactive(TContext context);
+        
+        void OnTransportException(TContext context, Exception ex);
+        
+        void OnTransportRead(TContext context, ref TReader reader, ref TransportArgs args);
+        
+        void OnTransportWrite(TContext context, ref TWriter writer, ref TransportArgs args);
     }
 }

@@ -30,7 +30,7 @@ namespace System.Net.Sockets
 
             foreach (var b in buffer)
             {
-                _bufferList.Add(b.GetArray());
+                _bufferList.Add(b.GetBinaryArray());
             }
 
             return _bufferList;
