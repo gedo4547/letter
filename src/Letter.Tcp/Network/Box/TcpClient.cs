@@ -8,13 +8,16 @@ using System.Threading.Tasks;
 
 namespace Letter.Tcp.Box
 {
-    class TcpClient : ATcpNetwork<TcpConnectorOptions>, ITcpClient
+    class TcpClient : ATcpNetwork<TcpClientOptions>, ITcpClient
     {
-        public TcpClient() : base(new TcpConnectorOptions())
+        public static readonly bool IsMacOS = OSPlatformHelper.IsOSX();
+        public static readonly bool IsWindows = OSPlatformHelper.IsWindows();
+        
+        public TcpClient() : base(new TcpClientOptions())
         {
         }
         
-        public string Id { get; }
+        public string Id { get; private set; }
         public EndPoint LocalAddress { get; private set; }
         public EndPoint RemoteAddress { get; private set; }
         public IDuplexPipe Transport { get; private set; }
@@ -41,7 +44,7 @@ namespace Letter.Tcp.Box
         public PipeReader Output => Application.Input;
         
         
-        public void SetConnectSocket(Socket socket, PipeScheduler scheduler)
+        public void Start(Socket socket, PipeScheduler scheduler)
         {
             if (socket is null)
             {
@@ -96,6 +99,8 @@ namespace Letter.Tcp.Box
 
         private void Run()
         {
+            this.Id = IdGeneratorHelper.GetNextId();
+            
             _processingTask = StartAsync();
         }
 
@@ -360,5 +365,25 @@ namespace Letter.Tcp.Box
         {
             return base.DisposeAsync();
         }
+        
+        
+        protected static bool IsConnectionResetError(SocketError errorCode)
+        {
+            // A connection reset can be reported as SocketError.ConnectionAborted on Windows.
+            // ProtocolType can be removed once https://github.com/dotnet/corefx/issues/31927 is fixed.
+            return errorCode == SocketError.ConnectionReset ||
+                   errorCode == SocketError.Shutdown ||
+                   (errorCode == SocketError.ConnectionAborted && IsWindows) ||
+                   (errorCode == SocketError.ProtocolType && IsMacOS);
+        }
+
+        protected static bool IsConnectionAbortError(SocketError errorCode)
+        {
+            // Calling Dispose after ReceiveAsync can cause an "InvalidArgument" error on *nix.
+            return errorCode == SocketError.OperationAborted ||
+                   errorCode == SocketError.Interrupted ||
+                   (errorCode == SocketError.InvalidArgument && !IsWindows);
+        }
+        
     }
 }

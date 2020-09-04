@@ -34,7 +34,6 @@ namespace tcp_test1
                 });
                 client.Build();
                 await client.ConnectAsync(address);
-
             }
 
             Console.ReadKey();

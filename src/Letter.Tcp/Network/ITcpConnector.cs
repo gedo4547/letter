@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 
 namespace Letter.Tcp
 {
-    public interface ITcpConnector : ITcpNetwork<TcpConnectorOptions>
+    public interface ITcpConnector : ITcpNetwork<TcpClientOptions>
     {
         ValueTask<ITcpSession> ConnectAsync(EndPoint endpoint, CancellationToken cancellationToken = default);
     }

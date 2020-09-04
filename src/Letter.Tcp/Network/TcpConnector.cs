@@ -8,9 +8,9 @@ using System.Threading.Tasks;
 
 namespace Letter.Tcp
 {
-    class TcpConnector : ATcpNetwork<TcpConnectorOptions>, ITcpConnector
+    class TcpConnector : ATcpNetwork<TcpClientOptions>, ITcpConnector
     {
-        public TcpConnector() : base(new TcpConnectorOptions())
+        public TcpConnector() : base(new TcpClientOptions())
         {
         }
         

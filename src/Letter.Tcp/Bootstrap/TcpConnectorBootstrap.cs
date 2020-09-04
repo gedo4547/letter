@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 
 namespace Letter.Tcp
 {
-    public sealed class TcpConnectorBootstrap : ATcpBootstrap<TcpConnectorOptions>, ITcpConnectorBootstrap
+    public sealed class TcpConnectorBootstrap : ATcpBootstrap<TcpClientOptions>, ITcpConnectorBootstrap
     {
         public TcpConnectorBootstrap()
         {

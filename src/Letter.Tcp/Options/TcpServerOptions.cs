@@ -2,7 +2,7 @@
 
 namespace Letter.Tcp
 {
-    public sealed class TcpListenerOptions : ATcpOptions
+    public sealed class TcpServerOptions : ATcpOptions
     {
         /// <summary>
         /// The number of I/O queues used to process requests. Set to 0 to directly schedule I/O to the ThreadPool.

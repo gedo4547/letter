@@ -8,9 +8,9 @@ using System.Threading.Tasks;
 
 namespace Letter.Tcp.Box
 {
-    class TcpServer : ATcpNetwork<TcpListenerOptions>, ITcpServer
+    class TcpServer : ATcpNetwork<TcpServerOptions>, ITcpServer
     {
-        public TcpServer() : base(new TcpListenerOptions())
+        public TcpServer() : base(new TcpServerOptions())
         {
         }
 
@@ -111,7 +111,7 @@ namespace Letter.Tcp.Box
                     TcpClient client = new TcpClient();
                     client.ConfigureOptions(this.OnConfigureClientOptions);
                     client.Build();
-                    client.SetConnectSocket(acceptSocket, this.schedulers[schedulerIndex]);
+                    client.Start(acceptSocket, this.schedulers[this.schedulerIndex]);
                     
                     this.schedulerIndex = (this.schedulerIndex + 1) % this.numSchedulers;
 
@@ -132,7 +132,7 @@ namespace Letter.Tcp.Box
             }
         }
 
-        private void OnConfigureClientOptions(TcpConnectorOptions options)
+        private void OnConfigureClientOptions(TcpClientOptions options)
         {
             options.WaitForDataBeforeAllocatingBuffer = this.options.WaitForDataBeforeAllocatingBuffer;
             options.MaxReadBufferSize = this.options.MaxReadBufferSize;
@@ -144,7 +144,7 @@ namespace Letter.Tcp.Box
 
         public override ValueTask CloseAsync(CancellationToken cancellationToken = default)
         {
-            if (listenSocket != null)
+            if (this.listenSocket != null)
             {
                 this.listenSocket.Dispose();
                 this.listenSocket = null;
@@ -162,6 +162,7 @@ namespace Letter.Tcp.Box
         public override async ValueTask DisposeAsync()
         {
             await CloseAsync();
+            
             this.memoryPool.Dispose();
         }
     }

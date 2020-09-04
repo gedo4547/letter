@@ -7,7 +7,7 @@ using Letter.Box;
 
 namespace Letter.Tcp.Box
 {
-    public interface ITcpClient : IClient<TcpConnectorOptions>
+    public interface ITcpClient : IClient<TcpClientOptions>
     {
         IDuplexPipe Transport { get; }
         MemoryPool<byte> MemoryPool { get; }
