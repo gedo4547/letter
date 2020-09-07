@@ -3,10 +3,11 @@ using System.Buffers;
 using System.IO.Pipelines;
 using System.Net;
 using System.Net.Sockets;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Letter.Tcp.Box
+namespace Letter.Tcp
 {
     class TcpClient : ATcpNetwork<TcpClientOptions>, ITcpClient
     {
@@ -24,11 +25,14 @@ namespace Letter.Tcp.Box
         public IDuplexPipe Application { get; private set; }
         public MemoryPool<byte> MemoryPool { get; private set; }
 
+        private Action<Exception> onException;
+        
+        
         private Socket connectSocket;
-        private bool waitForData;
-        private int minAllocBufferSize;
         private TcpSocketReceiver receiver;
         private TcpSocketSender sender;
+        private bool waitForData;
+        private int minAllocBufferSize;
         
         private Task _processingTask;
         private readonly CancellationTokenSource _connectionClosedTokenSource = new CancellationTokenSource();
@@ -43,7 +47,16 @@ namespace Letter.Tcp.Box
         public PipeWriter Input => Application.Output;
         public PipeReader Output => Application.Input;
         
-        
+        public void AddExceptionListener(Action<Exception> onException)
+        {
+            if (onException == null)
+            {
+                throw new ArgumentNullException(nameof(onException));
+            }
+
+            this.onException += onException;
+        }
+
         public void Start(Socket socket, PipeScheduler scheduler)
         {
             if (socket is null)
@@ -121,7 +134,11 @@ namespace Letter.Tcp.Box
             }
             catch (Exception ex)
             {
+                StringBuilder sb = new StringBuilder();
+                sb.AppendLine($"Unexpected exception in {nameof(TcpClient)}.{nameof(StartAsync)}.");
+                sb.AppendLine(ex.ToString());
                 // _trace.LogError(0, ex, $"Unexpected exception in {nameof(TcpSession)}.{nameof(StartAsync)}.");
+                this.onException?.Invoke(new Exception(sb.ToString()));
             }
         }
 
@@ -138,7 +155,7 @@ namespace Letter.Tcp.Box
                 error = new ConnectionResetException(ex.Message, ex);
                 if (!_socketDisposed)
                 {
-                    // _trace.ConnectionReset(this.Id);
+                    this.onException?.Invoke(error);
                 }
             }
             catch (Exception ex) when ((ex is SocketException socketEx && IsConnectionAbortError(socketEx.SocketErrorCode)) || ex is ObjectDisposedException)
@@ -149,14 +166,14 @@ namespace Letter.Tcp.Box
                 if (!_socketDisposed)
                 {
                     // This is unexpected if the socket hasn't been disposed yet.
-                    // _trace.ConnectionError(this.Id, error);
+                    this.onException?.Invoke(error);
                 }
             }
             catch (Exception ex)
             {
                 // This is unexpected.
                 error = ex;
-                // _trace.ConnectionError(this.Id, error);
+                this.onException?.Invoke(error);
             }
             finally
             {
@@ -180,36 +197,31 @@ namespace Letter.Tcp.Box
                     // Wait for data before allocating a buffer.
                     await receiver.WaitForDataAsync();
                 }
-
                 // Ensure we have some reasonable amount of buffer space
                 var buffer = input.GetMemory(minAllocBufferSize);
-
                 var bytesReceived = await receiver.ReceiveAsync(buffer);
-
                 if (bytesReceived == 0)
                 {
                     // FIN
-                    // _trace.ConnectionReadFin(this.Id);
+                    this.onException?.Invoke(new ConnectionReadFinException());
                     break;
                 }
 
                 input.Advance(bytesReceived);
-
                 var flushTask = input.FlushAsync();
-
-                var paused = !flushTask.IsCompleted;
-
-                if (paused)
-                {
-                    // _trace.ConnectionPause(this.Id);
-                }
+                // var paused = !flushTask.IsCompleted;
+                //
+                // if (paused)
+                // {
+                //     // _trace.ConnectionPause(this.Id);
+                // }
 
                 var result = await flushTask;
 
-                if (paused)
-                {
-                    // _trace.ConnectionResume(this.Id);
-                }
+                // if (paused)
+                // {
+                //     // _trace.ConnectionResume(this.Id);
+                // }
 
                 if (result.IsCompleted || result.IsCanceled)
                 {
@@ -231,7 +243,7 @@ namespace Letter.Tcp.Box
             catch (SocketException ex) when (IsConnectionResetError(ex.SocketErrorCode))
             {
                 shutdownReason = new ConnectionResetException(ex.Message, ex);
-                // _trace.ConnectionReset(this.Id);
+                this.onException?.Invoke(shutdownReason);
             }
             catch (Exception ex)
                 when ((ex is SocketException socketEx && IsConnectionAbortError(socketEx.SocketErrorCode)) ||
@@ -239,12 +251,13 @@ namespace Letter.Tcp.Box
             {
                 // This should always be ignored since Shutdown() must have already been called by Abort().
                 shutdownReason = ex;
+                this.onException?.Invoke(shutdownReason);
             }
             catch (Exception ex)
             {
                 shutdownReason = ex;
                 unexpectedError = ex;
-                // _trace.ConnectionError(this.Id, unexpectedError);
+                this.onException?.Invoke(ex);
             }
             finally
             {
@@ -358,12 +371,27 @@ namespace Letter.Tcp.Box
 
         public override ValueTask CloseAsync(CancellationToken cancellationToken = default)
         {
-            throw new NotImplementedException();
+            Shutdown(null);
+
+            // Cancel ProcessSends loop after calling shutdown to ensure the correct _shutdownReason gets set.
+            Output.CancelPendingRead();
+
+            return default;
         }
 
-        public override ValueTask DisposeAsync()
+        public override async ValueTask DisposeAsync()
         {
-            return base.DisposeAsync();
+            await base.DisposeAsync();
+            
+            Transport.Input.Complete();
+            Transport.Output.Complete();
+
+            if (_processingTask != null)
+            {
+                await _processingTask;
+            }
+
+            _connectionClosedTokenSource.Dispose();
         }
         
         

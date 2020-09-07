@@ -1,8 +1,6 @@
-﻿using Letter.IO;
-
-namespace Letter.Tcp
+﻿namespace Letter.Tcp
 {
-    public interface ITcpChannel : IChannel<ITcpContext, WrappedStreamReader, WrappedStreamWriter>
+    public interface ITcpChannel
     {
         
     }

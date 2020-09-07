@@ -1,6 +1,6 @@
-﻿using Letter.Box;
+﻿
 
-namespace Letter.Tcp.Box
+namespace Letter.Tcp
 {
     public interface ITcpServer : IServer<TcpServerOptions, TcpClientOptions, ITcpClient>
     {

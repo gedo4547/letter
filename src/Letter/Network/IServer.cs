@@ -2,7 +2,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Letter.Box
+namespace Letter
 {
     public interface IServer<TServerOptions, TClientOptions, TClient> : INetwork<TServerOptions>
         where TServerOptions : class, IOptions

@@ -1,8 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Net;
 using System.Threading.Tasks;
 using Letter.Tcp;
-using Letter.Tcp.Box;
 
 namespace tcp_test1
 {
@@ -24,8 +24,9 @@ namespace tcp_test1
             Task.Run(OnRun);
 
             System.Threading.Thread.Sleep(2 * 1000);
-
-            for (int i = 0; i < 5000; i++)
+            Console.WriteLine("开始连接");
+            List<ITcpClient> clients = new List<ITcpClient>();
+            for (int i = 0; i < 1; i++)
             {
                 var client = TcpNetworkFactory.Client();
                 client.ConfigureOptions((options) =>
@@ -34,8 +35,18 @@ namespace tcp_test1
                 });
                 client.Build();
                 await client.ConnectAsync(address);
+                clients.Add(client);
             }
 
+            
+            System.Threading.Thread.Sleep(5 * 1000);
+            Console.WriteLine("开始关闭");
+            for (int i = 0; i < clients.Count; i++)
+            {
+                await clients[i].CloseAsync();
+            }
+            
+            
             Console.ReadKey();
         }
 
@@ -45,9 +56,16 @@ namespace tcp_test1
             while (true)
             {
                 var c = await server.AcceptAsync();
+                c.AddExceptionListener(OnServerClientException);
+                
                 num ++;
                 Console.WriteLine("lianjie        " + num);
             }
+        }
+
+        private static void OnServerClientException(Exception ex)
+        {
+            Console.WriteLine(">OnServerClientException>>>"+ ex.ToString());
         }
     }
 }

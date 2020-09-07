@@ -1,11 +1,10 @@
 ﻿namespace Letter.Tcp
 {
-    abstract class ATcpNetwork<TTcpOptions> : ANetwork<TTcpOptions>, ITcpNetwork<TTcpOptions>
+    abstract class ATcpNetwork<TTcpOptions> : ANetwork<TTcpOptions>
         where TTcpOptions : ATcpOptions
     {
-        public ATcpNetwork(TTcpOptions options) : base(options)
+        protected ATcpNetwork(TTcpOptions options) : base(options)
         {
-            
         }
     }
 }

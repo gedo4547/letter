@@ -1,16 +1,15 @@
 ﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Letter
 {
-    public interface INetwork<TOptions> where TOptions : class, IOptions
+    public interface INetwork<TOptions> : IAsyncDisposable where TOptions : class, IOptions
     {
-        void ConfigureLogger(ISocketsTrace trace);
-        
         void ConfigureOptions(Action<TOptions> optionsFactory);
         
         void Build();
         
-        Task StopAsync();
+        ValueTask CloseAsync(CancellationToken cancellationToken = default);
     }
 }

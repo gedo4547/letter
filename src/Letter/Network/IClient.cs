@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Net;
 
-namespace Letter.Box
+namespace Letter
 {
     public interface IClient<TOptions> : INetwork<TOptions>, IAsyncDisposable
         where TOptions : class, IOptions
@@ -11,5 +11,7 @@ namespace Letter.Box
         EndPoint LocalAddress { get; }
         
         EndPoint RemoteAddress { get; }
+
+        void AddExceptionListener(Action<Exception> onException);
     }
 }

@@ -8,12 +8,14 @@ using System.Threading.Tasks;
 
 namespace Letter.Tcp
 {
-    class TcpListener : ATcpNetwork<TcpServerOptions>, ITcpListener
+    class TcpServer : ATcpNetwork<TcpServerOptions>, ITcpServer
     {
-        public TcpListener() : base(new TcpServerOptions())
+        public TcpServer() : base(new TcpServerOptions())
         {
         }
 
+        public EndPoint BindAddress { get; private set; }
+        
         private Socket listenSocket;
         private SafeSocketHandle socketHandle;
         private MemoryPool<byte> memoryPool;
@@ -22,8 +24,6 @@ namespace Letter.Tcp
         private int schedulerIndex;
         private PipeScheduler[] schedulers;
 
-        public EndPoint EndPoint { get; private set; }
-        
         public override void Build()
         {
             base.Build();
@@ -48,7 +48,7 @@ namespace Letter.Tcp
                 schedulers = directScheduler;
             }
         }
-
+        
         public void Bind(EndPoint point)
         {
             if (this.listenSocket != null)
@@ -56,10 +56,9 @@ namespace Letter.Tcp
                 throw new InvalidOperationException(SocketsStrings.TransportAlreadyBound);
             }
 
-            EndPoint = point;
+            this.BindAddress = point;
             Socket listenSocket;
-
-            switch (EndPoint)
+            switch (this.BindAddress)
             {
                 case FileHandleEndPoint fileHandle:
                     this.socketHandle = new SafeSocketHandle((IntPtr)fileHandle.FileHandle, ownsHandle: true);
@@ -71,16 +70,11 @@ namespace Letter.Tcp
                     break;
                 case IPEndPoint ip:
                     listenSocket = new Socket(ip.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
-
-                    // Kestrel expects IPv6Any to bind to both IPv6 and IPv4
-                    if (ip.Address == IPAddress.IPv6Any)
-                    {
-                        listenSocket.DualMode = true;
-                    }
+                    if (ip.Address == IPAddress.IPv6Any) listenSocket.DualMode = true;
                     BindSocket();
                     break;
                 default:
-                    listenSocket = new Socket(EndPoint.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
+                    listenSocket = new Socket(this.BindAddress.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
                     BindSocket();
                     break;
             }
@@ -89,7 +83,7 @@ namespace Letter.Tcp
             {
                 try
                 {
-                    listenSocket.Bind(EndPoint);
+                    listenSocket.Bind(this.BindAddress);
                 }
                 catch (SocketException e) when (e.SocketErrorCode == SocketError.AddressAlreadyInUse)
                 {
@@ -97,79 +91,79 @@ namespace Letter.Tcp
                 }
             }
 
-            EndPoint = listenSocket.LocalEndPoint;
-
+            this.BindAddress = listenSocket.LocalEndPoint;
             listenSocket.Listen(this.options.Backlog);
-
             this.listenSocket = listenSocket;
         }
 
-        public async ValueTask<ITcpSession> AcceptAsync(CancellationToken cancellationToken = default)
+        public async ValueTask<ITcpClient> AcceptAsync(CancellationToken cancellationToken = default)
         {
             while (true)
             {
                 try
                 {
                     var acceptSocket = await this.listenSocket.AcceptAsync();
-
-                    // Only apply no delay to Tcp based endpoints
                     if (acceptSocket.LocalEndPoint is IPEndPoint)
                     {
                         acceptSocket.NoDelay = this.options.NoDelay;
                     }
                     
-                    var session = new TcpSession(
-                        memoryPool, 
-                        schedulers[schedulerIndex],
-                        trace,
-                        options.MaxReadBufferSize, 
-                        options.MaxWriteBufferSize, 
-                        options.WaitForDataBeforeAllocatingBuffer);
-                    
-                    session.Start(acceptSocket);
+                    TcpClient client = new TcpClient();
+                    client.ConfigureOptions(this.OnConfigureClientOptions);
+                    client.Build();
+                    client.Start(acceptSocket, this.schedulers[this.schedulerIndex]);
                     
                     this.schedulerIndex = (this.schedulerIndex + 1) % this.numSchedulers;
 
-                    return session;
+                    return client;
                 }
                 catch (ObjectDisposedException)
                 {
-                    // A call was made to UnbindAsync/DisposeAsync just return null which signals we're done
                     return null;
                 }
                 catch (SocketException e) when (e.SocketErrorCode == SocketError.OperationAborted)
                 {
-                    // A call was made to UnbindAsync/DisposeAsync just return null which signals we're done
                     return null;
                 }
                 catch (SocketException)
                 {
                     // The connection got reset while it was in the backlog, so we try again.
-                    this.trace.ConnectionReset(connectionId: "(null)");
                 }
             }
         }
 
-        public ValueTask UnbindAsync(CancellationToken cancellationToken = default)
+        private void OnConfigureClientOptions(TcpClientOptions options)
         {
-            this.listenSocket?.Dispose();
+            options.WaitForDataBeforeAllocatingBuffer = this.options.WaitForDataBeforeAllocatingBuffer;
+            options.MaxReadBufferSize = this.options.MaxReadBufferSize;
+            options.MaxWriteBufferSize = this.options.MaxWriteBufferSize;
+            options.MemoryPoolFactory = this.ClientMemoryPoolFactory;
+        }
+        
+        private MemoryPool<byte> ClientMemoryPoolFactory() => this.memoryPool;
 
-            this.socketHandle?.Dispose();
-            
+        public override ValueTask CloseAsync(CancellationToken cancellationToken = default)
+        {
+            if (this.listenSocket != null)
+            {
+                this.listenSocket.Dispose();
+                this.listenSocket = null;
+            }
+
+            if (this.socketHandle != null)
+            {
+                this.socketHandle.Dispose();
+                this.socketHandle = null;
+            }
+
             return default;
         }
 
-        public override Task StopAsync()
+        public override async ValueTask DisposeAsync()
         {
-            this.listenSocket?.Dispose();
-
-            this.socketHandle?.Dispose();
-
-            // Dispose the memory pool
+            await CloseAsync();
+            
             this.memoryPool.Dispose();
-            
-            
-            return base.StopAsync();
         }
     }
 }

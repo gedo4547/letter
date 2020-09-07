@@ -1,9 +1,11 @@
 ﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Letter
 {
-    public abstract class ANetwork<TOptions> : INetwork<TOptions> where TOptions : class, IOptions
+    public abstract class ANetwork<TOptions> : INetwork<TOptions>
+        where TOptions : class, IOptions
     {
         public ANetwork(TOptions options)
         {
@@ -14,23 +16,10 @@ namespace Letter
 
             this.options = options;
         }
-
-        protected TOptions options;
-        protected ISocketsTrace trace; 
         
+        protected TOptions options;
         private Action<TOptions> optionsFactory;
-
-
-        public void ConfigureLogger(ISocketsTrace trace)
-        {
-            if (trace == null)
-            {
-                throw new ArgumentNullException(nameof(trace));
-            }
-
-            this.trace = trace;
-        }
-
+        
         public void ConfigureOptions(Action<TOptions> optionsFactory)
         {
             if (optionsFactory == null)
@@ -51,12 +40,14 @@ namespace Letter
             this.optionsFactory(this.options);
         }
 
-        public virtual Task StopAsync()
+        public abstract ValueTask CloseAsync(CancellationToken cancellationToken = default);
+
+        public virtual ValueTask DisposeAsync()
         {
             this.options = null;
             this.optionsFactory = null;
-            
-            return Task.CompletedTask;
+
+            return default;
         }
     }
 }
