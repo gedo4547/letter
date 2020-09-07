@@ -1,10 +1,11 @@
-﻿using System.Buffers;
+﻿using System;
+using System.Buffers;
 using System.Net;
 using System.Threading.Tasks;
 
 namespace Letter
 {
-    public interface IContext
+    public interface IContext : IAsyncDisposable
     {
         string Id { get; }
 

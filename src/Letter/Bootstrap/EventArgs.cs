@@ -2,9 +2,9 @@
 
 namespace Letter
 {
-    public ref struct TransportArgs
+    public ref struct EventArgs
     {
         public object item;
-        public ReadOnlySequence<byte> sequence;
+        public ReadOnlySequence<byte> buffer;
     }
 }

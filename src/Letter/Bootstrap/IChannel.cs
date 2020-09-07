@@ -13,8 +13,8 @@ namespace Letter
         
         void OnTransportException(TContext context, Exception ex);
         
-        void OnTransportRead(TContext context, ref TReader reader, ref TransportArgs args);
+        void OnTransportRead(TContext context, ref TReader reader, ref EventArgs args);
         
-        void OnTransportWrite(TContext context, ref TWriter writer, ref TransportArgs args);
+        void OnTransportWrite(TContext context, ref TWriter writer, ref EventArgs args);
     }
 }
