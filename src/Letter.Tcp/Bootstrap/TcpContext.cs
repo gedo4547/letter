@@ -9,6 +9,13 @@ namespace Letter.Tcp
 {
     public partial class TcpContext : ITcpContext
     {
+        public static TcpContext Get(List<ITcpChannel> channels, BinaryOrder order)
+        {
+            return null;
+        }
+
+
+
         public TcpContext(List<ITcpChannel> channels, BinaryOrder order)
         {
             if (channels == null)
@@ -49,12 +56,14 @@ namespace Letter.Tcp
         {
             this.client = client;
             
+            this.ReaderMemoryPolledIOAsync().NoAwait();
+
             this.OnTransportActive();
         }
 
         public Task WriteAsync(object o)
         {
-            this.SenderMemoryIOAsync(o).ConfigureAwait(false);
+            this.SenderMemoryIOAsync(o).NoAwait();
             
             return Task.CompletedTask;
         }
@@ -63,7 +72,7 @@ namespace Letter.Tcp
         {
             ReadOnlySequence<byte> sequence = new ReadOnlySequence<byte>(buffer, offset, count);
 
-            this.SenderMemoryIOAsync(ref sequence).ConfigureAwait(false);
+            this.SenderMemoryIOAsync(ref sequence).NoAwait();
             
             return Task.CompletedTask;
         }
