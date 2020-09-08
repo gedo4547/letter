@@ -5,7 +5,7 @@ using Letter.IO;
 namespace Letter.Tcp
 {
     public interface ITcpBootstrap<TOptions> : IBootstrap<TOptions, ITcpChannel, ITcpContext, WrappedStreamReader, WrappedStreamWriter>
-        where TOptions : IOptions
+        where TOptions : ATcpOptions
     {
         Task StartAsync(EndPoint point);
     }

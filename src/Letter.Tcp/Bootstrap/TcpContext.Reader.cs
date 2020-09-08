@@ -32,7 +32,7 @@ namespace Letter.Tcp
                 }
                 catch (Exception e)
                 {
-                    // this.listener.OnException(e);
+                    this.OnTransportException(e);
                     break;
                 }
             }
@@ -43,12 +43,12 @@ namespace Letter.Tcp
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private void ReaderMemoryIO(ref ReadOnlySequence<byte> buffer)
         {
-            // var reader = new WrappedStreamReader(
-            //     this.Input,
-            //     ref buffer,
-            //     ref this.order);
-            //
-            // this.listener.OnChannelRead(null, ref reader);
+            var reader = new WrappedStreamReader(
+                this.Input,
+                ref buffer,
+                ref this.order);
+            
+            this.OnTransportRead(ref reader);
         }
     }
 }

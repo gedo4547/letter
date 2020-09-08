@@ -1,11 +1,25 @@
-﻿using System.Buffers;
+﻿using System;
+using System.Buffers;
+using System.Collections.Generic;
 using System.Net;
 using System.Threading.Tasks;
+using Letter.IO;
 
 namespace Letter.Tcp
 {
     public partial class TcpContext : ITcpContext
     {
+        public TcpContext(List<ITcpChannel> channels, BinaryOrder order)
+        {
+            if (channels == null)
+            {
+                throw new ArgumentNullException(nameof(channels));
+            }
+
+            this.order = order;
+            this.channels = channels;
+        }
+        
         public string Id
         {
             get { return this.client.Id; }
@@ -26,31 +40,43 @@ namespace Letter.Tcp
             get { return this.client.MemoryPool; }
         }
 
+        private BinaryOrder order;
+
         private ITcpClient client;
+        private List<ITcpChannel> channels;
         
         public void Initialize(ITcpClient client)
         {
             this.client = client;
+            
+            this.OnTransportActive();
         }
 
         public Task WriteAsync(object o)
         {
-            throw new System.NotImplementedException();
+            this.SenderMemoryIOAsync(o).ConfigureAwait(false);
+            
+            return Task.CompletedTask;
         }
 
         public Task WriteAsync(byte[] buffer, int offset, int count)
         {
-            throw new System.NotImplementedException();
+            ReadOnlySequence<byte> sequence = new ReadOnlySequence<byte>(buffer, offset, count);
+
+            this.SenderMemoryIOAsync(ref sequence).ConfigureAwait(false);
+            
+            return Task.CompletedTask;
         }
         
-        public Task CloseAsync()
+        public async Task CloseAsync()
         {
-            throw new System.NotImplementedException();
+            this.channels.Clear();
+            await this.client.CloseAsync();
         }
         
-        public ValueTask DisposeAsync()
+        public async ValueTask DisposeAsync()
         {
-            throw new System.NotImplementedException();
+            await this.client.DisposeAsync();
         }
     }
 }

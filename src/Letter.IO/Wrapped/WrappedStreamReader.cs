@@ -6,7 +6,7 @@ namespace Letter.IO
 {
     public partial struct WrappedStreamReader
     {
-        internal WrappedStreamReader(PipeReader pipeReader, ref ReadOnlySequence<byte> buffer, ref BinaryOrder order)
+        public WrappedStreamReader(PipeReader pipeReader, ref ReadOnlySequence<byte> buffer, ref BinaryOrder order)
         {
             this.order = order;
             this.buffer = buffer;

@@ -11,9 +11,9 @@ namespace Letter
         where TContext : class, IContext
         where TChannel : IChannel<TContext, TReader, TWriter>
     {
-        protected List<Func<TChannel>> channelFactorys;
-        protected Action<TOptions> optionsFactory;
         
+        protected Action<TOptions> optionsFactory;
+        protected List<Func<TChannel>> channelFactorys = new List<Func<TChannel>>();
         
         public void AddChannel(Func<TChannel> channelFactory)
         {
@@ -34,7 +34,27 @@ namespace Letter
 
             this.optionsFactory = optionsFactory;
         }
-        
+
+        protected List<TChannel> CreateChannels()
+        {
+            List<TChannel> channels = new List<TChannel>();
+            for (int i = 0; i < this.channelFactorys.Count; i++)
+            {
+                var channel = this.channelFactorys[i]();
+                if (channel == null)
+                {
+                    throw new NullReferenceException("The value returned by channelFactorys is null");
+                }
+                
+                channels.Add(channel);
+            }
+
+            return channels;
+        }
+
+
+
+
         public virtual Task StopAsync()
         {
             if (this.channelFactorys != null)

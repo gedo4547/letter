@@ -4,20 +4,22 @@ using System.Threading.Tasks;
 
 namespace Letter.Tcp
 {
-    public class TcpServerBootstrap : ATcpBootstrap<TcpServerOptions>, ITcpServerBootstrap
+    public class TcpServerBootstrap : ATcpBootstrap<TcpServerBootstrapOptions>, ITcpServerBootstrap
     {
         public TcpServerBootstrap()
         {
-             this.server = TcpNetworkFactory.Server();
+             this.server = TcpFactory.Server();
              this.server.ConfigureOptions((options) =>
              {
-                 this.optionsFactory(options);
+                 TcpServerBootstrapOptions bootstrapOptions = new TcpServerBootstrapOptions();
+                 this.optionsFactory(bootstrapOptions);
+                 options = bootstrapOptions;
+                 this.order = bootstrapOptions.Order;
              });
         }
 
         private ITcpServer server;
         
-
         public override Task StartAsync(EndPoint point)
         {
             if (point == null)
@@ -26,7 +28,7 @@ namespace Letter.Tcp
             }
 
             this.server.Build();
-            
+            this.server.Bind(point);
             this.StartAcceptAsync().ConfigureAwait(false);
             
             return Task.CompletedTask;

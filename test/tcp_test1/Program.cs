@@ -13,59 +13,30 @@ namespace tcp_test1
         
         static async Task Main(string[] args)
         {
-            server = TcpNetworkFactory.Server();
-            server.ConfigureOptions((options) =>
+            var server = TcpFactory.ServerBootstrap();
+            server.ConfigurationOptions((options) =>
             {
                 
             });
-            
-            server.Build();
-            server.Bind(address);
-            Task.Run(OnRun);
+            server.AddChannel(() => { return new TcpTestChannel_1("服务器");});
+            server.AddChannel(() => { return new TcpTestChannel_2("服务器");});
+            await server.StartAsync(new IPEndPoint(IPAddress.Loopback, 20001));
 
-            System.Threading.Thread.Sleep(2 * 1000);
-            Console.WriteLine("开始连接");
-            List<ITcpClient> clients = new List<ITcpClient>();
-            for (int i = 0; i < 1; i++)
-            {
-                var client = TcpNetworkFactory.Client();
-                client.ConfigureOptions((options) =>
-                {
-                    
-                });
-                client.Build();
-                await client.ConnectAsync(address);
-                clients.Add(client);
-            }
 
-            
-            System.Threading.Thread.Sleep(5 * 1000);
-            Console.WriteLine("开始关闭");
-            for (int i = 0; i < clients.Count; i++)
+
+            var client = TcpFactory.ClientBootstrap();
+            client.ConfigurationOptions((options) =>
             {
-                await clients[i].CloseAsync();
-            }
+                
+            });
+            client.AddChannel(() => { return new TcpTestChannel_1("客户端");});
+            client.AddChannel(() => { return new TcpTestChannel_2("客户端");});
+            await client.StartAsync(new IPEndPoint(IPAddress.Loopback, 20001));
             
             
             Console.ReadKey();
         }
 
-        private static int num;
-        private static async void OnRun()
-        {
-            while (true)
-            {
-                var c = await server.AcceptAsync();
-                c.AddExceptionListener(OnServerClientException);
-                
-                num ++;
-                Console.WriteLine("lianjie        " + num);
-            }
-        }
-
-        private static void OnServerClientException(Exception ex)
-        {
-            Console.WriteLine(">OnServerClientException>>>"+ ex.ToString());
-        }
+      
     }
 }
