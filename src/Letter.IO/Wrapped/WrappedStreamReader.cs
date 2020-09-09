@@ -1,4 +1,5 @@
 using System.Buffers;
+using System.ComponentModel;
 using System.IO.Pipelines;
 using System.Runtime.CompilerServices;
 
@@ -6,6 +7,7 @@ namespace Letter.IO
 {
     public partial struct WrappedStreamReader
     {
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public WrappedStreamReader(PipeReader pipeReader, ref ReadOnlySequence<byte> buffer, ref BinaryOrder order)
         {
             this.order = order;
@@ -35,6 +37,7 @@ namespace Letter.IO
             get => this.buffer.Length;
         }
 
+        [EditorBrowsable(EditorBrowsableState.Never)]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Flush()
         {

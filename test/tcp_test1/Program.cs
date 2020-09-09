@@ -8,7 +8,7 @@ namespace tcp_test1
 {
     class Program
     {
-        private static ITcpServer server;
+        private static byte[] symbol = {(byte) '\n'};
         private static IPEndPoint address = new IPEndPoint(IPAddress.Loopback, 20001);
         
         static async Task Main(string[] args)
@@ -18,9 +18,9 @@ namespace tcp_test1
             {
                 
             });
-            server.AddChannel(() => { return new TcpTestChannel_1("服务器");});
-            server.AddChannel(() => { return new TcpTestChannel_2("服务器");});
-            await server.StartAsync(new IPEndPoint(IPAddress.Loopback, 20001));
+            server.AddChannel(() => { return new DefaultFixedSymbolChannel(symbol);});
+            server.AddChannel(() => { return new TcpTestChannel_Server("服务器");});
+            await server.StartAsync(address);
 
 
 
@@ -29,9 +29,9 @@ namespace tcp_test1
             {
                 
             });
-            client.AddChannel(() => { return new TcpTestChannel_1("客户端");});
-            client.AddChannel(() => { return new TcpTestChannel_2("客户端");});
-            await client.StartAsync(new IPEndPoint(IPAddress.Loopback, 20001));
+            client.AddChannel(() => { return new DefaultFixedSymbolChannel(symbol);});
+            client.AddChannel(() => { return new TcpTestChannel_Client("客户端");});
+            await client.StartAsync(address);
             
             
             Console.ReadKey();

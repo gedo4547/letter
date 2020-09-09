@@ -43,6 +43,8 @@ namespace Letter.Tcp
             {
                 channel.OnTransportRead(this, ref reader, ref args);
             }
+            
+            reader.Flush();
         }
 
         private void OnTransportWrite(ref WrappedStreamWriter writer, ref ReadOnlySequence<byte> sequence)
@@ -54,6 +56,8 @@ namespace Letter.Tcp
             {
                 channel.OnTransportWrite(this, ref writer, ref args);
             }
+            
+            writer.Flush();
         }
         
         
@@ -66,6 +70,8 @@ namespace Letter.Tcp
             {
                 channel.OnTransportWrite(this, ref writer, ref args);
             }
+            
+            writer.Flush();
         }
     }
 }

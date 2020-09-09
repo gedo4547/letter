@@ -1,5 +1,6 @@
 using System;
 using System.Buffers;
+using System.ComponentModel;
 using System.IO.Pipelines;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
@@ -8,6 +9,7 @@ namespace Letter.IO
 {
     public struct WrappedStreamWriter
     {
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public WrappedStreamWriter(PipeWriter pipeWriter, ref BinaryOrder order)
         {
             this.order = order;
@@ -164,6 +166,7 @@ namespace Letter.IO
         }
 
         //To keep the API consistent
+        [EditorBrowsable(EditorBrowsableState.Never)]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Flush()
         {

@@ -40,16 +40,12 @@ namespace Letter.Tcp
                 ReadOnlySequence<byte> buffer = reader.ReadRange(endPosition);
                 args.buffer = buffer;
             }
-
-            reader.Flush();
         }
 
         public void OnTransportWrite(ITcpContext context, ref WrappedStreamWriter writer, ref EventArgs args)
         {
             writer.Write(ref args.buffer);
             writer.Write(this.symbol);
-            
-            writer.Flush();
         }
     }
 }

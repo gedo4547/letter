@@ -14,8 +14,6 @@ namespace Letter.Tcp
             return null;
         }
 
-
-
         public TcpContext(List<ITcpChannel> channels, BinaryOrder order)
         {
             if (channels == null)
@@ -70,7 +68,7 @@ namespace Letter.Tcp
 
         public Task WriteAsync(byte[] buffer, int offset, int count)
         {
-            ReadOnlySequence<byte> sequence = new ReadOnlySequence<byte>(buffer, offset, count);
+            var sequence = new ReadOnlySequence<byte>(buffer, offset, count);
 
             this.SenderMemoryIOAsync(ref sequence).NoAwait();
             

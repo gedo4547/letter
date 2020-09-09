@@ -8,7 +8,7 @@ namespace Letter.Tcp
     {
         private const int PackHeaderBytesLen = 4;
         
-        public DefaultFixedHeaderChannel(int maxLength)
+        public DefaultFixedHeaderChannel(int maxLength = 4096)
         {
             this.maxLength = maxLength == 0 ? 4096 : maxLength;
         }
@@ -54,13 +54,12 @@ namespace Letter.Tcp
                 {
                     ReadOnlySequence<byte> buffer = reader.ReadRange(this.currentReadLength);
                     args.buffer = buffer;
-
                     this.currentReadLength = PackHeaderBytesLen;
                     this.currentReadPart = PackPart.Head;
                 }
             }
 
-            reader.Flush();
+           
         }
 
         public void OnTransportWrite(ITcpContext context, ref WrappedStreamWriter writer, ref EventArgs args)
@@ -69,10 +68,9 @@ namespace Letter.Tcp
             {
                 throw new Exception("pack length error！！！" + args.buffer.Length);
             }
-
+            
             writer.Write((int)args.buffer.Length);
             writer.Write(ref args.buffer);
-            writer.Flush();
         }
         
         enum PackPart : byte
