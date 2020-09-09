@@ -7,3 +7,11 @@
 /src/Letter.IO/bin
 /src/Letter.Tcp/obj
 /src/Letter.Tcp/bin
+/src/Letter.Kcp/obj
+/src/Letter.Kcp/bin
+/src/Letter.Quic/obj
+/src/Letter.Quic/bin
+/src/Letter.Udp/obj
+/src/Letter.Udp/bin
+/test/tcp_test1/obj
+/test/tcp_test1/bin
