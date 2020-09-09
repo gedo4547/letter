@@ -33,7 +33,6 @@ namespace tcp_test1
 
         public void OnTransportRead(ITcpContext context, ref WrappedStreamReader reader, ref EventArgs args)
         {
-           
             // var span = args.buffer.First.Span;
             // string str = System.Text.Encoding.UTF8.GetString(span);
             
