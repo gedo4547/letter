@@ -5,5 +5,6 @@ namespace Letter.Udp
 {
     public static class UdpFactory
     {
+        
     }
 }

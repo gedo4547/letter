@@ -2,7 +2,7 @@
 
 namespace Letter.Quic
 {
-    public class QuicFactory
+    public static class QuicFactory
     {
     }
 }

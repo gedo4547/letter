@@ -1,7 +1,9 @@
-﻿namespace Letter.Udp.Network
+﻿using System.Net;
+
+namespace Letter.Udp
 {
-    public interface IUdpClient
+    public interface IUdpClient : IClient<UdpClientOptions>
     {
-        
+        void Bind(EndPoint point);
     }
 }

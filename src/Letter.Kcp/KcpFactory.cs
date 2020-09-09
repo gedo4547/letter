@@ -2,7 +2,7 @@
 
 namespace Letter.Kcp
 {
-    public class KcpFactory
+    public static class KcpFactory
     {
     }
 }
