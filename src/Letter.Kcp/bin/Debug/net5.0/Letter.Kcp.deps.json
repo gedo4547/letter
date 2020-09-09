@@ -1,0 +1,23 @@
+{
+  "runtimeTarget": {
+    "name": "net5.0",
+    "signature": ""
+  },
+  "compilationOptions": {},
+  "targets": {
+    "net5.0": {
+      "Letter.Kcp/1.0.0": {
+        "runtime": {
+          "Letter.Kcp.dll": {}
+        }
+      }
+    }
+  },
+  "libraries": {
+    "Letter.Kcp/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    }
+  }
+}

@@ -1,0 +1,8 @@
+F:\letter-github\src\Letter.Quic\bin\Debug\net48\Letter.Quic.dll
+F:\letter-github\src\Letter.Quic\bin\Debug\net48\Letter.Quic.pdb
+F:\letter-github\src\Letter.Quic\obj\Debug\net48\Letter.Quic.csprojAssemblyReference.cache
+F:\letter-github\src\Letter.Quic\obj\Debug\net48\Letter.Quic.AssemblyInfoInputs.cache
+F:\letter-github\src\Letter.Quic\obj\Debug\net48\Letter.Quic.AssemblyInfo.cs
+F:\letter-github\src\Letter.Quic\obj\Debug\net48\Letter.Quic.csproj.CoreCompileInputs.cache
+F:\letter-github\src\Letter.Quic\obj\Debug\net48\Letter.Quic.dll
+F:\letter-github\src\Letter.Quic\obj\Debug\net48\Letter.Quic.pdb

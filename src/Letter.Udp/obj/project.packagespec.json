@@ -1,0 +1,57 @@
+﻿{
+  "version": "1.0.0",
+  "restore": {
+    "projectUniqueName": "F:\\letter-github\\src\\Letter.Udp\\Letter.Udp.csproj",
+    "projectName": "Letter.Udp",
+    "projectPath": "F:\\letter-github\\src\\Letter.Udp\\Letter.Udp.csproj",
+    "outputPath": "F:\\letter-github\\src\\Letter.Udp\\obj\\",
+    "projectStyle": "PackageReference",
+    "fallbackFolders": [
+      "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
+    ],
+    "originalTargetFrameworks": [
+      "net50"
+    ],
+    "sources": {
+      "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+      "https://api.nuget.org/v3/index.json": {}
+    },
+    "frameworks": {
+      "netcoreapp5.0": {
+        "projectReferences": {
+          "F:\\letter-github\\src\\Letter.IO\\Letter.IO.csproj": {
+            "projectPath": "F:\\letter-github\\src\\Letter.IO\\Letter.IO.csproj"
+          },
+          "F:\\letter-github\\src\\Letter\\Letter.csproj": {
+            "projectPath": "F:\\letter-github\\src\\Letter\\Letter.csproj"
+          }
+        }
+      }
+    },
+    "warningProperties": {
+      "warnAsError": [
+        "NU1605"
+      ]
+    }
+  },
+  "frameworks": {
+    "netcoreapp5.0": {
+      "imports": [
+        "net461",
+        "net462",
+        "net47",
+        "net471",
+        "net472",
+        "net48"
+      ],
+      "assetTargetFallback": true,
+      "warn": true,
+      "frameworkReferences": {
+        "Microsoft.NETCore.App": {
+          "privateAssets": "all"
+        }
+      },
+      "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\5.0.100-preview.8.20417.9\\RuntimeIdentifierGraph.json"
+    }
+  }
+}
