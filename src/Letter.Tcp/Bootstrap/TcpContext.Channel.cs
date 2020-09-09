@@ -14,24 +14,30 @@ namespace Letter.Tcp
         
         private void OnTransportActive()
         {
-            foreach (var channel in this.Channels)
+            int length = this.Channels.Count;
+            for (int i = 0; i < length; i++)
             {
+                var channel = this.Channels[i];
                 channel.OnTransportActive(this);
             }
         }
 
         private void OnTransportInactive()
         {
-            foreach (var channel in this.Channels)
+            int length = this.Channels.Count;
+            for (int i = 0; i < length; i++)
             {
+                var channel = this.Channels[i];
                 channel.OnTransportInactive(this);
             }
         }
 
         private void OnTransportException(Exception ex)
         {
-            foreach (var channel in this.Channels)
+            int length = this.Channels.Count;
+            for (int i = 0; i < length; i++)
             {
+                var channel = this.Channels[i];
                 channel.OnTransportException(this, ex);
             }
         }
@@ -39,8 +45,10 @@ namespace Letter.Tcp
         private void OnTransportRead(ref WrappedStreamReader reader)
         {
             EventArgs args = new EventArgs();
-            foreach (var channel in this.Channels)
+            int length = this.Channels.Count;
+            for (int i = 0; i < length; i++)
             {
+                var channel = this.Channels[i];
                 channel.OnTransportRead(this, ref reader, ref args);
             }
             
@@ -52,8 +60,10 @@ namespace Letter.Tcp
             EventArgs args = new EventArgs();
             args.buffer = sequence;
             
-            foreach (var channel in this.Channels)
+            int length = this.Channels.Count;
+            for (int i = 0; i < length; i++)
             {
+                var channel = this.Channels[i];
                 channel.OnTransportWrite(this, ref writer, ref args);
             }
             
@@ -66,8 +76,10 @@ namespace Letter.Tcp
             EventArgs args = new EventArgs();
             args.item = obj;
             
-            foreach (var channel in this.Channels)
+            int length = this.Channels.Count;
+            for (int i = 0; i < length; i++)
             {
+                var channel = this.Channels[i];
                 channel.OnTransportWrite(this, ref writer, ref args);
             }
             
