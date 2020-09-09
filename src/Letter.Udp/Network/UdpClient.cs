@@ -26,6 +26,11 @@ namespace Letter.Udp
         public void Bind(EndPoint point)
         {
             this.socket = new Socket(point.AddressFamily, SocketType.Dgram, ProtocolType.Udp);
+            uint IOC_IN = 0x80000000;
+            uint IOC_VENDOR = 0x18000000;
+            uint SIO_UDP_CONNRESET = IOC_IN | IOC_VENDOR | 12;
+            this.socket.IOControl((int)SIO_UDP_CONNRESET, new byte[] { Convert.ToByte(false) }, null);
+            
             this.socket.Bind(point);
         }
         
