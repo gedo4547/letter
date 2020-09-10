@@ -52,8 +52,7 @@ namespace Letter.Tcp
                 }
                 else if (this.currentReadPart == PackPart.Body)
                 {
-                    ReadOnlySequence<byte> buffer = reader.ReadRange(this.currentReadLength);
-                    args.buffer = buffer;
+                    args.buffer= reader.ReadRange(this.currentReadLength);
                     this.currentReadLength = PackHeaderBytesLen;
                     this.currentReadPart = PackPart.Head;
                 }

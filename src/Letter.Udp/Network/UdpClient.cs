@@ -23,6 +23,11 @@ namespace Letter.Udp
             throw new NotImplementedException();
         }
 
+        public override void Build()
+        {
+            base.Build();
+        }
+
         public void Bind(EndPoint point)
         {
             this.socket = new Socket(point.AddressFamily, SocketType.Dgram, ProtocolType.Udp);
@@ -33,6 +38,8 @@ namespace Letter.Udp
             
             this.socket.Bind(point);
         }
+        
+        
         
         public override ValueTask CloseAsync(CancellationToken cancellationToken = default)
         {

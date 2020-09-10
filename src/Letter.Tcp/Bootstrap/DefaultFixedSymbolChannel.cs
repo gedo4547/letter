@@ -37,8 +37,7 @@ namespace Letter.Tcp
         {
             while (reader.TryFindPosition(this.symbol, out SequencePosition endPosition))
             {
-                ReadOnlySequence<byte> buffer = reader.ReadRange(endPosition);
-                args.buffer = buffer;
+                args.buffer = reader.ReadRange(endPosition);
             }
         }
 

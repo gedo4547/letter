@@ -51,10 +51,7 @@ namespace Letter
 
             return channels;
         }
-
-
-
-
+        
         public virtual Task StopAsync()
         {
             if (this.channelFactorys != null)
