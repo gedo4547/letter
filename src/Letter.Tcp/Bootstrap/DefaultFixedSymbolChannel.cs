@@ -9,7 +9,7 @@ namespace Letter.Tcp
         public DefaultFixedSymbolChannel(byte[] symbol)
         {
             if (symbol.Length > 8)
-            { 
+            {
                 throw new Exception("Only symbols of length 8 are supported");
             }
             

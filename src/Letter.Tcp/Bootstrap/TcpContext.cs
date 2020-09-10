@@ -14,41 +14,27 @@ namespace Letter.Tcp
             return null;
         }
 
-        public TcpContext(List<ITcpChannel> channels, BinaryOrder order)
+        public TcpContext(TcpChannelGroup channelGroup, BinaryOrder order)
         {
-            if (channels == null)
+            if (channelGroup == null)
             {
-                throw new ArgumentNullException(nameof(channels));
+                throw new ArgumentNullException(nameof(channelGroup));
             }
 
             this.order = order;
-            this.channels = channels;
+            this.channelGroup = channelGroup;
         }
+
+        public string Id => this.client.Id;
+        public EndPoint LoaclAddress => this.client.LocalAddress;
+        public EndPoint RemoteAddress => this.client.RemoteAddress;
+        public MemoryPool<byte> MemoryPool => this.client.MemoryPool;
         
-        public string Id
-        {
-            get { return this.client.Id; }
-        }
-        
-        public EndPoint LoaclAddress 
-        {
-            get { return this.client.LocalAddress; }
-        }
-        
-        public EndPoint RemoteAddress 
-        {
-            get { return this.client.RemoteAddress; }
-        }
-        
-        public MemoryPool<byte> MemoryPool 
-        {
-            get { return this.client.MemoryPool; }
-        }
 
         private BinaryOrder order;
 
         private ITcpClient client;
-        private List<ITcpChannel> channels;
+        private TcpChannelGroup channelGroup;
         
         public void Initialize(ITcpClient client)
         {
@@ -56,7 +42,7 @@ namespace Letter.Tcp
             
             this.ReaderMemoryPolledIOAsync().NoAwait();
 
-            this.OnTransportActive();
+            this.channelGroup.OnTransportActive(this);
         }
 
         public Task WriteAsync(object o)
@@ -77,12 +63,12 @@ namespace Letter.Tcp
         
         public async Task CloseAsync()
         {
-            this.channels.Clear();
             await this.client.CloseAsync();
         }
         
         public async ValueTask DisposeAsync()
         {
+            this.channelGroup.Dispose();
             await this.client.DisposeAsync();
         }
     }

@@ -4,16 +4,23 @@ using System.Threading.Tasks;
 
 namespace Letter
 {
-    public abstract class ABootstrap<TOptions, TChannel, TContext, TReader, TWriter> : IBootstrap<TOptions, TChannel, TContext, TReader, TWriter>
+    public abstract class ABootstrap<TOptions, TChannelGroup, TChannel, TContext, TReader, TWriter> : IBootstrap<TOptions, TChannel, TContext, TReader, TWriter>
         where TOptions: IOptions
         where TReader : struct
         where TWriter : struct
         where TContext : class, IContext
         where TChannel : IChannel<TContext, TReader, TWriter>
+        where TChannelGroup : AChannelGroup<TChannel, TContext, TReader, TWriter>
     {
-        
+        public ABootstrap()
+        {
+            this.channelGroupFactory = new ChannelGroupFactory<TChannelGroup, TChannel, TContext, TReader, TWriter>(this.OnCreateChannelGroup);
+        }
+
+       protected abstract TChannelGroup OnCreateChannelGroup(List<TChannel> channels);
+
         protected Action<TOptions> optionsFactory;
-        protected List<Func<TChannel>> channelFactorys = new List<Func<TChannel>>();
+        protected ChannelGroupFactory<TChannelGroup, TChannel, TContext, TReader, TWriter> channelGroupFactory;
         
         public void AddChannel(Func<TChannel> channelFactory)
         {
@@ -22,7 +29,7 @@ namespace Letter
                 throw new ArgumentNullException(nameof(channelFactory));
             }
 
-            this.channelFactorys.Add(channelFactory);
+            this.channelGroupFactory.AddChannelFactory(channelFactory);
         }
 
         public void ConfigurationOptions(Action<TOptions> optionsFactory)
@@ -34,31 +41,9 @@ namespace Letter
 
             this.optionsFactory = optionsFactory;
         }
-
-        protected List<TChannel> CreateChannels()
-        {
-            List<TChannel> channels = new List<TChannel>();
-            for (int i = 0; i < this.channelFactorys.Count; i++)
-            {
-                var channel = this.channelFactorys[i]();
-                if (channel == null)
-                {
-                    throw new NullReferenceException("The value returned by channelFactorys is null");
-                }
-                
-                channels.Add(channel);
-            }
-
-            return channels;
-        }
         
         public virtual Task StopAsync()
         {
-            if (this.channelFactorys != null)
-            {
-                this.channelFactorys.Clear();
-                this.channelFactorys = null;
-            }
             this.optionsFactory = null;
             
             return Task.CompletedTask;

@@ -26,12 +26,12 @@ namespace Letter.Tcp
                 lock (syncLock)
                 {
                     WrappedStreamWriter writer = new WrappedStreamWriter(this.Output, ref this.order);
-                    this.OnTransportWrite(ref writer, obj);
+                    this.channelGroup.OnTransportWrite(this, ref writer, obj);
                 }
             }
             catch (Exception e)
             {
-                this.OnTransportException(e);
+                this.channelGroup.OnTransportException(this, e);
                 return Task.CompletedTask;
             }
 
@@ -46,12 +46,12 @@ namespace Letter.Tcp
                 lock (syncLock)
                 {
                     WrappedStreamWriter writer = new WrappedStreamWriter(this.Output, ref this.order);
-                    this.OnTransportWrite(ref writer, ref sequence);
+                    this.channelGroup.OnTransportWrite(this, ref writer, ref sequence);
                 }
             }
             catch (Exception e)
             {
-                this.OnTransportException(e);
+                this.channelGroup.OnTransportException(this, e);
                 return Task.CompletedTask;
             }
 

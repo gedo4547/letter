@@ -32,7 +32,7 @@ namespace Letter.Tcp
                 }
                 catch (Exception e)
                 {
-                    this.OnTransportException(e);
+                    this.channelGroup.OnTransportException(this, e);
                     break;
                 }
             }
@@ -48,7 +48,7 @@ namespace Letter.Tcp
                 ref buffer,
                 ref this.order);
             
-            this.OnTransportRead(ref reader);
+            this.channelGroup.OnTransportRead(this, ref reader);
         }
     }
 }
