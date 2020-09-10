@@ -38,6 +38,8 @@ namespace Letter.Tcp
             while (reader.TryFindPosition(this.symbol, out SequencePosition endPosition))
             {
                 args.buffer = reader.ReadRange(endPosition);
+                long length = args.buffer.Length - this.symbol.Length;
+                args.buffer = args.buffer.Slice(0, length);
             }
         }
 
