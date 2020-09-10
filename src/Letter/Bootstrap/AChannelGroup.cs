@@ -55,8 +55,7 @@ namespace Letter
             int count = this.channels.Count;
             for (int i = 0; i < count; i++)
             {
-                var channel = this.channels[i];
-                channel.OnChannelRead(context, ref reader, ref args);
+                this.channels[i].OnChannelRead(context, ref reader, ref args);
             }
         }
         
@@ -68,8 +67,7 @@ namespace Letter
             int count = this.channels.Count;
             for (int i = 0; i < count; i++)
             {
-                var channel = this.channels[i];
-                channel.OnChannelWrite(context, ref writer, ref args);
+                this.channels[i].OnChannelWrite(context, ref writer, ref args);
             }
         }
 
@@ -81,8 +79,7 @@ namespace Letter
             int count = this.channels.Count;
             for (int i = 0; i < count; i++)
             {
-                var channel = this.channels[i];
-                channel.OnChannelWrite(context, ref writer, ref args);
+                this.channels[i].OnChannelWrite(context, ref writer, ref args);
             }
         }
 
