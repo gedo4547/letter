@@ -22,45 +22,45 @@ namespace Letter
 
         private List<TChannel> channels;
 
-        public void OnTransportActive(TContext context)
+        public void OnChannelActive(TContext context)
         {
             int count = channels.Count;
             for (int i = 0; i < count; i++)
             {
-                this.channels[i].OnTransportActive(context);
+                this.channels[i].OnChannelActive(context);
             }
         }
 
-        public void OnTransportInactive(TContext context)
+        public void OnChannelInactive(TContext context)
         {
             int count = channels.Count;
             for (int i = 0; i < count; i++)
             {
-                this.channels[i].OnTransportInactive(context);
+                this.channels[i].OnChannelInactive(context);
             }
         }
         
-        public void OnTransportException(TContext context, Exception ex)
+        public void OnChannelException(TContext context, Exception ex)
         {
             int count = this.channels.Count;
             for (int i = 0; i < count; i++)
             {
-                this.channels[i].OnTransportException(context, ex);
+                this.channels[i].OnChannelException(context, ex);
             }
         }
         
-        public virtual void OnTransportRead(TContext context, ref TReader reader)
+        public virtual void OnChannelRead(TContext context, ref TReader reader)
         {
             EventArgs args = new EventArgs();
             int count = this.channels.Count;
             for (int i = 0; i < count; i++)
             {
                 var channel = this.channels[i];
-                channel.OnTransportRead(context, ref reader, ref args);
+                channel.OnChannelRead(context, ref reader, ref args);
             }
         }
         
-        public virtual void OnTransportWrite(TContext context, ref TWriter writer, ref ReadOnlySequence<byte> sequence)
+        public virtual void OnChannelWrite(TContext context, ref TWriter writer, ref ReadOnlySequence<byte> sequence)
         {
             EventArgs args = new EventArgs();
             args.buffer = sequence;
@@ -69,11 +69,11 @@ namespace Letter
             for (int i = 0; i < count; i++)
             {
                 var channel = this.channels[i];
-                channel.OnTransportWrite(context, ref writer, ref args);
+                channel.OnChannelWrite(context, ref writer, ref args);
             }
         }
 
-        public virtual void OnTransportWrite(TContext context, ref TWriter writer, object obj)
+        public virtual void OnChannelWrite(TContext context, ref TWriter writer, object obj)
         {
             EventArgs args = new EventArgs();
             args.item = obj;
@@ -82,7 +82,7 @@ namespace Letter
             for (int i = 0; i < count; i++)
             {
                 var channel = this.channels[i];
-                channel.OnTransportWrite(context, ref writer, ref args);
+                channel.OnChannelWrite(context, ref writer, ref args);
             }
         }
 

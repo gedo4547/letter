@@ -18,22 +18,22 @@ namespace Letter.Tcp
 
         private byte[] symbol;
 
-        public void OnTransportActive(ITcpContext context)
+        public void OnChannelActive(ITcpContext context)
         {
             
         }
 
-        public void OnTransportInactive(ITcpContext context)
+        public void OnChannelInactive(ITcpContext context)
         {
             
         }
 
-        public void OnTransportException(ITcpContext context, Exception ex)
+        public void OnChannelException(ITcpContext context, Exception ex)
         {
             
         }
 
-        public void OnTransportRead(ITcpContext context, ref WrappedStreamReader reader, ref EventArgs args)
+        public void OnChannelRead(ITcpContext context, ref WrappedStreamReader reader, ref EventArgs args)
         {
             while (reader.TryFindPosition(this.symbol, out SequencePosition endPosition))
             {
@@ -41,7 +41,7 @@ namespace Letter.Tcp
             }
         }
 
-        public void OnTransportWrite(ITcpContext context, ref WrappedStreamWriter writer, ref EventArgs args)
+        public void OnChannelWrite(ITcpContext context, ref WrappedStreamWriter writer, ref EventArgs args)
         {
             writer.Write(ref args.buffer);
             writer.Write(this.symbol);

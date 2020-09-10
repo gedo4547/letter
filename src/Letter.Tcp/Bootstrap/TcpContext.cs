@@ -42,7 +42,7 @@ namespace Letter.Tcp
             
             this.ReaderMemoryPolledIOAsync().NoAwait();
 
-            this.channelGroup.OnTransportActive(this);
+            this.channelGroup.OnChannelActive(this);
         }
 
         public Task WriteAsync(object o)

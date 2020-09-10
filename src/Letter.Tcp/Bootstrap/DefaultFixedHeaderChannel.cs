@@ -17,22 +17,22 @@ namespace Letter.Tcp
         private PackPart currentReadPart = PackPart.Head;
         private int currentReadLength = PackHeaderBytesLen;
 
-        public void OnTransportActive(ITcpContext context)
+        public void OnChannelActive(ITcpContext context)
         {
             
         }
 
-        public void OnTransportInactive(ITcpContext context)
+        public void OnChannelInactive(ITcpContext context)
         {
             
         }
 
-        public void OnTransportException(ITcpContext context, Exception ex)
+        public void OnChannelException(ITcpContext context, Exception ex)
         {
             
         }
 
-        public void OnTransportRead(ITcpContext context, ref WrappedStreamReader reader, ref EventArgs args)
+        public void OnChannelRead(ITcpContext context, ref WrappedStreamReader reader, ref EventArgs args)
         {
             while (true)
             {
@@ -61,7 +61,7 @@ namespace Letter.Tcp
            
         }
 
-        public void OnTransportWrite(ITcpContext context, ref WrappedStreamWriter writer, ref EventArgs args)
+        public void OnChannelWrite(ITcpContext context, ref WrappedStreamWriter writer, ref EventArgs args)
         {
             if (args.buffer.Length > this.maxLength)
             {

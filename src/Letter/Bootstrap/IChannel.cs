@@ -7,14 +7,14 @@ namespace Letter
         where TWriter : struct
         where TContext : class, IContext
     {
-        void OnTransportActive(TContext context);
+        void OnChannelActive(TContext context);
         
-        void OnTransportInactive(TContext context);
+        void OnChannelInactive(TContext context);
         
-        void OnTransportException(TContext context, Exception ex);
+        void OnChannelException(TContext context, Exception ex);
         
-        void OnTransportRead(TContext context, ref TReader reader, ref EventArgs args);
+        void OnChannelRead(TContext context, ref TReader reader, ref EventArgs args);
         
-        void OnTransportWrite(TContext context, ref TWriter writer, ref EventArgs args);
+        void OnChannelWrite(TContext context, ref TWriter writer, ref EventArgs args);
     }
 }

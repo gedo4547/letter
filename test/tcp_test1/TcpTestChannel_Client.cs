@@ -14,34 +14,34 @@ namespace tcp_test1
 
         private string name;
         
-        public void OnTransportActive(ITcpContext context)
+        public void OnChannelActive(ITcpContext context)
         {
-            Console.WriteLine($"--{name}->{nameof(TcpTestChannel_Client)}.{nameof(OnTransportActive)}");
+            Console.WriteLine($"--{name}->{nameof(TcpTestChannel_Client)}.{nameof(OnChannelActive)}");
             byte[] bytes = System.Text.Encoding.UTF8.GetBytes("你好");
             context.WriteAsync(bytes, 0, bytes.Length);
         }
 
-        public void OnTransportInactive(ITcpContext context)
+        public void OnChannelInactive(ITcpContext context)
         {
-            Console.WriteLine($"--{name}->{nameof(TcpTestChannel_Client)}.{nameof(OnTransportInactive)}");
+            Console.WriteLine($"--{name}->{nameof(TcpTestChannel_Client)}.{nameof(OnChannelInactive)}");
         }
 
-        public void OnTransportException(ITcpContext context, Exception ex)
+        public void OnChannelException(ITcpContext context, Exception ex)
         {
-            Console.WriteLine($"--{name}->{nameof(TcpTestChannel_Client)}.{nameof(OnTransportException)}>>{ex}");
+            Console.WriteLine($"--{name}->{nameof(TcpTestChannel_Client)}.{nameof(OnChannelException)}>>{ex}");
         }
 
-        public void OnTransportRead(ITcpContext context, ref WrappedStreamReader reader, ref EventArgs args)
+        public void OnChannelRead(ITcpContext context, ref WrappedStreamReader reader, ref EventArgs args)
         {
             // var span = args.buffer.First.Span;
             // string str = System.Text.Encoding.UTF8.GetString(span);
             
-            Console.WriteLine($"--{name}->{nameof(TcpTestChannel_Client)}.{nameof(OnTransportRead)}>{args.buffer.Length}");
+            Console.WriteLine($"--{name}->{nameof(TcpTestChannel_Client)}.{nameof(OnChannelRead)}>{args.buffer.Length}");
         }
 
-        public void OnTransportWrite(ITcpContext context, ref WrappedStreamWriter writer, ref EventArgs args)
+        public void OnChannelWrite(ITcpContext context, ref WrappedStreamWriter writer, ref EventArgs args)
         {
-            Console.WriteLine($"--{name}->{nameof(TcpTestChannel_Client)}.{nameof(OnTransportWrite)}");
+            Console.WriteLine($"--{name}->{nameof(TcpTestChannel_Client)}.{nameof(OnChannelWrite)}");
         }
     }
 }

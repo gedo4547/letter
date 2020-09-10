@@ -10,21 +10,21 @@ namespace Letter.Tcp
         {
         }
 
-        public override void OnTransportRead(ITcpContext context, ref WrappedStreamReader reader)
+        public override void OnChannelRead(ITcpContext context, ref WrappedStreamReader reader)
         {
-            base.OnTransportRead(context, ref reader);
+            base.OnChannelRead(context, ref reader);
             reader.Flush();
         }
 
-        public override void OnTransportWrite(ITcpContext context, ref WrappedStreamWriter writer, ref ReadOnlySequence<byte> sequence)
+        public override void OnChannelWrite(ITcpContext context, ref WrappedStreamWriter writer, ref ReadOnlySequence<byte> sequence)
         {
-            base.OnTransportWrite(context, ref writer, ref sequence);
+            base.OnChannelWrite(context, ref writer, ref sequence);
             writer.Flush();
         }
 
-        public override void OnTransportWrite(ITcpContext context, ref WrappedStreamWriter writer, object obj)
+        public override void OnChannelWrite(ITcpContext context, ref WrappedStreamWriter writer, object obj)
         {
-            base.OnTransportWrite(context, ref writer, obj);
+            base.OnChannelWrite(context, ref writer, obj);
             writer.Flush();
         }
     }

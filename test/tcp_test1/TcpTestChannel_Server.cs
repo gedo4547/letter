@@ -15,32 +15,32 @@ namespace tcp_test1
 
         private string name;
 
-        public void OnTransportActive(ITcpContext context)
+        public void OnChannelActive(ITcpContext context)
         {
-            Console.WriteLine($"--{name}->{nameof(TcpTestChannel_Server)}.{nameof(OnTransportActive)}");
+            Console.WriteLine($"--{name}->{nameof(TcpTestChannel_Server)}.{nameof(OnChannelActive)}");
         }
 
-        public void OnTransportInactive(ITcpContext context)
+        public void OnChannelInactive(ITcpContext context)
         {
-            Console.WriteLine($"--{name}->{nameof(TcpTestChannel_Server)}.{nameof(OnTransportInactive)}");
+            Console.WriteLine($"--{name}->{nameof(TcpTestChannel_Server)}.{nameof(OnChannelInactive)}");
         }
 
-        public void OnTransportException(ITcpContext context, Exception ex)
+        public void OnChannelException(ITcpContext context, Exception ex)
         {
-            Console.WriteLine($"--{name}->{nameof(TcpTestChannel_Server)}.{nameof(OnTransportException)}>>{ex}");
+            Console.WriteLine($"--{name}->{nameof(TcpTestChannel_Server)}.{nameof(OnChannelException)}>>{ex}");
         }
 
-        public void OnTransportRead(ITcpContext context, ref WrappedStreamReader reader, ref EventArgs args)
+        public void OnChannelRead(ITcpContext context, ref WrappedStreamReader reader, ref EventArgs args)
         {
-            Console.WriteLine($"--{name}->{nameof(TcpTestChannel_Server)}.{nameof(OnTransportRead)}>{args.buffer.Length}");
+            Console.WriteLine($"--{name}->{nameof(TcpTestChannel_Server)}.{nameof(OnChannelRead)}>{args.buffer.Length}");
             var span = args.buffer.First.Span;
             string str = System.Text.Encoding.UTF8.GetString(span);
             Console.WriteLine(str);
         }
 
-        public void OnTransportWrite(ITcpContext context, ref WrappedStreamWriter writer, ref EventArgs args)
+        public void OnChannelWrite(ITcpContext context, ref WrappedStreamWriter writer, ref EventArgs args)
         {
-            Console.WriteLine($"--{name}->{nameof(TcpTestChannel_Server)}.{nameof(OnTransportWrite)}");
+            Console.WriteLine($"--{name}->{nameof(TcpTestChannel_Server)}.{nameof(OnChannelWrite)}");
         }
     }
 }
