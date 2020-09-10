@@ -1,6 +1,6 @@
 ﻿namespace Letter.Udp
 {
-    public class UdpClientOptions : IOptions
+    public interface IUdpContext : IContext
     {
         
     }

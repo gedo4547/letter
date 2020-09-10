@@ -6,7 +6,7 @@ using System.Runtime.InteropServices;
 
 namespace Letter.IO
 {
-    public ref struct WrappedDgramWriter
+    public struct WrappedDgramWriter
     {
         public delegate void MemoryWritePushDelegate(UdpMessageNode node);
         

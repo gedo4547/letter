@@ -3,7 +3,7 @@ using System.Runtime.CompilerServices;
 
 namespace Letter.IO
 {
-    public ref partial struct WrappedDgramReader
+    public partial struct WrappedDgramReader
     {
         internal WrappedDgramReader(ref Memory<byte> memory, ref BinaryOrder order)
         {

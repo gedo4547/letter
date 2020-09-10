@@ -3,7 +3,7 @@ using System.Runtime.CompilerServices;
 
 namespace Letter.IO
 {
-    public ref partial struct WrappedDgramReader
+    public partial struct WrappedDgramReader
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public sbyte ReadInt8()
