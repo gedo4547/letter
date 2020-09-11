@@ -75,9 +75,34 @@ using System.IO.Pipelines;
 
         public void Dispose()
         {
-            memoryPool?.Dispose();
-            headNode?.Dispose();
-            tailNode?.Dispose();
+            if (this.memoryPool != null)
+            {
+                this.memoryPool.Dispose();
+                this.memoryPool = null;
+            }
+
+            if (this.headNode != null)
+            {
+                this.headNode.Dispose();
+                this.headNode = null;
+            }
+
+
+            if (this.tailNode != null)
+            {
+                this.tailNode.Dispose();
+                this.tailNode = null;
+            }
+
+            if (this.nodeStack != null)
+            {
+                while (this.nodeStack.TryPop(out var node))
+                {
+                    node.Dispose();
+                }
+
+                this.nodeStack = null;
+            }
         }
     }
 }
