@@ -5,7 +5,7 @@ using System.Threading;
 
 namespace Letter.IO
 {
-    partial class UdpPipe : IUdpPipeWriter
+    public partial class UdpPipe : IUdpPipeWriter
     {
         public UdpMessageNode GetDgramNode()
         {

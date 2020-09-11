@@ -11,7 +11,7 @@ namespace Letter
         where TOptions: IOptions
         where TContext : class, IContext
     {
-        public ADgramNetwork()
+        public ADgramNetwork(TOptions options) : base(options)
         {
             this.channelGroupFactory = new ChannelGroupFactoryDgramImpl<TContext>(this.OnCreateChannelGroup);
         }

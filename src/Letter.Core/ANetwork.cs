@@ -12,7 +12,18 @@ namespace Letter
         where TChannelGroup : AChannelGroup<TChannel, TContext, TReader, TWriter>
         where TChannelGroupFactory : AChannelGroupFactory<TChannelGroup, TChannel, TContext, TReader, TWriter>
     {
-        protected Action<TOptions> optionsFactory;
+        public ANetwork(TOptions options)
+        {
+            if (options == null)
+            {
+                throw new ArgumentNullException(nameof(options));
+            }
+
+            this.options = options;
+        }
+
+        protected TOptions options;
+        private Action<TOptions> optionsFactory;
         protected abstract TChannelGroupFactory ChannelGroupFactory { get; }
 
         public void AddChannel(Func<TChannel> channelFactory)
@@ -29,6 +40,16 @@ namespace Letter
                 throw new ArgumentNullException(nameof(optionsFactory));
 
             this.optionsFactory = optionsFactory;
+        }
+
+        public void Build()
+        {
+            if (this.optionsFactory == null)
+            {
+                throw new NullReferenceException(nameof(this.optionsFactory));
+            }
+
+            this.optionsFactory(this.options);
         }
 
         public virtual Task CloseAsync()

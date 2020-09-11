@@ -1,0 +1,92 @@
+using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
+
+namespace System.Net.Sockets
+{
+    public static class SocketExtension
+    {
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void SettingReuseAddress(this Socket socket, bool reuseAddress)
+        {
+            socket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, reuseAddress);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void SettingLingerState(this Socket socket, LingerOption option)
+        {
+            socket.LingerState = option;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void SettingKeepAlive(this Socket socket, bool keepAlive)
+        {
+            socket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.KeepAlive, keepAlive);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void SettingNoDelay(this Socket socket, bool noDelay)
+        {
+            socket.NoDelay = noDelay;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void SettingRcvBufferSize(this Socket socket, int rcvBufferSize)
+        {
+            socket.ReceiveBufferSize = rcvBufferSize;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void SettingSndBufferSize(this Socket socket, int sndBufferSize)
+        {
+            socket.SendBufferSize = sndBufferSize;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void SettingRcvTimeout(this Socket socket, int rcvTimeout)
+        {
+            socket.ReceiveTimeout = rcvTimeout;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void SettingSndTimeout(this Socket socket, int sndTimeout)
+        {
+            socket.SendTimeout = sndTimeout;
+        }
+
+
+
+
+        private const int SIO_LOOPBACK_FAST_PATH = -1744830448;
+        private static readonly byte[] Enabled = BitConverter.GetBytes(1);
+
+        /// <summary>
+        /// Enables TCP Loopback Fast Path on a socket.
+        /// See https://blogs.technet.microsoft.com/wincat/2012/12/05/fast-tcp-loopback-performance-and-low-latency-with-windows-server-2012-tcp-loopback-fast-path/
+        /// for more information.
+        /// </summary>
+        /// <param name="socket">The socket for which FastPath should be enabled.</param>
+        public static void EnableTcpFastPath(this Socket socket)
+        {
+            try { socket.NoDelay = true; } catch { }
+
+            if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                return;
+
+            try
+            {
+                // Win8/Server2012+ only
+                var osVersion = Environment.OSVersion.Version;
+                if (osVersion.Major > 6 || osVersion.Major == 6 && osVersion.Minor >= 2)
+                {
+                    socket.IOControl(SIO_LOOPBACK_FAST_PATH, Enabled, null);
+                }
+            }
+            catch
+            {
+                // If the operating system version on this machine did
+                // not support SIO_LOOPBACK_FAST_PATH (i.e. version
+                // prior to Windows 8 / Windows Server 2012), handle the exception
+            }
+        }
+    }
+}

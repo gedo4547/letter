@@ -1,6 +1,6 @@
 ﻿﻿namespace Letter.IO
 {
-    interface IUdpPipeReader
+    public interface IUdpPipeReader
     {
         void ReceiveAsync();
 

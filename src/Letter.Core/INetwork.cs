@@ -14,6 +14,8 @@ namespace Letter
 
         void ConfigurationOptions(Action<TOptions> optionsFactory);
 
+        void Build();
+
         Task CloseAsync();
     }
 }

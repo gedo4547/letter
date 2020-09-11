@@ -3,7 +3,7 @@ using System.Threading;
 
 namespace Letter.IO
 {
-    partial class UdpPipe : IUdpPipeReader
+    public partial class UdpPipe : IUdpPipeReader
     {
         public void ReceiveAsync()
         {

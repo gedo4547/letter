@@ -11,7 +11,7 @@ namespace Letter
         where TOptions : IOptions
         where TContext : class, IContext
     {
-        public AStreamNetwork()
+        public AStreamNetwork(TOptions options) : base(options)
         {
             this.channelGroupFactory = new ChannelGroupFactoryStreamImpl<TContext>(this.OnCreateChannelGroup);
         }

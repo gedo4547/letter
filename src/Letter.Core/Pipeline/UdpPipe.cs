@@ -4,7 +4,7 @@ using System.IO.Pipelines;
 
  namespace Letter.IO
 {
-    partial class UdpPipe : IDisposable
+    public partial class UdpPipe : IDisposable
     {
         internal const int FALSE = 0;
         internal const int TRUE = 1;
