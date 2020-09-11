@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Buffers;
 using Letter.IO;
 
 namespace Letter.Tcp
@@ -37,9 +36,10 @@ namespace Letter.Tcp
         {
             while (reader.TryFindPosition(this.symbol, out SequencePosition endPosition))
             {
-                args.buffer = reader.ReadRange(endPosition);
-                long length = args.buffer.Length - this.symbol.Length;
-                args.buffer = args.buffer.Slice(0, length);
+                var buffer = reader.ReadRange(endPosition);
+                long length = buffer.Length - this.symbol.Length;
+                
+                args.buffer = buffer.Slice(0, length);
             }
         }
 

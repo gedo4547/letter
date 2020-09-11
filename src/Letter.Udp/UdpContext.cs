@@ -13,10 +13,8 @@ namespace Letter.Udp
         {
             this.MemoryPool = memoryPool;
             this.channelGroup = channelGroup;
-            this.pipeline = new UdpPipe(memoryPool, PipeScheduler.ThreadPool, this.OnReceiveBuffer);
+            this.socketPipeline = new UdpPipe(memoryPool, PipeScheduler.ThreadPool, this.OnReceiveBuffer);
         }
-
-       
 
         public string Id
         {
@@ -39,7 +37,7 @@ namespace Letter.Udp
         }
 
         private Socket socket;
-        private UdpPipe pipeline;
+        private UdpPipe socketPipeline;
         private ChannelGroupDgramImpl<IUdpContext> channelGroup;
         
         public void Start(Socket socket)
@@ -57,7 +55,15 @@ namespace Letter.Udp
             throw new System.NotImplementedException();
         }
         
-        
+        public Task WriteAsync(EndPoint remote, object o)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public Task WriteAsync(EndPoint remote, byte[] buffer, int offset, int count)
+        {
+            throw new System.NotImplementedException();
+        }
         
         public Task CloseAsync()
         {
