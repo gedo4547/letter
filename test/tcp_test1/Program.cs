@@ -21,9 +21,7 @@ namespace tcp_test1
             server.AddChannel(() => { return new DefaultFixedSymbolChannel(symbol);});
             server.AddChannel(() => { return new TcpTestChannel_Server("服务器");});
             await server.StartAsync(address);
-
-
-
+            
             var client = TcpFactory.ClientBootstrap();
             client.ConfigurationOptions((options) =>
             {
