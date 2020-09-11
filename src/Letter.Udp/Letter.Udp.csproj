@@ -5,8 +5,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\Letter.IO\Letter.IO.csproj" />
-      <ProjectReference Include="..\Letter\Letter.csproj" />
+      <ProjectReference Include="..\Letter.Core\Letter.Core.csproj" />
     </ItemGroup>
 
 </Project>

@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 
 namespace Letter
 {
-    public abstract class ABootstrap<TOptions, TChannelGroupFactory, TChannelGroup, TChannel, TContext, TReader, TWriter> : IBootstrap<TOptions, TChannel, TContext, TReader, TWriter>
+    public abstract class ANetwork<TOptions, TChannelGroupFactory, TChannelGroup, TChannel, TContext, TReader, TWriter> : INetwork<TOptions, TChannel, TContext, TReader, TWriter>
         where TOptions: IOptions
         where TReader : struct
         where TWriter : struct
@@ -13,12 +13,8 @@ namespace Letter
         where TChannelGroupFactory : AChannelGroupFactory<TChannelGroup, TChannel, TContext, TReader, TWriter>
     {
         protected Action<TOptions> optionsFactory;
+        protected abstract TChannelGroupFactory ChannelGroupFactory { get; }
 
-        protected abstract TChannelGroupFactory ChannelGroupFactory
-        {
-            get;
-        }
-        
         public void AddChannel(Func<TChannel> channelFactory)
         {
             if (channelFactory == null)
@@ -35,11 +31,15 @@ namespace Letter
             this.optionsFactory = optionsFactory;
         }
 
-        public virtual Task StopAsync()
+        public virtual Task CloseAsync()
+        {
+            return Task.CompletedTask;
+        }
+
+        public virtual ValueTask DisposeAsync()
         {
             this.optionsFactory = null;
-            
-            return Task.CompletedTask;
+            return default;
         }
     }
 }

@@ -55,7 +55,7 @@ namespace Letter
 
         public abstract void OnChannelWrite(TContext context, ref TWriter writer, object obj);
 
-        public void Dispose()
+        public virtual void Dispose()
         {
             if (this.channels != null)
             {

@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 
 namespace Letter
 {
-    public interface IBootstrap<TOptions, TChannel, TContext, TReader, TWriter>
+    public interface INetwork<TOptions, TChannel, TContext, TReader, TWriter> : IAsyncDisposable
         where TOptions: IOptions
         where TReader : struct
         where TWriter : struct
@@ -14,6 +14,6 @@ namespace Letter
 
         void ConfigurationOptions(Action<TOptions> optionsFactory);
 
-        Task StopAsync();
+        Task CloseAsync();
     }
 }
