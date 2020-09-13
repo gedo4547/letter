@@ -1,4 +1,5 @@
-﻿using System.Buffers;
+﻿using System;
+using System.Buffers;
 using System.IO.Pipelines;
 using System.Net;
 using System.Net.Sockets;
@@ -13,7 +14,9 @@ namespace Letter.Udp
         {
             this.MemoryPool = memoryPool;
             this.channelGroup = channelGroup;
-            this.socketPipeline = new UdpPipe(memoryPool, PipeScheduler.ThreadPool, this.OnReceiveBuffer);
+
+            this.senderPipeline = new UdpPipe(memoryPool, PipeScheduler.ThreadPool,this.OnSenderPipelineReceiveBuffer);
+            this.receiverPipeline = new UdpPipe(memoryPool, PipeScheduler.ThreadPool, this.OnReceiverPipelineReceiveBuffer);
         }
 
         public string Id
@@ -37,7 +40,9 @@ namespace Letter.Udp
         }
 
         private Socket socket;
-        private UdpPipe socketPipeline;
+        private UdpPipe receiverPipeline;
+        private UdpPipe senderPipeline;
+
         private ChannelGroupDgramImpl<IUdpContext> channelGroup;
         
         public void Start(Socket socket)
@@ -47,12 +52,23 @@ namespace Letter.Udp
             this.LoaclAddress = this.socket.LocalEndPoint;
             this.RemoteAddress = this.socket.RemoteEndPoint;
 
+            this.receiverPipeline.ReceiveAsync();
+            this.senderPipeline.ReceiveAsync();
+
             this.channelGroup.OnChannelActive(this);
         }
-        
-        private void OnReceiveBuffer(IUdpPipeReader reader)
+
+        private void OnSenderPipelineReceiveBuffer(IUdpPipeReader reader)
         {
-            throw new System.NotImplementedException();
+            var node = reader.Read();
+            
+
+            throw new NotImplementedException();
+        }
+
+        private void OnReceiverPipelineReceiveBuffer(IUdpPipeReader reader)
+        {
+            throw new NotImplementedException();
         }
         
         public Task WriteAsync(EndPoint remote, object o)
