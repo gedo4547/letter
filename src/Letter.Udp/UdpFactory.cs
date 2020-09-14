@@ -2,9 +2,6 @@
 {
     public static class UdpFactory
     {
-        public static IUdpClient Client()
-        {
-            return new UdpClient();
-        }
+        public static IUdpClient Client() => new UdpClient();
     }
 }
