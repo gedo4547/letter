@@ -1,10 +1,9 @@
-﻿using Letter.IO;
-
-namespace Letter
+﻿namespace Letter
 {
-    public interface IDgramNetwork<TOptions, TContext> : INetwork<TOptions, IDgramChannel<TContext>, TContext>
+    public interface IDgramNetwork<TOptions, TContext, TChannel> : INetwork<TOptions, TChannel , TContext>
         where TOptions: IOptions
-        where TContext : class, IContext
+        where TContext : IContext
+        where TChannel : IDgramChannel<TContext>
     {
         
     }

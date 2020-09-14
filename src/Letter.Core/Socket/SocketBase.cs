@@ -4,14 +4,27 @@ namespace System.Net.Sockets
 {
     public abstract class SocketBase : IDisposable
     {
-        protected readonly Socket _socket;
-        protected readonly SocketAwaitableEventArgs _awaitableEventArgs;
-
         protected SocketBase(Socket socket, PipeScheduler scheduler)
         {
             _socket = socket;
             _awaitableEventArgs = new SocketAwaitableEventArgs(scheduler);
         }
+        
+        protected readonly Socket _socket;
+        protected readonly SocketAwaitableEventArgs _awaitableEventArgs;
+
+        public EndPoint RemoteAddress
+        {
+            get { return _socket.RemoteEndPoint; }
+        }
+
+        public EndPoint LocalAddress
+        {
+            get { return _socket.LocalEndPoint; }
+        }
+
+
+
 
         public void Dispose() => _awaitableEventArgs.Dispose();
     }

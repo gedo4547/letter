@@ -8,14 +8,14 @@ using Letter.IO;
 
 namespace Letter.Udp
 {
-    //
     public partial class UdpContext : IUdpContext
     {
-        public UdpContext(ChannelGroupDgramImpl<IUdpContext> channelGroup, MemoryPool<byte> memoryPool)
+        public UdpContext(ChannelGroupDgramImpl<IUdpContext, IUdpChannel> channelGroup, MemoryPool<byte> memoryPool)
         {
             this.MemoryPool = memoryPool;
             this.channelGroup = channelGroup;
             this.onMemoryPushEvent = this.OnMemoryWritePush;
+            
             this.senderPipeline = new UdpPipe(memoryPool, PipeScheduler.ThreadPool,this.OnSenderPipelineReceiveBuffer);
             this.receiverPipeline = new UdpPipe(memoryPool, PipeScheduler.ThreadPool, this.OnReceiverPipelineReceiveBuffer);
         }
@@ -34,35 +34,34 @@ namespace Letter.Udp
         private UdpSocketSender sender;
         private WrappedDgramWriter.MemoryWritePushDelegate onMemoryPushEvent;
 
-        private ChannelGroupDgramImpl<IUdpContext> channelGroup;
+        private ChannelGroupDgramImpl<IUdpContext, IUdpChannel> channelGroup;
         
         public void Start(Socket socket)
         {
             this.socket = socket;
             this.LoaclAddress = this.socket.LocalEndPoint;
             this.RemoteAddress = this.socket.RemoteEndPoint;
+            this.receiver = new UdpSocketReceiver(this.socket, PipeScheduler.ThreadPool);
+            this.sender = new UdpSocketSender(this.socket, PipeScheduler.ThreadPool);
+            
+            
 
+            ReaderMemoryPolledIOAsync().NoAwait();
+            
             this.receiverPipeline.ReceiveAsync();
             this.senderPipeline.ReceiveAsync();
 
             this.channelGroup.OnChannelActive(this);
         }
 
-       
-
-        private void OnReceiverPipelineReceiveBuffer(IUdpPipeReader reader)
-        {
-            throw new NotImplementedException();
-        }
-        
         public Task WriteAsync(EndPoint remote, object o)
         {
-            throw new System.NotImplementedException();
+            return this.SenderMemoryIOAsync(remote, o);
         }
 
-        public Task WriteAsync(EndPoint remote, byte[] buffer, int offset, int count)
+        public Task WriteAsync(EndPoint remote, ref ReadOnlySequence<byte> sequence)
         {
-            throw new System.NotImplementedException();
+            return this.SenderMemoryIOAsync(remote, ref sequence);
         }
         
         public Task CloseAsync()

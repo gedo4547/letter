@@ -5,7 +5,7 @@ namespace Letter
 {
     public abstract class ANetwork<TOptions, TChannelGroupFactory, TChannelGroup, TChannel, TContext> : INetwork<TOptions, TChannel, TContext>
         where TOptions: IOptions
-        where TContext : class, IContext
+        where TContext : IContext
         where TChannel : IChannel<TContext>
         where TChannelGroup : AChannelGroup<TChannel, TContext>
         where TChannelGroupFactory : AChannelGroupFactory<TChannelGroup, TChannel, TContext>

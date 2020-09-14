@@ -4,25 +4,25 @@ using Letter.IO;
     
 namespace Letter
 {
-    public abstract class AStreamNetwork<TOptions, TContext> : ANetwork<TOptions, ChannelGroupFactoryStreamImpl<TContext>, ChannelGroupStreamImpl<TContext>, IStreamChannel<TContext>, TContext>, IStreamNetwork<TOptions, TContext>
-    
+    public abstract class AStreamNetwork<TOptions, TContext, TChannel> : ANetwork<TOptions, ChannelGroupFactoryStreamImpl<TContext, TChannel>, ChannelGroupStreamImpl<TContext, TChannel>, TChannel, TContext>, IStreamNetwork<TOptions, TContext, TChannel>
         where TOptions : IOptions
-        where TContext : class, IContext
+        where TContext : IContext
+        where TChannel : IStreamChannel<TContext>
     {
         public AStreamNetwork(TOptions options) : base(options)
         {
-            this.channelGroupFactory = new ChannelGroupFactoryStreamImpl<TContext>(this.OnCreateChannelGroup);
+            this.channelGroupFactory = new ChannelGroupFactoryStreamImpl<TContext, TChannel>(this.OnCreateChannelGroup);
         }
         
-        private ChannelGroupFactoryStreamImpl<TContext> channelGroupFactory;
-        protected override ChannelGroupFactoryStreamImpl<TContext> ChannelGroupFactory
+        private ChannelGroupFactoryStreamImpl<TContext, TChannel> channelGroupFactory;
+        protected override ChannelGroupFactoryStreamImpl<TContext, TChannel> ChannelGroupFactory
         {
             get { return this.channelGroupFactory; }
         }
         
-        private ChannelGroupStreamImpl<TContext> OnCreateChannelGroup(List<IStreamChannel<TContext>> arg)
+        private ChannelGroupStreamImpl<TContext, TChannel> OnCreateChannelGroup(List<TChannel> arg)
         {
-            return new ChannelGroupStreamImpl<TContext>(arg);
+            return new ChannelGroupStreamImpl<TContext, TChannel>(arg);
         }
         
         public override ValueTask DisposeAsync()

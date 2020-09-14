@@ -5,7 +5,7 @@ namespace Letter.IO
 {
     public partial struct WrappedDgramReader
     {
-        internal WrappedDgramReader(ref Memory<byte> memory, ref BinaryOrder order)
+        public WrappedDgramReader(ref Memory<byte> memory, ref BinaryOrder order)
         {
             this.order = order;
             this.memory = memory;

@@ -3,7 +3,7 @@
 namespace Letter
 {
     public interface IStreamChannel<TContext> : IChannel<TContext>
-        where TContext : class, IContext
+        where TContext : IContext
     {
         void OnChannelRead(TContext context, ref WrappedStreamReader reader, ref EventArgs args);
         

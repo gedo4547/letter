@@ -2,9 +2,10 @@
 
 namespace Letter
 {
-    public interface IStreamNetwork<TOptions, TContext> : INetwork<TOptions, IStreamChannel<TContext>, TContext>
+    public interface IStreamNetwork<TOptions, TContext, TChannel> : INetwork<TOptions, TChannel, TContext>
         where TOptions : IOptions
-        where TContext : class, IContext
+        where TContext : IContext
+        where TChannel : IStreamChannel<TContext>
     {
         
     }

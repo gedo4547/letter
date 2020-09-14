@@ -5,7 +5,7 @@ namespace Letter
 {
     public interface INetwork<TOptions, TChannel, TContext> : IAsyncDisposable
         where TOptions: IOptions
-        where TContext : class, IContext
+        where TContext : IContext
         where TChannel : IChannel<TContext>
     {
         void AddChannel(Func<TChannel> channelFactory);

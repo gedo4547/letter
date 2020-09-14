@@ -1,13 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using Letter.IO;
 
 namespace Letter
 {
-    public class ChannelGroupFactoryStreamImpl<TContext> : AChannelGroupFactory<ChannelGroupStreamImpl<TContext>, IStreamChannel<TContext>, TContext>
-        where TContext : class, IContext
+    public class ChannelGroupFactoryStreamImpl<TContext, TChannel> : AChannelGroupFactory<ChannelGroupStreamImpl<TContext, TChannel>, TChannel, TContext>
+        where TContext : IContext
+        where TChannel : IStreamChannel<TContext>
     {
-        public ChannelGroupFactoryStreamImpl(Func<List<IStreamChannel<TContext>>, ChannelGroupStreamImpl<TContext>> channelGroupCreator) : base(channelGroupCreator)
+        public ChannelGroupFactoryStreamImpl(Func<List<TChannel>, ChannelGroupStreamImpl<TContext, TChannel>> channelGroupCreator) : base(channelGroupCreator)
         {
         }
     }

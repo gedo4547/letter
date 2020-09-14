@@ -3,10 +3,10 @@ using System.Threading.Tasks;
 
 namespace Letter.Udp
 {
-    public interface IUdpClient : IDgramNetwork<UdpOptions, IUdpContext>
+    public interface IUdpClient : IDgramNetwork<UdpOptions, IUdpContext, IUdpChannel>
     {
-        Task StartAsync(EndPoint bindLocalAddress);
+        Task StartAsync(EndPoint bindAddress);
 
-        Task StartAsync(EndPoint bindLocalAddress, EndPoint connectRemoteAddress);
+        Task StartAsync(EndPoint bindAddress, EndPoint connectAddress);
     }
 }

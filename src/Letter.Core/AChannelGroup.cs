@@ -4,7 +4,7 @@ using System.Collections.Generic;
 namespace Letter
 {
     public abstract class AChannelGroup<TChannel, TContext> : IDisposable
-        where TContext : class, IContext
+        where TContext : IContext
         where TChannel : IChannel<TContext>
     {
         public AChannelGroup(List<TChannel> channels)

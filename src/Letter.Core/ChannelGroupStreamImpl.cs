@@ -4,10 +4,11 @@ using Letter.IO;
 
 namespace Letter
 {
-    public class ChannelGroupStreamImpl<TContext> : AChannelGroup<IStreamChannel<TContext>, TContext>
-        where TContext : class, IContext
+    public class ChannelGroupStreamImpl<TContext, TChannel> : AChannelGroup<TChannel, TContext>
+        where TContext : IContext
+        where TChannel : IStreamChannel<TContext>
     {
-        public ChannelGroupStreamImpl(List<IStreamChannel<TContext>> channels) : base(channels)
+        public ChannelGroupStreamImpl(List<TChannel> channels) : base(channels)
         {
         }
 

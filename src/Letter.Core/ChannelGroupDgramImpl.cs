@@ -4,10 +4,11 @@ using Letter.IO;
 
 namespace Letter
 {
-    public class ChannelGroupDgramImpl<TContext> : AChannelGroup<IDgramChannel<TContext>, TContext>
-        where TContext : class, IContext
+    public class ChannelGroupDgramImpl<TContext, TChannel> : AChannelGroup<TChannel, TContext>
+        where TContext : IContext
+        where TChannel : IDgramChannel<TContext>
     {
-        public ChannelGroupDgramImpl(List<IDgramChannel<TContext>> channels) : base(channels)
+        public ChannelGroupDgramImpl(List<TChannel> channels) : base(channels)
         {
         }
 

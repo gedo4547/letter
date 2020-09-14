@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Letter.Udp
 {
-    public class UdpClient : ADgramNetwork<UdpOptions, IUdpContext>, IUdpClient
+    public class UdpClient : ADgramNetwork<UdpOptions, IUdpContext, IUdpChannel>, IUdpClient
     {
         public UdpClient() : base(new UdpOptions())
         {
@@ -27,15 +27,15 @@ namespace Letter.Udp
                 this.socket.IOControl((int)SIO_UDP_CONNRESET, new byte[] { Convert.ToByte(false) }, null);
             }
 
-            if (this.options.RcvBufferSize > 0)
-                this.socket.SettingRcvBufferSize(this.options.RcvBufferSize);
-            if (this.options.SndBufferSize > 0)
-                this.socket.SettingSndBufferSize(this.options.SndBufferSize);
+            if (this.options.RcvTimeout != null)
+                this.socket.SettingRcvTimeout(this.options.RcvTimeout.Value);
+            if (this.options.SndTimeout != null)
+                this.socket.SettingSndTimeout(this.options.SndTimeout.Value);
             
-            if (this.options.RcvTimeout > -1)
-                this.socket.SettingRcvTimeout(this.options.RcvTimeout);
-            if (this.options.SndTimeout > -1)
-                this.socket.SettingSndTimeout(this.options.SndTimeout);
+            if (this.options.RcvBufferSize != null)
+                this.socket.SettingRcvBufferSize(this.options.RcvBufferSize.Value);
+            if (this.options.SndBufferSize != null)
+                this.socket.SettingSndBufferSize(this.options.SndBufferSize.Value);
         }
 
         public Task StartAsync(EndPoint bindLocalAddress)
