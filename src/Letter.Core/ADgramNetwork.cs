@@ -4,9 +4,7 @@ using Letter.IO;
 
 namespace Letter
 {
-    public abstract class ADgramNetwork<TOptions, TContext> : 
-        ANetwork<TOptions, ChannelGroupFactoryDgramImpl<TContext>, ChannelGroupDgramImpl<TContext>, IDgramChannel<TContext>, TContext, WrappedDgramReader, WrappedDgramWriter>,
-        IDgramNetwork<TOptions, TContext>
+    public abstract class ADgramNetwork<TOptions, TContext> : ANetwork<TOptions, ChannelGroupFactoryDgramImpl<TContext>, ChannelGroupDgramImpl<TContext>, IDgramChannel<TContext>, TContext>, IDgramNetwork<TOptions, TContext>
     
         where TOptions: IOptions
         where TContext : class, IContext

@@ -3,12 +3,10 @@ using System.Threading.Tasks;
 
 namespace Letter
 {
-    public interface INetwork<TOptions, TChannel, TContext, TReader, TWriter> : IAsyncDisposable
+    public interface INetwork<TOptions, TChannel, TContext> : IAsyncDisposable
         where TOptions: IOptions
-        where TReader : struct
-        where TWriter : struct
         where TContext : class, IContext
-        where TChannel : IChannel<TContext, TReader, TWriter>
+        where TChannel : IChannel<TContext>
     {
         void AddChannel(Func<TChannel> channelFactory);
 

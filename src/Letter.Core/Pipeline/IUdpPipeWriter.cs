@@ -3,7 +3,7 @@ using System.Net;
 
 namespace Letter.IO
 {
-    interface IUdpPipeWriter
+    public interface IUdpPipeWriter
     {
         UdpMessageNode GetDgramNode();
         

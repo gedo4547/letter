@@ -4,9 +4,7 @@ using Letter.IO;
     
 namespace Letter
 {
-    public abstract class AStreamNetwork<TOptions, TContext> :
-        ANetwork<TOptions, ChannelGroupFactoryStreamImpl<TContext>, ChannelGroupStreamImpl<TContext>, IStreamChannel<TContext>, TContext, WrappedStreamReader, WrappedStreamWriter>,
-        IStreamNetwork<TOptions, TContext>
+    public abstract class AStreamNetwork<TOptions, TContext> : ANetwork<TOptions, ChannelGroupFactoryStreamImpl<TContext>, ChannelGroupStreamImpl<TContext>, IStreamChannel<TContext>, TContext>, IStreamNetwork<TOptions, TContext>
     
         where TOptions : IOptions
         where TContext : class, IContext

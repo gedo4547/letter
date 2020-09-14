@@ -4,14 +4,14 @@ using Letter.IO;
 
 namespace Letter
 {
-    public class ChannelGroupDgramImpl<TContext> : AChannelGroup<IDgramChannel<TContext>, TContext, WrappedDgramReader, WrappedDgramWriter>
+    public class ChannelGroupDgramImpl<TContext> : AChannelGroup<IDgramChannel<TContext>, TContext>
         where TContext : class, IContext
     {
         public ChannelGroupDgramImpl(List<IDgramChannel<TContext>> channels) : base(channels)
         {
         }
 
-        public override void OnChannelRead(TContext context, ref WrappedDgramReader reader)
+        public void OnChannelRead(TContext context, ref WrappedDgramReader reader)
         {
             EventArgs args = new EventArgs();
             
@@ -23,7 +23,7 @@ namespace Letter
             reader.Flush();
         }
 
-        public override void OnChannelWrite(TContext context, ref WrappedDgramWriter writer, ref ReadOnlySequence<byte> sequence)
+        public void OnChannelWrite(TContext context, ref WrappedDgramWriter writer, ref ReadOnlySequence<byte> sequence)
         {
             EventArgs args = new EventArgs();
             args.buffer = sequence;
@@ -36,7 +36,7 @@ namespace Letter
             writer.Flush();
         }
 
-        public override void OnChannelWrite(TContext context, ref WrappedDgramWriter writer, object obj)
+        public void OnChannelWrite(TContext context, ref WrappedDgramWriter writer, object obj)
         {
             EventArgs args = new EventArgs();
             args.item = obj;

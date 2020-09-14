@@ -10,48 +10,14 @@ namespace Letter.Udp
     {
         public UdpClient() : base(new UdpOptions())
         {
+            this.socket = new Socket(SocketType.Dgram, ProtocolType.Udp);
         }
 
         private Socket socket;
-        
-        public Task StartAsync(EndPoint bindLocalAddress)
+
+        public override void Build()
         {
-            this.InitializeSocket(bindLocalAddress);
-            
-            try
-            {
-                this.socket.Bind(bindLocalAddress);
-            }
-            catch (SocketException ex) when (ex.SocketErrorCode == SocketError.AddressAlreadyInUse)
-            {
-                throw ex;
-            }
-
-            this.Run();
-            
-            return Task.CompletedTask;
-        }
-
-        public async Task StartAsync(EndPoint bindLocalAddress, EndPoint connectRemoteAddress)
-        {
-            this.InitializeSocket(bindLocalAddress);
-            
-            try
-            {
-                this.socket.Bind(bindLocalAddress);
-                await this.socket.ConnectAsync(connectRemoteAddress);
-            }
-            catch (SocketException ex) when (ex.SocketErrorCode == SocketError.AddressAlreadyInUse)
-            {
-                throw ex;
-            }
-
-            this.Run();
-        }
-
-        private void InitializeSocket(EndPoint bindLocalAddress)
-        {
-            this.socket = new Socket(bindLocalAddress.AddressFamily, SocketType.Dgram, ProtocolType.Udp);
+            base.Build();
             
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
@@ -70,6 +36,37 @@ namespace Letter.Udp
                 this.socket.SettingRcvTimeout(this.options.RcvTimeout);
             if (this.options.SndTimeout > -1)
                 this.socket.SettingSndTimeout(this.options.SndTimeout);
+        }
+
+        public Task StartAsync(EndPoint bindLocalAddress)
+        {
+            try
+            {
+                this.socket.Bind(bindLocalAddress);
+            }
+            catch (SocketException ex) when (ex.SocketErrorCode == SocketError.AddressAlreadyInUse)
+            {
+                throw ex;
+            }
+
+            this.Run();
+            
+            return Task.CompletedTask;
+        }
+
+        public async Task StartAsync(EndPoint bindLocalAddress, EndPoint connectRemoteAddress)
+        {
+            try
+            {
+                this.socket.Bind(bindLocalAddress);
+                await this.socket.ConnectAsync(connectRemoteAddress);
+            }
+            catch (SocketException ex) when (ex.SocketErrorCode == SocketError.AddressAlreadyInUse)
+            {
+                throw ex;
+            }
+
+            this.Run();
         }
 
         private void Run()

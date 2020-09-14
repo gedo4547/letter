@@ -8,47 +8,37 @@ using Letter.IO;
 
 namespace Letter.Udp
 {
-    public class UdpContext : IUdpContext
+    //
+    public partial class UdpContext : IUdpContext
     {
         public UdpContext(ChannelGroupDgramImpl<IUdpContext> channelGroup, MemoryPool<byte> memoryPool)
         {
             this.MemoryPool = memoryPool;
             this.channelGroup = channelGroup;
-
+            this.onMemoryPushEvent = this.OnMemoryWritePush;
             this.senderPipeline = new UdpPipe(memoryPool, PipeScheduler.ThreadPool,this.OnSenderPipelineReceiveBuffer);
             this.receiverPipeline = new UdpPipe(memoryPool, PipeScheduler.ThreadPool, this.OnReceiverPipelineReceiveBuffer);
         }
 
-        public string Id
-        {
-            get;
-        }
+        public string Id { get; }
+        public EndPoint LoaclAddress { get; private set; }
+        public EndPoint RemoteAddress { get; private set; }
+        public MemoryPool<byte> MemoryPool { get; private set; }
 
-        public EndPoint LoaclAddress
-        {
-            get; private set;
-        }
-
-        public EndPoint RemoteAddress
-        {
-            get; private set;
-        }
-
-        public MemoryPool<byte> MemoryPool
-        {
-            get; private set;
-        }
+        public BinaryOrder Order;
 
         private Socket socket;
         private UdpPipe receiverPipeline;
         private UdpPipe senderPipeline;
+        private UdpSocketReceiver receiver;
+        private UdpSocketSender sender;
+        private WrappedDgramWriter.MemoryWritePushDelegate onMemoryPushEvent;
 
         private ChannelGroupDgramImpl<IUdpContext> channelGroup;
         
         public void Start(Socket socket)
         {
             this.socket = socket;
-
             this.LoaclAddress = this.socket.LocalEndPoint;
             this.RemoteAddress = this.socket.RemoteEndPoint;
 
@@ -58,13 +48,7 @@ namespace Letter.Udp
             this.channelGroup.OnChannelActive(this);
         }
 
-        private void OnSenderPipelineReceiveBuffer(IUdpPipeReader reader)
-        {
-            var node = reader.Read();
-            
-
-            throw new NotImplementedException();
-        }
+       
 
         private void OnReceiverPipelineReceiveBuffer(IUdpPipeReader reader)
         {

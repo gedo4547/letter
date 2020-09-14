@@ -3,14 +3,12 @@ using System.Threading.Tasks;
 
 namespace Letter
 {
-    public abstract class ANetwork<TOptions, TChannelGroupFactory, TChannelGroup, TChannel, TContext, TReader, TWriter> : INetwork<TOptions, TChannel, TContext, TReader, TWriter>
+    public abstract class ANetwork<TOptions, TChannelGroupFactory, TChannelGroup, TChannel, TContext> : INetwork<TOptions, TChannel, TContext>
         where TOptions: IOptions
-        where TReader : struct
-        where TWriter : struct
         where TContext : class, IContext
-        where TChannel : IChannel<TContext, TReader, TWriter>
-        where TChannelGroup : AChannelGroup<TChannel, TContext, TReader, TWriter>
-        where TChannelGroupFactory : AChannelGroupFactory<TChannelGroup, TChannel, TContext, TReader, TWriter>
+        where TChannel : IChannel<TContext>
+        where TChannelGroup : AChannelGroup<TChannel, TContext>
+        where TChannelGroupFactory : AChannelGroupFactory<TChannelGroup, TChannel, TContext>
     {
         public ANetwork(TOptions options)
         {
@@ -42,7 +40,7 @@ namespace Letter
             this.optionsFactory = optionsFactory;
         }
 
-        public void Build()
+        public virtual void Build()
         {
             if (this.optionsFactory == null)
             {

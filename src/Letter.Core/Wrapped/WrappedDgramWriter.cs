@@ -10,7 +10,7 @@ namespace Letter.IO
     {
         public delegate void MemoryWritePushDelegate(UdpMessageNode node);
         
-        internal WrappedDgramWriter(UdpMessageNode node, ref BinaryOrder order, MemoryWritePushDelegate onMemoryPush)
+        public WrappedDgramWriter(UdpMessageNode node, ref BinaryOrder order, MemoryWritePushDelegate onMemoryPush)
         {
             this.order = order;
             this.node = node;

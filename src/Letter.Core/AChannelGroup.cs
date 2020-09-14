@@ -1,14 +1,11 @@
 ﻿using System;
-using System.Buffers;
 using System.Collections.Generic;
 
 namespace Letter
 {
-    public abstract class AChannelGroup<TChannel, TContext, TReader, TWriter> : IDisposable
-        where TReader : struct
-        where TWriter : struct
+    public abstract class AChannelGroup<TChannel, TContext> : IDisposable
         where TContext : class, IContext
-        where TChannel : IChannel<TContext, TReader, TWriter>
+        where TChannel : IChannel<TContext>
     {
         public AChannelGroup(List<TChannel> channels)
         {
@@ -25,7 +22,7 @@ namespace Letter
         public void OnChannelActive(TContext context)
         {
             int count = channels.Count;
-            for (int i = 0; i < count; i++)
+            for (int i = 0; i < count; ++i)
             {
                 this.channels[i].OnChannelActive(context);
             }
@@ -34,7 +31,7 @@ namespace Letter
         public void OnChannelInactive(TContext context)
         {
             int count = channels.Count;
-            for (int i = 0; i < count; i++)
+            for (int i = 0; i < count; ++i)
             {
                 this.channels[i].OnChannelInactive(context);
             }
@@ -43,17 +40,11 @@ namespace Letter
         public void OnChannelException(TContext context, Exception ex)
         {
             int count = this.channels.Count;
-            for (int i = 0; i < count; i++)
+            for (int i = 0; i < count; ++i)
             {
                 this.channels[i].OnChannelException(context, ex);
             }
         }
-
-        public abstract void OnChannelRead(TContext context, ref TReader reader);
-
-        public abstract void OnChannelWrite(TContext context, ref TWriter writer, ref ReadOnlySequence<byte> sequence);
-
-        public abstract void OnChannelWrite(TContext context, ref TWriter writer, object obj);
 
         public virtual void Dispose()
         {

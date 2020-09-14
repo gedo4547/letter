@@ -3,12 +3,10 @@ using System.Collections.Generic;
 
 namespace Letter
 {
-    public abstract class AChannelGroupFactory<TChannelGroup, TChannel, TContext, TReader, TWriter> : IDisposable
-        where TReader : struct
-        where TWriter : struct
+    public abstract class AChannelGroupFactory<TChannelGroup, TChannel, TContext> : IDisposable
         where TContext : class, IContext
-        where TChannel : IChannel<TContext, TReader, TWriter>
-        where TChannelGroup : AChannelGroup<TChannel, TContext, TReader, TWriter>
+        where TChannel : IChannel<TContext>
+        where TChannelGroup : AChannelGroup<TChannel, TContext>
     {
         public AChannelGroupFactory(Func<List<TChannel>, TChannelGroup> channelGroupCreator)
         {
