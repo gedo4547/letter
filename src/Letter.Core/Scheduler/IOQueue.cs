@@ -4,7 +4,7 @@ using System.IO.Pipelines;
 
 namespace System.Threading
 {
-     [EditorBrowsable(EditorBrowsableState.Never)]
+    [EditorBrowsable(EditorBrowsableState.Never)]
     public sealed class IOQueue : PipeScheduler, IThreadPoolWorkItem
     {
         private readonly ConcurrentQueue<Work> _workItems = new ConcurrentQueue<Work>();

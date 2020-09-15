@@ -3,20 +3,19 @@ using System.Threading.Tasks;
 
 namespace Letter
 {
-    public abstract class ABootstrap<TOptions, TChannelGroupFactory, TChannelGroup, TChannel, TContext> : IBootstrap<TOptions, TChannel, TContext>
+    public abstract class ABootstrap<TOptions, TChannelGroupFactory, TChannelGroup, TChannel, TContext, TNetwork> : IBootstrap<TOptions, TChannel, TContext>
         where TOptions : IOptions
         where TContext : IContext
         where TChannel : IChannel<TContext>
         where TChannelGroup : AChannelGroup<TChannel, TContext>
         where TChannelGroupFactory : AChannelGroupFactory<TChannelGroup, TChannel, TContext>
+        where TNetwork : INetwork<TOptions, TChannelGroupFactory, TChannelGroup, TChannel, TContext>
     {
         public ABootstrap(TOptions options)
         {
             if (options == null)
-            {
                 throw new ArgumentNullException(nameof(options));
-            }
-
+            
             this.options = options;
         }
 
@@ -51,6 +50,8 @@ namespace Letter
             this.optionsFactory(this.options);
         }
 
+        protected abstract TNetwork NetworkFactory();
+
         public virtual Task CloseAsync()
         {
             return Task.CompletedTask;
@@ -61,5 +62,7 @@ namespace Letter
             this.optionsFactory = null;
             return default;
         }
+        
+       
     }
 }

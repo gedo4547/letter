@@ -3,10 +3,11 @@ using System.Threading.Tasks;
 
 namespace Letter
 {
-    public abstract class AStreamBootstrap<TOptions, TContext, TChannel> : ABootstrap<TOptions, ChannelGroupFactoryStreamImpl<TContext, TChannel>, ChannelGroupStreamImpl<TContext, TChannel>, TChannel, TContext>, IStreamBootstrap<TOptions, TContext, TChannel>
+    public abstract class AStreamBootstrap<TOptions, TContext, TChannel, TNetwork> : ABootstrap<TOptions, ChannelGroupFactoryStreamImpl<TContext, TChannel>, ChannelGroupStreamImpl<TContext, TChannel>, TChannel, TContext, TNetwork>, IStreamBootstrap<TOptions, TContext, TChannel>
         where TOptions : IOptions
         where TContext : IContext
         where TChannel : IStreamChannel<TContext>
+        where TNetwork : IStreamNetwork<TOptions, TChannel, TContext>
     {
         public AStreamBootstrap(TOptions options) : base(options)
         {

@@ -3,10 +3,11 @@ using System.Threading.Tasks;
 
 namespace Letter
 {
-    public abstract class ADgramBootstrap<TOptions, TContext, TChannel> : ABootstrap<TOptions, ChannelGroupFactoryDgramImpl<TContext, TChannel>, ChannelGroupDgramImpl<TContext, TChannel>, TChannel, TContext>, IDgramBootstrap<TOptions, TContext, TChannel>
+    public abstract class ADgramBootstrap<TOptions, TContext, TChannel, TNetwork> : ABootstrap<TOptions, ChannelGroupFactoryDgramImpl<TContext, TChannel>, ChannelGroupDgramImpl<TContext, TChannel>, TChannel, TContext, TNetwork>, IDgramBootstrap<TOptions, TContext, TChannel>
         where TChannel : IDgramChannel<TContext>
-        where TOptions: IOptions
+        where TOptions : IOptions
         where TContext : IContext
+        where TNetwork : IDgramNetwork<TOptions, TChannel, TContext>
     {
         public ADgramBootstrap(TOptions options) : base(options)
         {
