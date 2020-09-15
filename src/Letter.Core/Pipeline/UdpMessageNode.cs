@@ -3,7 +3,7 @@ using System.Buffers;
 using System.Net;
 using System.Threading.Tasks;
 
-namespace Letter.IO
+namespace Letter
 {
     public class UdpMessageNode : IUdpMessageNode, IDisposable
     {

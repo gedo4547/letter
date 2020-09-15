@@ -5,7 +5,7 @@ using System.IO.Pipelines;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
-namespace Letter.IO
+namespace Letter
 {
     public struct WrappedStreamWriter
     {

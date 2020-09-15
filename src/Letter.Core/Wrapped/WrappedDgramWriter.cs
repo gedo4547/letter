@@ -4,7 +4,7 @@ using System.Net;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
-namespace Letter.IO
+namespace Letter
 {
     public struct WrappedDgramWriter
     {

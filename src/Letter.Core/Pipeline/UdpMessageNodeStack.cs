@@ -1,4 +1,4 @@
-﻿﻿namespace Letter.IO
+﻿﻿namespace Letter
 {
     class UdpMessageNodeStack : ObjectStack<UdpMessageNode>
     {

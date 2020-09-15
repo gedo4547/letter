@@ -1,7 +1,7 @@
 ﻿﻿using System;
 using System.Net;
 
-namespace Letter.IO
+namespace Letter
 {
     public interface IUdpPipeWriter
     {

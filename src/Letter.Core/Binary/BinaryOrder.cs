@@ -1,4 +1,4 @@
-﻿namespace Letter.IO
+﻿namespace Letter
 {
     public enum BinaryOrder
     {

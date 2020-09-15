@@ -2,7 +2,7 @@
 using System.Buffers;
 using System.IO.Pipelines;
 
- namespace Letter.IO
+ namespace Letter
 {
     public partial class UdpPipe : IDisposable
     {

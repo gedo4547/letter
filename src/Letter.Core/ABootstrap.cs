@@ -22,6 +22,7 @@ namespace Letter
 
         protected TOptions options;
         private Action<TOptions> optionsFactory;
+        
         protected abstract TChannelGroupFactory ChannelGroupFactory { get; }
 
         public void AddChannel(Func<TChannel> channelFactory)

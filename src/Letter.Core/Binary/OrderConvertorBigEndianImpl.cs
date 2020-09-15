@@ -2,7 +2,7 @@
 using System.Buffers.Binary;
 using System.Runtime.CompilerServices;
 
-namespace Letter.IO
+namespace Letter
 {
     sealed class OrderConvertorBigEndianImpl : IBinaryOrderConvertor
     {

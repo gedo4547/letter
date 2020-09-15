@@ -1,7 +1,7 @@
 ﻿﻿using System;
 using System.Threading;
 
-namespace Letter.IO
+namespace Letter
 {
     public partial class UdpPipe : IUdpPipeReader
     {

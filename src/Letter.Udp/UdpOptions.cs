@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Buffers;
-using Letter.IO;
 
 namespace Letter.Udp
 {

@@ -1,7 +1,7 @@
 using System;
 using System.Runtime.CompilerServices;
 
-namespace Letter.IO
+namespace Letter
 {
     public partial struct WrappedDgramReader
     {

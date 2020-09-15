@@ -3,7 +3,7 @@ using System.Buffers;
 using System.Net;
 using System.Threading;
 
-namespace Letter.IO
+namespace Letter
 {
     public partial class UdpPipe : IUdpPipeWriter
     {

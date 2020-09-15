@@ -1,6 +1,5 @@
 ﻿using System.Buffers;
 using System.Collections.Generic;
-using Letter.IO;
 
 namespace Letter
 {
@@ -14,7 +13,7 @@ namespace Letter
 
         public void OnChannelRead(TContext context, ref WrappedStreamReader reader)
         {
-            EventArgs args = new EventArgs();
+            ChannelArgs args = new ChannelArgs();
             
             int count = this.channels.Count;
             for (int i = 0; i < count; ++i)
@@ -26,7 +25,7 @@ namespace Letter
 
         public void OnChannelWrite(TContext context, ref WrappedStreamWriter writer, ref ReadOnlySequence<byte> sequence)
         {
-            EventArgs args = new EventArgs()
+            ChannelArgs args = new ChannelArgs()
             {
                 buffer = sequence
             };
@@ -42,7 +41,7 @@ namespace Letter
 
         public void OnChannelWrite(TContext context, ref WrappedStreamWriter writer, object obj)
         {
-            EventArgs args = new EventArgs()
+            ChannelArgs args = new ChannelArgs()
             {
                 item = obj
             };

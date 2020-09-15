@@ -1,7 +1,6 @@
 ﻿using System;
-using Letter.IO;
+using Letter;
 using Letter.Udp;
-using EventArgs = Letter.EventArgs;
 
 namespace udp_text
 {
@@ -29,7 +28,7 @@ namespace udp_text
             Console.WriteLine($"--{name}->{nameof(UdpChannel_2)}.{nameof(OnChannelException)}"+ex.ToString());
         }
 
-        public void OnChannelRead(IUdpContext context, ref WrappedDgramReader reader, ref EventArgs args)
+        public void OnChannelRead(IUdpContext context, ref WrappedDgramReader reader, ref ChannelArgs args)
         {
             int length = reader.Length;
             var buffer = reader.ReadRange(length);
@@ -38,7 +37,7 @@ namespace udp_text
             Console.WriteLine(str);
         }
 
-        public void OnChannelWrite(IUdpContext context, ref WrappedDgramWriter writer, ref EventArgs args)
+        public void OnChannelWrite(IUdpContext context, ref WrappedDgramWriter writer, ref ChannelArgs args)
         {
             Console.WriteLine($"--{name}->{nameof(UdpChannel_2)}.{nameof(OnChannelWrite)}");
             writer.Write(ref args.buffer);

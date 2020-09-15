@@ -3,7 +3,7 @@ using System.ComponentModel;
 using System.IO.Pipelines;
 using System.Runtime.CompilerServices;
 
-namespace Letter.IO
+namespace Letter
 {
     public partial struct WrappedStreamReader
     {

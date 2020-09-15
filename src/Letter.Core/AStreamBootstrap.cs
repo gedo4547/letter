@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using Letter.IO;
-    
+
 namespace Letter
 {
     public abstract class AStreamBootstrap<TOptions, TContext, TChannel> : ABootstrap<TOptions, ChannelGroupFactoryStreamImpl<TContext, TChannel>, ChannelGroupStreamImpl<TContext, TChannel>, TChannel, TContext>, IStreamBootstrap<TOptions, TContext, TChannel>
