@@ -1,4 +1,4 @@
-﻿namespace Letter
+﻿namespace Letter.Box.ssss
 {
     public interface IOptions
     {

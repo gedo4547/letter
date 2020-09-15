@@ -1,11 +1,10 @@
-﻿
-namespace Letter
+﻿namespace Letter.Box.ssss
 {
-    public interface IDgramChannel<TContext> : IChannel<TContext>
-        where TContext : IContext
+    public interface IDgramChannel<TSession> : IChannel<TSession>
+        where TSession : ISession
     {
-        void OnChannelRead(TContext context, ref WrappedDgramReader reader, ref ChannelArgs args);
+        void OnChannelRead(TSession session, ref WrappedDgramReader reader, ref ChannelArgs args);
         
-        void OnChannelWrite(TContext context, ref WrappedDgramWriter writer, ref ChannelArgs args);
+        void OnChannelWrite(TSession session, ref WrappedDgramWriter writer, ref ChannelArgs args);
     }
 }

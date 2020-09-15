@@ -2,7 +2,9 @@
 
 namespace Letter.Box.ssss
 {
-    public interface IChannel<TSession> where TSession : ISession
+    public interface IChannelGroup<TSession, TChannel> : IAsyncDisposable
+        where TSession : ISession
+        where TChannel : IChannel<TSession>
     {
         void OnChannelActive(TSession session);
         void OnChannelInactive(TSession session);

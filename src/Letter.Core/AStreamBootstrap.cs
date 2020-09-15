@@ -1,39 +1,10 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
-
-namespace Letter
+﻿namespace Letter.Box.ssss
 {
-    public abstract class AStreamBootstrap<TOptions, TContext, TChannel, TNetwork> : ABootstrap<TOptions, ChannelGroupFactoryStreamImpl<TContext, TChannel>, ChannelGroupStreamImpl<TContext, TChannel>, TChannel, TContext, TNetwork>, IStreamBootstrap<TOptions, TContext, TChannel>
-        where TOptions : IOptions
-        where TContext : IContext
-        where TChannel : IStreamChannel<TContext>
-        where TNetwork : IStreamNetwork<TOptions, TChannel, TContext>
+    public abstract class AStreamBootstrap<TOptions, TSession, TChannel, TNetwork> : ABootstrap<TOptions, TNetwork>, IStreamBootstrap<TOptions, TSession, TChannel, TNetwork>
+        where TOptions : IOptions, new()
+        where TSession : ISession
+        where TChannel : IStreamChannel<TSession>
+        where TNetwork : IStreamNetwork<TSession, TChannel>
     {
-        public AStreamBootstrap(TOptions options) : base(options)
-        {
-            this.channelGroupFactory = new ChannelGroupFactoryStreamImpl<TContext, TChannel>(this.OnCreateChannelGroup);
-        }
-        
-        private ChannelGroupFactoryStreamImpl<TContext, TChannel> channelGroupFactory;
-        protected override ChannelGroupFactoryStreamImpl<TContext, TChannel> ChannelGroupFactory
-        {
-            get { return this.channelGroupFactory; }
-        }
-        
-        private ChannelGroupStreamImpl<TContext, TChannel> OnCreateChannelGroup(List<TChannel> arg)
-        {
-            return new ChannelGroupStreamImpl<TContext, TChannel>(arg);
-        }
-        
-        public override ValueTask DisposeAsync()
-        {
-            if (this.channelGroupFactory != null)
-            {
-                this.channelGroupFactory.Dispose();
-                this.channelGroupFactory = null;
-            }
-            
-            return base.DisposeAsync();
-        }
     }
 }

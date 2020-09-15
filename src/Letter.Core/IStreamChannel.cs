@@ -1,10 +1,9 @@
-﻿
-namespace Letter
+﻿namespace Letter.Box.ssss
 {
-    public interface IStreamChannel<TContext> : IChannel<TContext> where TContext : IContext
+    public interface IStreamChannel<TSession> : IChannel<TSession>
+        where TSession : ISession
     {
-        void OnChannelRead(TContext context, ref WrappedStreamReader reader, ref ChannelArgs args);
-        
-        void OnChannelWrite(TContext context, ref WrappedStreamWriter writer, ref ChannelArgs args);
+        void OnChannelRead(TSession session, ref WrappedStreamReader reader, ref ChannelArgs args);
+        void OnChannelWrite(TSession session, ref WrappedStreamWriter writer, ref ChannelArgs args);
     }
 }

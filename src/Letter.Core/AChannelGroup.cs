@@ -1,58 +1,56 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
-namespace Letter
+namespace Letter.Box.ssss
 {
-    public abstract class AChannelGroup<TChannel, TContext> : IDisposable
-        where TContext : IContext
-        where TChannel : IChannel<TContext>
+    public class AChannelGroup<TSession, TChannel> : IChannelGroup<TSession, TChannel>
+        where TSession : ISession
+        where TChannel : IChannel<TSession>
     {
         public AChannelGroup(List<TChannel> channels)
         {
-            if (channels == null)
-            {
-                throw new ArgumentNullException(nameof(channels));
-            }
-
             this.channels = channels;
         }
 
         protected List<TChannel> channels;
-
-        public void OnChannelActive(TContext context)
-        {
-            int count = channels.Count;
-            for (int i = 0; i < count; ++i)
-            {
-                this.channels[i].OnChannelActive(context);
-            }
-        }
-
-        public void OnChannelInactive(TContext context)
-        {
-            int count = channels.Count;
-            for (int i = 0; i < count; ++i)
-            {
-                this.channels[i].OnChannelInactive(context);
-            }
-        }
         
-        public void OnChannelException(TContext context, Exception ex)
+        public void OnChannelActive(TSession session)
+        {
+            int count = channels.Count;
+            for (int i = 0; i < count; ++i)
+            {
+                this.channels[i].OnChannelActive(session);
+            }
+        }
+
+        public void OnChannelInactive(TSession session)
+        {
+            int count = channels.Count;
+            for (int i = 0; i < count; ++i)
+            {
+                this.channels[i].OnChannelInactive(session);
+            }
+        }
+
+        public void OnChannelException(TSession session, Exception ex)
         {
             int count = this.channels.Count;
             for (int i = 0; i < count; ++i)
             {
-                this.channels[i].OnChannelException(context, ex);
+                this.channels[i].OnChannelException(session, ex);
             }
         }
-
-        public virtual void Dispose()
+        
+        public ValueTask DisposeAsync()
         {
             if (this.channels != null)
             {
                 this.channels.Clear();
                 this.channels = null;
             }
+
+            return default;
         }
     }
 }

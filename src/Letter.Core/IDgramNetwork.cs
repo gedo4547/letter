@@ -1,10 +1,11 @@
-﻿namespace Letter
+﻿using System;
+
+namespace Letter.Box.ssss
 {
-    public interface IDgramNetwork<TOptions, TChannel, TContext> : INetwork<TOptions, ChannelGroupFactoryDgramImpl<TContext, TChannel>, ChannelGroupDgramImpl<TContext, TChannel>, TChannel, TContext>
-        where TChannel : IDgramChannel<TContext>
-        where TOptions : IOptions
-        where TContext : IContext
+    public interface IDgramNetwork<TSession, TChannel> : INetwork
+        where TSession : ISession
+        where TChannel : IDgramChannel<TSession>
     {
-        
+        void AddChannel(Func<TChannel> channelFactory);
     }
 }

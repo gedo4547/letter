@@ -1,31 +1,21 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
-namespace Letter
+namespace Letter.Box.ssss
 {
-    public abstract class AChannelGroupFactory<TChannelGroup, TChannel, TContext> : IDisposable
-        where TContext : IContext
-        where TChannel : IChannel<TContext>
-        where TChannelGroup : AChannelGroup<TChannel, TContext>
+    public abstract class AChannelGroupFactory<TSession, TChannel, TChannelGroup> : IChannelGroupFactory<TSession, TChannel, TChannelGroup>
+        where TSession : ISession
+        where TChannel : IChannel<TSession>
+        where TChannelGroup : IChannelGroup<TSession, TChannel>
     {
-        public AChannelGroupFactory(Func<List<TChannel>, TChannelGroup> channelGroupCreator)
-        {
-            if (channelGroupCreator == null)
-            {
-                throw new ArgumentNullException(nameof(channelGroupCreator));
-            }
-
-            this.channelGroupCreator = channelGroupCreator;
-        }
-        
-        private Func<List<TChannel>, TChannelGroup> channelGroupCreator;
         private List<Func<TChannel>> channelFactorys = new List<Func<TChannel>>();
-
+        
         public void AddChannelFactory(Func<TChannel> channelFactory)
         {
             if (channelFactory == null)
             {
-                throw new ArgumentNullException(nameof(channelFactory));
+                throw new  ArgumentNullException(nameof(channelFactory));
             }
             
             this.channelFactorys.Add(channelFactory);
@@ -34,30 +24,30 @@ namespace Letter
         public TChannelGroup CreateChannelGroup()
         {
             List<TChannel> channels = new List<TChannel>();
-            int count = this.channelFactorys.Count;
-            for (int i = 0; i < count; i++)
+            foreach (var channelFactory in channelFactorys)
             {
-                var channel = this.channelFactorys[i]();
+                var channel = channelFactory();
                 if (channel == null)
-                {
                     throw new NullReferenceException(nameof(channel));
-                }
                 
                 channels.Add(channel);
             }
 
-            return this.channelGroupCreator(channels);
+            return this.ChannelGroupCreator(channels);
         }
 
-        public void Dispose()
+        protected abstract TChannelGroup ChannelGroupCreator(List<TChannel> channels);
+        
+
+        public ValueTask DisposeAsync()
         {
-            this.channelGroupCreator = null;
-            
             if (this.channelFactorys != null)
             {
                 this.channelFactorys.Clear();
                 this.channelFactorys = null;
             }
+
+            return default;
         }
     }
 }

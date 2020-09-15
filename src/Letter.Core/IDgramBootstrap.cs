@@ -1,9 +1,10 @@
-﻿namespace Letter
+﻿namespace Letter.Box.ssss
 {
-    public interface IDgramBootstrap<TOptions, TContext, TChannel> : IBootstrap<TOptions, TChannel , TContext>
-        where TOptions : IOptions
-        where TContext : IContext
-        where TChannel : IDgramChannel<TContext>
+    public interface IDgramBootstrap<TOptions, TSession, TChannel, TNetwork> : IBootstrap<TOptions, TNetwork>
+        where TOptions : IOptions, new()
+        where TSession : ISession
+        where TChannel : IDgramChannel<TSession>
+        where TNetwork : IDgramNetwork<TSession, TChannel>
     {
         
     }

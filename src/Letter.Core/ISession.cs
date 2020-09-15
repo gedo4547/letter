@@ -1,11 +1,10 @@
-﻿using System;
-using System.Buffers;
+﻿using System.Buffers;
 using System.Net;
 using System.Threading.Tasks;
 
-namespace Letter
+namespace Letter.Box.ssss
 {
-    public interface IContext : IAsyncDisposable
+    public interface ISession
     {
         string Id { get; }
 

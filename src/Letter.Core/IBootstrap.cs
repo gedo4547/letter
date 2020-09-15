@@ -1,19 +1,14 @@
 ﻿using System;
 using System.Threading.Tasks;
 
-namespace Letter
+namespace Letter.Box.ssss
 {
-    public interface IBootstrap<TOptions, TChannel, TContext> : IAsyncDisposable
-        where TOptions : IOptions
-        where TContext : IContext
-        where TChannel : IChannel<TContext>
+    public interface IBootstrap<TOptions, TNetwork> : IAsyncDisposable
+        where TOptions : IOptions, new()
+        where TNetwork : INetwork
     {
-        void AddChannel(Func<TChannel> channelFactory);
-
         void ConfigurationOptions(Action<TOptions> optionsFactory);
-
-        void Build();
-
-        Task CloseAsync();
+        
+        Task<TNetwork> BuildAsync();
     }
 }

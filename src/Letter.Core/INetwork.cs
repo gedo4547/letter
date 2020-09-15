@@ -1,14 +1,9 @@
 ﻿using System;
 
-namespace Letter
+namespace Letter.Box.ssss
 {
-    public interface INetwork<TOptions, TChannelGroupFactory, TChannelGroup, TChannel, TContext> : IAsyncDisposable
-        where TOptions : IOptions
-        where TContext : IContext
-        where TChannel : IChannel<TContext>
-        where TChannelGroup : AChannelGroup<TChannel, TContext>
-        where TChannelGroupFactory : AChannelGroupFactory<TChannelGroup, TChannel, TContext>
+    public interface INetwork : IAsyncDisposable
     {
-        void Initialize(TOptions options, TChannelGroupFactory factory);
+        
     }
 }

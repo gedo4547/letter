@@ -1,10 +1,10 @@
-﻿
-namespace Letter
+﻿namespace Letter.Box.ssss
 {
-    public interface IStreamBootstrap<TOptions, TContext, TChannel> : IBootstrap<TOptions, TChannel, TContext>
-        where TOptions : IOptions
-        where TContext : IContext
-        where TChannel : IStreamChannel<TContext>
+    public interface IStreamBootstrap<TOptions, TSession, TChannel, TNetwork> : IBootstrap<TOptions, TNetwork>
+        where TOptions : IOptions, new()
+        where TSession : ISession
+        where TChannel : IStreamChannel<TSession>
+        where TNetwork : IStreamNetwork<TSession, TChannel>
     {
         
     }

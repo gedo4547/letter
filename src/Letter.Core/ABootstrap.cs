@@ -1,68 +1,46 @@
 ﻿using System;
 using System.Threading.Tasks;
 
-namespace Letter
+namespace Letter.Box.ssss
 {
-    public abstract class ABootstrap<TOptions, TChannelGroupFactory, TChannelGroup, TChannel, TContext, TNetwork> : IBootstrap<TOptions, TChannel, TContext>
-        where TOptions : IOptions
-        where TContext : IContext
-        where TChannel : IChannel<TContext>
-        where TChannelGroup : AChannelGroup<TChannel, TContext>
-        where TChannelGroupFactory : AChannelGroupFactory<TChannelGroup, TChannel, TContext>
-        where TNetwork : INetwork<TOptions, TChannelGroupFactory, TChannelGroup, TChannel, TContext>
+    public abstract class ABootstrap<TOptions, TNetwork> : IBootstrap<TOptions, TNetwork>
+        where TOptions : IOptions, new()
+        where TNetwork : INetwork
     {
-        public ABootstrap(TOptions options)
-        {
-            if (options == null)
-                throw new ArgumentNullException(nameof(options));
-            
-            this.options = options;
-        }
-
-        protected TOptions options;
+        protected TOptions options = new TOptions();
+        
         private Action<TOptions> optionsFactory;
         
-        protected abstract TChannelGroupFactory ChannelGroupFactory { get; }
-
-        public void AddChannel(Func<TChannel> channelFactory)
-        {
-            if (channelFactory == null)
-                throw new ArgumentNullException(nameof(channelFactory));
-
-            this.ChannelGroupFactory.AddChannelFactory(channelFactory);
-        }
-
         public void ConfigurationOptions(Action<TOptions> optionsFactory)
         {
             if (optionsFactory == null)
+            {
                 throw new ArgumentNullException(nameof(optionsFactory));
-
+            }
+            
             this.optionsFactory = optionsFactory;
         }
 
-        public virtual void Build()
+        public virtual Task<TNetwork> BuildAsync()
         {
-            if (this.optionsFactory == null)
+            if (this.optionsFactory != null)
             {
                 throw new NullReferenceException(nameof(this.optionsFactory));
             }
 
             this.optionsFactory(this.options);
+
+            return this.NetworkCreator();
         }
 
-        protected abstract TNetwork NetworkFactory();
-
-        public virtual Task CloseAsync()
-        {
-            return Task.CompletedTask;
-        }
-
+        protected abstract Task<TNetwork> NetworkCreator();
+        
         public virtual ValueTask DisposeAsync()
         {
             this.optionsFactory = null;
+            this.options = default;
+
             return default;
         }
-        
-       
     }
 }
