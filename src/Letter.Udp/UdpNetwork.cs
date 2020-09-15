@@ -1,4 +1,5 @@
 ﻿using System.Net;
+using System.Net.Sockets;
 using System.Threading.Tasks;
 using Letter;
 
@@ -11,6 +12,7 @@ namespace Letter.Udp
             this.options = options;
         }
 
+        private Socket socket;
         private UdpOptions options;
 
         public Task StartAsync(EndPoint bindAddress)
@@ -20,11 +22,13 @@ namespace Letter.Udp
 
         public Task StartAsync(EndPoint bindAddress, EndPoint connectAddress)
         {
+            this.CreateSocket(bindAddress.AddressFamily);
             return Task.CompletedTask;
         }
 
-        private void Create()
+        private void CreateSocket(AddressFamily family)
         {
+            this.socket = new Socket(family, SocketType.Dgram, ProtocolType.Udp);
             
         }
 

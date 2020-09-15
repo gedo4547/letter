@@ -1,4 +1,5 @@
 ﻿using System;
+using Letter.Udp;
 
 namespace udp_text
 {
@@ -6,7 +7,11 @@ namespace udp_text
     {
         static void Main(string[] args)
         {
-            
+            var udp = UdpFactory.Create();
+            udp.ConfigurationNetwork(network =>
+            {
+                
+            });
             
             // var udp1 = UdpFactory.Client();
             // udp1.ConfigurationOptions((options =>

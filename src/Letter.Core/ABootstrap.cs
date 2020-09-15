@@ -56,7 +56,8 @@ namespace Letter
         {
             this.optionsFactory = null;
             this.options = default;
-
+            this.networkConfigurator = null;
+            
             return default;
         }
     }
