@@ -4,12 +4,12 @@ using Letter.IO;
     
 namespace Letter
 {
-    public abstract class AStreamNetwork<TOptions, TContext, TChannel> : ANetwork<TOptions, ChannelGroupFactoryStreamImpl<TContext, TChannel>, ChannelGroupStreamImpl<TContext, TChannel>, TChannel, TContext>, IStreamNetwork<TOptions, TContext, TChannel>
+    public abstract class AStreamBootstrap<TOptions, TContext, TChannel> : ABootstrap<TOptions, ChannelGroupFactoryStreamImpl<TContext, TChannel>, ChannelGroupStreamImpl<TContext, TChannel>, TChannel, TContext>, IStreamBootstrap<TOptions, TContext, TChannel>
         where TOptions : IOptions
         where TContext : IContext
         where TChannel : IStreamChannel<TContext>
     {
-        public AStreamNetwork(TOptions options) : base(options)
+        public AStreamBootstrap(TOptions options) : base(options)
         {
             this.channelGroupFactory = new ChannelGroupFactoryStreamImpl<TContext, TChannel>(this.OnCreateChannelGroup);
         }

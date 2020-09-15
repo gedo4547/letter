@@ -2,8 +2,7 @@
 
 namespace Letter
 {
-    public interface IChannel<TContext>
-        where TContext : IContext
+    public interface IChannel<TContext> where TContext : IContext
     {
         void OnChannelActive(TContext context);
         

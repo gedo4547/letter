@@ -44,12 +44,10 @@ namespace Letter.Udp
             this.receiver = new UdpSocketReceiver(this.socket, PipeScheduler.ThreadPool);
             this.sender = new UdpSocketSender(this.socket, PipeScheduler.ThreadPool);
             
-            
-
-            ReaderMemoryPolledIOAsync().NoAwait();
-            
             this.receiverPipeline.ReceiveAsync();
             this.senderPipeline.ReceiveAsync();
+            
+            this.ReaderMemoryPolledIOAsync().NoAwait();
 
             this.channelGroup.OnChannelActive(this);
         }

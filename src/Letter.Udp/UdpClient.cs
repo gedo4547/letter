@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Letter.Udp
 {
-    public class UdpClient : ADgramNetwork<UdpOptions, IUdpContext, IUdpChannel>, IUdpClient
+    public class UdpClient : ADgramBootstrap<UdpOptions, IUdpContext, IUdpChannel>, IUdpClient
     {
         public UdpClient() : base(new UdpOptions())
         {

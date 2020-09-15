@@ -3,14 +3,14 @@ using System.Threading.Tasks;
 
 namespace Letter
 {
-    public abstract class ANetwork<TOptions, TChannelGroupFactory, TChannelGroup, TChannel, TContext> : INetwork<TOptions, TChannel, TContext>
-        where TOptions: IOptions
+    public abstract class ABootstrap<TOptions, TChannelGroupFactory, TChannelGroup, TChannel, TContext> : IBootstrap<TOptions, TChannel, TContext>
+        where TOptions : IOptions
         where TContext : IContext
         where TChannel : IChannel<TContext>
         where TChannelGroup : AChannelGroup<TChannel, TContext>
         where TChannelGroupFactory : AChannelGroupFactory<TChannelGroup, TChannel, TContext>
     {
-        public ANetwork(TOptions options)
+        public ABootstrap(TOptions options)
         {
             if (options == null)
             {

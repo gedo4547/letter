@@ -2,8 +2,7 @@
 
 namespace Letter
 {
-    public interface IStreamChannel<TContext> : IChannel<TContext>
-        where TContext : IContext
+    public interface IStreamChannel<TContext> : IChannel<TContext> where TContext : IContext
     {
         void OnChannelRead(TContext context, ref WrappedStreamReader reader, ref EventArgs args);
         

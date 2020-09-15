@@ -4,12 +4,12 @@ using Letter.IO;
 
 namespace Letter
 {
-    public abstract class ADgramNetwork<TOptions, TContext, TChannel> : ANetwork<TOptions, ChannelGroupFactoryDgramImpl<TContext, TChannel>, ChannelGroupDgramImpl<TContext, TChannel>, TChannel, TContext>, IDgramNetwork<TOptions, TContext, TChannel>
+    public abstract class ADgramBootstrap<TOptions, TContext, TChannel> : ABootstrap<TOptions, ChannelGroupFactoryDgramImpl<TContext, TChannel>, ChannelGroupDgramImpl<TContext, TChannel>, TChannel, TContext>, IDgramBootstrap<TOptions, TContext, TChannel>
         where TChannel : IDgramChannel<TContext>
         where TOptions: IOptions
         where TContext : IContext
     {
-        public ADgramNetwork(TOptions options) : base(options)
+        public ADgramBootstrap(TOptions options) : base(options)
         {
             this.channelGroupFactory = new ChannelGroupFactoryDgramImpl<TContext, TChannel>(this.OnCreateChannelGroup);
         }
