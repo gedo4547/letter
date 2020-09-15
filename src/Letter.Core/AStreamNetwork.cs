@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 
-namespace Letter.Box.ssss
+namespace Letter
 {
     public abstract class AStreamNetwork<TSession, TChannel> : IStreamNetwork<TSession, TChannel>
         where TSession : ISession

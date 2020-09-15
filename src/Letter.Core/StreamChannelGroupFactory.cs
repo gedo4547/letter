@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Letter.Box.ssss
+namespace Letter
 {
     public class StreamChannelGroupFactory<TSession, TChannel> : AChannelGroupFactory<TSession, TChannel, StreamChannelGroup<TSession, TChannel>>, IChannelGroupFactory<TSession,TChannel, StreamChannelGroup<TSession, TChannel>>
         where TSession : ISession

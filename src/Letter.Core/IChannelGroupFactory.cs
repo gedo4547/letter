@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Letter.Box.ssss
+namespace Letter
 {
     public interface IChannelGroupFactory<TSession, TChannel, TChannelGroup> : IAsyncDisposable
         where TSession : ISession

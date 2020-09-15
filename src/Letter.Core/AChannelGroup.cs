@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace Letter.Box.ssss
+namespace Letter
 {
     public class AChannelGroup<TSession, TChannel> : IChannelGroup<TSession, TChannel>
         where TSession : ISession

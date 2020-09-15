@@ -2,7 +2,7 @@
 using System.Net;
 using System.Threading.Tasks;
 
-namespace Letter.Box.ssss
+namespace Letter
 {
     public interface ISession
     {

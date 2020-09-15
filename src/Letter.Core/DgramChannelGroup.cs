@@ -1,7 +1,7 @@
 ﻿using System.Buffers;
 using System.Collections.Generic;
 
-namespace Letter.Box.ssss
+namespace Letter
 {
     
     public class DgramChannelGroup<TSession, TChannel> : AChannelGroup<TSession, TChannel>, IDgramChannelGroup<TSession, TChannel>

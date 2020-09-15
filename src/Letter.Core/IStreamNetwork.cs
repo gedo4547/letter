@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Letter.Box.ssss
+namespace Letter
 {
     public interface IStreamNetwork<TSession, TChannel> : INetwork
         where TSession : ISession

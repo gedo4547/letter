@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace Letter.Box.ssss
+namespace Letter
 {
     public abstract class AChannelGroupFactory<TSession, TChannel, TChannelGroup> : IChannelGroupFactory<TSession, TChannel, TChannelGroup>
         where TSession : ISession

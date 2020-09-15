@@ -1,16 +1,27 @@
 ﻿using System;
 using System.Threading.Tasks;
 
-namespace Letter.Box.ssss
+namespace Letter
 {
     public abstract class ABootstrap<TOptions, TNetwork> : IBootstrap<TOptions, TNetwork>
-        where TOptions : IOptions, new()
+        where TOptions : class, IOptions, new()
         where TNetwork : INetwork
     {
-        protected TOptions options = new TOptions();
+        protected TOptions options;
         
         private Action<TOptions> optionsFactory;
+        private Action<TNetwork> networkConfigurator;
         
+        public void ConfigurationNetwork(Action<TNetwork> configurator)
+        {
+            if (configurator == null)
+            {
+                throw new ArgumentNullException(nameof(configurator));
+            }
+
+            this.networkConfigurator = configurator;
+        }
+
         public void ConfigurationOptions(Action<TOptions> optionsFactory)
         {
             if (optionsFactory == null)
@@ -21,16 +32,22 @@ namespace Letter.Box.ssss
             this.optionsFactory = optionsFactory;
         }
 
-        public virtual Task<TNetwork> BuildAsync()
+        public virtual async Task<TNetwork> BuildAsync()
         {
-            if (this.optionsFactory != null)
+            if (this.options == null)
             {
-                throw new NullReferenceException(nameof(this.optionsFactory));
+                if (this.optionsFactory != null)
+                {
+                    throw new NullReferenceException(nameof(this.optionsFactory));
+                }
+                
+                this.optionsFactory(this.options);
             }
-
-            this.optionsFactory(this.options);
-
-            return this.NetworkCreator();
+            
+            TNetwork network = await this.NetworkCreator();
+            this.networkConfigurator?.Invoke(network);
+            
+            return network;
         }
 
         protected abstract Task<TNetwork> NetworkCreator();

@@ -1,6 +1,6 @@
 ﻿using System.Buffers;
 
-namespace Letter.Box.ssss
+namespace Letter
 {
     public interface IDgramChannelGroup<TSession, TChannel> : IChannelGroup<TSession, TChannel>
         where TSession : ISession

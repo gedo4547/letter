@@ -1,12 +1,14 @@
 ﻿using System;
 using System.Threading.Tasks;
 
-namespace Letter.Box.ssss
+namespace Letter
 {
     public interface IBootstrap<TOptions, TNetwork> : IAsyncDisposable
-        where TOptions : IOptions, new()
+        where TOptions : class, IOptions, new()
         where TNetwork : INetwork
     {
+        void ConfigurationNetwork(Action<TNetwork> configurator);
+        
         void ConfigurationOptions(Action<TOptions> optionsFactory);
         
         Task<TNetwork> BuildAsync();

@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Letter.Box.ssss
+namespace Letter
 {
     public class DgramChannelGroupFactory<TSession, TChannel> : AChannelGroupFactory<TSession, TChannel, DgramChannelGroup<TSession, TChannel>>, IChannelGroupFactory<TSession, TChannel, DgramChannelGroup<TSession, TChannel>>
         where TSession : ISession
