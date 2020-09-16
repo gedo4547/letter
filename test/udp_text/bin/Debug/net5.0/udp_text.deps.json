@@ -7,6 +7,9 @@
   "targets": {
     "net5.0": {
       "udp_text/1.0.0": {
+        "dependencies": {
+          "Letter.Udp": "1.0.0"
+        },
         "runtime": {
           "udp_text.dll": {}
         }

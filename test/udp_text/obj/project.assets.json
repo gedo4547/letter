@@ -1,7 +1,7 @@
 {
   "version": 3,
   "targets": {
-    ".NETCoreApp,Version=v5.0": {
+    "net5.0": {
       "System.IO.Pipelines/5.0.0-preview.8.20407.11": {
         "type": "package",
         "compile": {
@@ -13,7 +13,7 @@
       },
       "Letter.Core/1.0.0": {
         "type": "project",
-        "framework": ".NETCoreApp,Version=v5.0",
+        "framework": "net5.0",
         "dependencies": {
           "System.IO.Pipelines": "5.0.0-preview.8.20407.11"
         },
@@ -26,7 +26,7 @@
       },
       "Letter.Udp/1.0.0": {
         "type": "project",
-        "framework": ".NETCoreApp,Version=v5.0",
+        "framework": "net5.0",
         "dependencies": {
           "Letter.Core": "1.0.0"
         },
@@ -77,42 +77,41 @@
     }
   },
   "projectFileDependencyGroups": {
-    ".NETCoreApp,Version=v5.0": [
+    "net5.0": [
       "Letter.Udp >= 1.0.0"
     ]
   },
   "packageFolders": {
-    "C:\\Users\\pc\\.nuget\\packages\\": {},
-    "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder": {}
+    "/Users/guanyedong/.nuget/packages/": {},
+    "/usr/local/share/dotnet/sdk/NuGetFallbackFolder": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "F:\\letter-github\\test\\udp_text\\udp_text.csproj",
+      "projectUniqueName": "/Users/guanyedong/Projects/letter-github/test/udp_text/udp_text.csproj",
       "projectName": "udp_text",
-      "projectPath": "F:\\letter-github\\test\\udp_text\\udp_text.csproj",
-      "packagesPath": "C:\\Users\\pc\\.nuget\\packages\\",
-      "outputPath": "F:\\letter-github\\test\\udp_text\\obj\\",
+      "projectPath": "/Users/guanyedong/Projects/letter-github/test/udp_text/udp_text.csproj",
+      "packagesPath": "/Users/guanyedong/.nuget/packages/",
+      "outputPath": "/Users/guanyedong/Projects/letter-github/test/udp_text/obj/",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
-        "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
+        "/usr/local/share/dotnet/sdk/NuGetFallbackFolder"
       ],
       "configFilePaths": [
-        "C:\\Users\\pc\\AppData\\Roaming\\NuGet\\NuGet.Config",
-        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+        "/Users/guanyedong/.nuget/NuGet/NuGet.Config"
       ],
       "originalTargetFrameworks": [
-        "net50"
+        "net5.0"
       ],
       "sources": {
-        "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
         "https://api.nuget.org/v3/index.json": {}
       },
       "frameworks": {
-        "netcoreapp5.0": {
+        "net5.0": {
+          "targetAlias": "net5.0",
           "projectReferences": {
-            "F:\\letter-github\\src\\Letter.Udp\\Letter.Udp.csproj": {
-              "projectPath": "F:\\letter-github\\src\\Letter.Udp\\Letter.Udp.csproj"
+            "/Users/guanyedong/Projects/letter-github/src/Letter.Udp/Letter.Udp.csproj": {
+              "projectPath": "/Users/guanyedong/Projects/letter-github/src/Letter.Udp/Letter.Udp.csproj"
             }
           }
         }
@@ -124,7 +123,8 @@
       }
     },
     "frameworks": {
-      "netcoreapp5.0": {
+      "net5.0": {
+        "targetAlias": "net5.0",
         "imports": [
           "net461",
           "net462",
@@ -140,7 +140,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\5.0.100-preview.8.20417.9\\RuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/5.0.100-preview.8.20417.9/RuntimeIdentifierGraph.json"
       }
     }
   }

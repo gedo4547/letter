@@ -26,7 +26,10 @@ namespace Letter.Udp
 
         public EndPoint RemoteAddress
         {
-            get { throw new Exception("Udp does not support direct use of RemoteAddress, please use IUdpSession.RcvAddress or IUdpSession.SndAddress");}
+            get 
+            {
+                throw new Exception("please use IUdpSession.RcvAddress or IUdpSession.SndAddress");
+            }
         }
 
         public EndPoint RcvAddress { get; private set; }
