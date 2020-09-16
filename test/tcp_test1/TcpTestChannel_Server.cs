@@ -6,41 +6,41 @@ using EventArgs = Letter.EventArgs;
 
 namespace tcp_test1
 {
-    public class TcpTestChannel_Server : ITcpChannel
+    public class TcpTestFilter_Server : ITcpFilter
     {
-        public TcpTestChannel_Server(string name)
+        public TcpTestFilter_Server(string name)
         {
             this.name = name;
         }
 
         private string name;
 
-        public void OnChannelActive(ITcpContext context)
+        public void OnFilterActive(ITcpContext context)
         {
-            Console.WriteLine($"--{name}->{nameof(TcpTestChannel_Server)}.{nameof(OnChannelActive)}");
+            Console.WriteLine($"--{name}->{nameof(TcpTestFilter_Server)}.{nameof(OnFilterActive)}");
         }
 
-        public void OnChannelInactive(ITcpContext context)
+        public void OnFilterInactive(ITcpContext context)
         {
-            Console.WriteLine($"--{name}->{nameof(TcpTestChannel_Server)}.{nameof(OnChannelInactive)}");
+            Console.WriteLine($"--{name}->{nameof(TcpTestFilter_Server)}.{nameof(OnFilterInactive)}");
         }
 
-        public void OnChannelException(ITcpContext context, Exception ex)
+        public void OnFilterException(ITcpContext context, Exception ex)
         {
-            Console.WriteLine($"--{name}->{nameof(TcpTestChannel_Server)}.{nameof(OnChannelException)}>>{ex}");
+            Console.WriteLine($"--{name}->{nameof(TcpTestFilter_Server)}.{nameof(OnFilterException)}>>{ex}");
         }
 
-        public void OnChannelRead(ITcpContext context, ref WrappedStreamReader reader, ref EventArgs args)
+        public void OnFilterRead(ITcpContext context, ref WrappedStreamReader reader, ref EventArgs args)
         {
-            Console.WriteLine($"--{name}->{nameof(TcpTestChannel_Server)}.{nameof(OnChannelRead)}>{args.buffer.Length}");
+            Console.WriteLine($"--{name}->{nameof(TcpTestFilter_Server)}.{nameof(OnFilterRead)}>{args.buffer.Length}");
             var span = args.buffer.First.Span;
             string str = System.Text.Encoding.UTF8.GetString(span);
             Console.WriteLine(str);
         }
 
-        public void OnChannelWrite(ITcpContext context, ref WrappedStreamWriter writer, ref EventArgs args)
+        public void OnFilterWrite(ITcpContext context, ref WrappedStreamWriter writer, ref EventArgs args)
         {
-            Console.WriteLine($"--{name}->{nameof(TcpTestChannel_Server)}.{nameof(OnChannelWrite)}");
+            Console.WriteLine($"--{name}->{nameof(TcpTestFilter_Server)}.{nameof(OnFilterWrite)}");
         }
     }
 }

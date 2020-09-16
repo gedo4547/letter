@@ -9,20 +9,20 @@ namespace Letter.Tcp
 {
     public partial class TcpContext : ITcpContext
     {
-        public static TcpContext Get(List<ITcpChannel> channels, BinaryOrder order)
+        public static TcpContext Get(List<ITcpFilter> Filters, BinaryOrder order)
         {
             return null;
         }
 
-        public TcpContext(TcpChannelGroup channelGroup, BinaryOrder order)
+        public TcpContext(TcpFilterGroup FilterGroup, BinaryOrder order)
         {
-            if (channelGroup == null)
+            if (FilterGroup == null)
             {
-                throw new ArgumentNullException(nameof(channelGroup));
+                throw new ArgumentNullException(nameof(FilterGroup));
             }
 
             this.order = order;
-            this.channelGroup = channelGroup;
+            this.FilterGroup = FilterGroup;
         }
 
         public string Id => this.client.Id;
@@ -34,7 +34,7 @@ namespace Letter.Tcp
         private BinaryOrder order;
 
         private ITcpClient client;
-        private TcpChannelGroup channelGroup;
+        private TcpFilterGroup FilterGroup;
         
         public void Initialize(ITcpClient client)
         {
@@ -42,7 +42,7 @@ namespace Letter.Tcp
             
             this.ReaderMemoryPolledIOAsync().NoAwait();
 
-            this.channelGroup.OnChannelActive(this);
+            this.FilterGroup.OnFilterActive(this);
         }
 
         public Task WriteAsync(object o)
@@ -68,7 +68,7 @@ namespace Letter.Tcp
         
         public async ValueTask DisposeAsync()
         {
-            this.channelGroup.Dispose();
+            this.FilterGroup.Dispose();
             await this.client.DisposeAsync();
         }
     }

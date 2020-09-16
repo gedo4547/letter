@@ -1,10 +1,10 @@
-﻿namespace Letter.Udp
-{
-    public static class UdpFactory
-    {
-        public static IUdpBootstrap Create()
-        {
-            return new UdpBootstrap();
-        }
-    }
-}
+﻿// namespace Letter.Udp
+// {
+//     public static class UdpFactory
+//     {
+//         public static IUdpBootstrap Create()
+//         {
+//             return new UdpBootstrap();
+//         }
+//     }
+// }

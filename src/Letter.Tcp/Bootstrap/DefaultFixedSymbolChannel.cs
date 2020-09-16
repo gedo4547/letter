@@ -3,9 +3,9 @@ using Letter.IO;
 
 namespace Letter.Tcp
 {
-    public class DefaultFixedSymbolChannel : ITcpChannel
+    public class DefaultFixedSymbolFilter : ITcpFilter
     {
-        public DefaultFixedSymbolChannel(byte[] symbol)
+        public DefaultFixedSymbolFilter(byte[] symbol)
         {
             if (symbol.Length > 8)
             {
@@ -17,22 +17,22 @@ namespace Letter.Tcp
 
         private byte[] symbol;
 
-        public void OnChannelActive(ITcpContext context)
+        public void OnFilterActive(ITcpContext context)
         {
             
         }
 
-        public void OnChannelInactive(ITcpContext context)
+        public void OnFilterInactive(ITcpContext context)
         {
             
         }
 
-        public void OnChannelException(ITcpContext context, Exception ex)
+        public void OnFilterException(ITcpContext context, Exception ex)
         {
             
         }
 
-        public void OnChannelRead(ITcpContext context, ref WrappedStreamReader reader, ref EventArgs args)
+        public void OnFilterRead(ITcpContext context, ref WrappedStreamReader reader, ref EventArgs args)
         {
             while (reader.TryFindPosition(this.symbol, out SequencePosition endPosition))
             {
@@ -43,7 +43,7 @@ namespace Letter.Tcp
             }
         }
 
-        public void OnChannelWrite(ITcpContext context, ref WrappedStreamWriter writer, ref EventArgs args)
+        public void OnFilterWrite(ITcpContext context, ref WrappedStreamWriter writer, ref EventArgs args)
         {
             writer.Write(ref args.buffer);
             writer.Write(this.symbol);

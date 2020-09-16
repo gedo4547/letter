@@ -5,43 +5,43 @@ using EventArgs = Letter.EventArgs;
 
 namespace tcp_test1
 {
-    public class TcpTestChannel_Client : ITcpChannel
+    public class TcpTestFilter_Client : ITcpFilter
     {
-        public TcpTestChannel_Client(string name)
+        public TcpTestFilter_Client(string name)
         {
             this.name = name;
         }
 
         private string name;
         
-        public void OnChannelActive(ITcpContext context)
+        public void OnFilterActive(ITcpContext context)
         {
-            Console.WriteLine($"--{name}->{nameof(TcpTestChannel_Client)}.{nameof(OnChannelActive)}");
+            Console.WriteLine($"--{name}->{nameof(TcpTestFilter_Client)}.{nameof(OnFilterActive)}");
             byte[] bytes = System.Text.Encoding.UTF8.GetBytes("你好");
             context.WriteAsync(bytes, 0, bytes.Length);
         }
 
-        public void OnChannelInactive(ITcpContext context)
+        public void OnFilterInactive(ITcpContext context)
         {
-            Console.WriteLine($"--{name}->{nameof(TcpTestChannel_Client)}.{nameof(OnChannelInactive)}");
+            Console.WriteLine($"--{name}->{nameof(TcpTestFilter_Client)}.{nameof(OnFilterInactive)}");
         }
 
-        public void OnChannelException(ITcpContext context, Exception ex)
+        public void OnFilterException(ITcpContext context, Exception ex)
         {
-            Console.WriteLine($"--{name}->{nameof(TcpTestChannel_Client)}.{nameof(OnChannelException)}>>{ex}");
+            Console.WriteLine($"--{name}->{nameof(TcpTestFilter_Client)}.{nameof(OnFilterException)}>>{ex}");
         }
 
-        public void OnChannelRead(ITcpContext context, ref WrappedStreamReader reader, ref EventArgs args)
+        public void OnFilterRead(ITcpContext context, ref WrappedStreamReader reader, ref EventArgs args)
         {
             // var span = args.buffer.First.Span;
             // string str = System.Text.Encoding.UTF8.GetString(span);
             
-            Console.WriteLine($"--{name}->{nameof(TcpTestChannel_Client)}.{nameof(OnChannelRead)}>{args.buffer.Length}");
+            Console.WriteLine($"--{name}->{nameof(TcpTestFilter_Client)}.{nameof(OnFilterRead)}>{args.buffer.Length}");
         }
 
-        public void OnChannelWrite(ITcpContext context, ref WrappedStreamWriter writer, ref EventArgs args)
+        public void OnFilterWrite(ITcpContext context, ref WrappedStreamWriter writer, ref EventArgs args)
         {
-            Console.WriteLine($"--{name}->{nameof(TcpTestChannel_Client)}.{nameof(OnChannelWrite)}");
+            Console.WriteLine($"--{name}->{nameof(TcpTestFilter_Client)}.{nameof(OnFilterWrite)}");
         }
     }
 }

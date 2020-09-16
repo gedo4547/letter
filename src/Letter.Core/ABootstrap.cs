@@ -3,25 +3,14 @@ using System.Threading.Tasks;
 
 namespace Letter
 {
-    public abstract class ABootstrap<TOptions, TNetwork> : IBootstrap<TOptions, TNetwork>
+    public abstract class ABootstrap<TOptions, TChannel> : IBootstrap<TOptions, TChannel>
         where TOptions : class, IOptions, new()
-        where TNetwork : INetwork
+        where TChannel : IChannel
     {
         protected TOptions options;
         
         private Action<TOptions> optionsFactory;
-        private Action<TNetwork> networkConfigurator;
         
-        public void ConfigurationNetwork(Action<TNetwork> configurator)
-        {
-            if (configurator == null)
-            {
-                throw new ArgumentNullException(nameof(configurator));
-            }
-
-            this.networkConfigurator = configurator;
-        }
-
         public void ConfigurationOptions(Action<TOptions> optionsFactory)
         {
             if (optionsFactory == null)
@@ -32,7 +21,7 @@ namespace Letter
             this.optionsFactory = optionsFactory;
         }
 
-        public virtual async Task<TNetwork> BuildAsync()
+        public virtual Task<TChannel> BuildAsync()
         {
             if (this.options == null)
             {
@@ -43,20 +32,15 @@ namespace Letter
                 
                 this.optionsFactory(this.options);
             }
-            
-            TNetwork network = await this.NetworkCreator();
-            this.networkConfigurator?.Invoke(network);
-            
-            return network;
+
+            return null;
         }
 
-        protected abstract Task<TNetwork> NetworkCreator();
         
         public virtual ValueTask DisposeAsync()
         {
             this.optionsFactory = null;
             this.options = default;
-            this.networkConfigurator = null;
             
             return default;
         }

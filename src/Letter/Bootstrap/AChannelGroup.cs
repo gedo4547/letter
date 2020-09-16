@@ -4,91 +4,91 @@ using System.Collections.Generic;
 
 namespace Letter
 {
-    public abstract class AChannelGroup<TChannel, TContext, TReader, TWriter> : IDisposable
+    public abstract class AFilterGroup<TFilter, TContext, TReader, TWriter> : IDisposable
         where TReader : struct
         where TWriter : struct
         where TContext : class, IContext
-        where TChannel : IChannel<TContext, TReader, TWriter>
+        where TFilter : IFilter<TContext, TReader, TWriter>
     {
-        public AChannelGroup(List<TChannel> channels)
+        public AFilterGroup(List<TFilter> Filters)
         {
-            if (channels == null)
+            if (Filters == null)
             {
-                throw new ArgumentNullException(nameof(channels));
+                throw new ArgumentNullException(nameof(Filters));
             }
 
-            this.channels = channels;
+            this.Filters = Filters;
         }
 
-        private List<TChannel> channels;
+        private List<TFilter> Filters;
 
-        public void OnChannelActive(TContext context)
+        public void OnFilterActive(TContext context)
         {
-            int count = channels.Count;
+            int count = Filters.Count;
             for (int i = 0; i < count; i++)
             {
-                this.channels[i].OnChannelActive(context);
+                this.Filters[i].OnFilterActive(context);
             }
         }
 
-        public void OnChannelInactive(TContext context)
+        public void OnFilterInactive(TContext context)
         {
-            int count = channels.Count;
+            int count = Filters.Count;
             for (int i = 0; i < count; i++)
             {
-                this.channels[i].OnChannelInactive(context);
+                this.Filters[i].OnFilterInactive(context);
             }
         }
         
-        public void OnChannelException(TContext context, Exception ex)
+        public void OnFilterException(TContext context, Exception ex)
         {
-            int count = this.channels.Count;
+            int count = this.Filters.Count;
             for (int i = 0; i < count; i++)
             {
-                this.channels[i].OnChannelException(context, ex);
+                this.Filters[i].OnFilterException(context, ex);
             }
         }
         
-        public virtual void OnChannelRead(TContext context, ref TReader reader)
+        public virtual void OnFilterRead(TContext context, ref TReader reader)
         {
             EventArgs args = new EventArgs();
-            int count = this.channels.Count;
+            int count = this.Filters.Count;
             for (int i = 0; i < count; i++)
             {
-                this.channels[i].OnChannelRead(context, ref reader, ref args);
+                this.Filters[i].OnFilterRead(context, ref reader, ref args);
             }
         }
         
-        public virtual void OnChannelWrite(TContext context, ref TWriter writer, ref ReadOnlySequence<byte> sequence)
+        public virtual void OnFilterWrite(TContext context, ref TWriter writer, ref ReadOnlySequence<byte> sequence)
         {
             EventArgs args = new EventArgs();
             args.buffer = sequence;
             
-            int count = this.channels.Count;
+            int count = this.Filters.Count;
             for (int i = 0; i < count; i++)
             {
-                this.channels[i].OnChannelWrite(context, ref writer, ref args);
+                this.Filters[i].OnFilterWrite(context, ref writer, ref args);
             }
         }
 
-        public virtual void OnChannelWrite(TContext context, ref TWriter writer, object obj)
+        public virtual void OnFilterWrite(TContext context, ref TWriter writer, object obj)
         {
             EventArgs args = new EventArgs();
             args.item = obj;
             
-            int count = this.channels.Count;
+            int count = this.Filters.Count;
             for (int i = 0; i < count; i++)
             {
-                this.channels[i].OnChannelWrite(context, ref writer, ref args);
+                this.Filters[i].OnFilterWrite(context, ref writer, ref args);
             }
         }
 
         public void Dispose()
         {
-            if (this.channels != null)
+            if (this.Filters != null)
             {
-                this.channels.Clear();
-                this.channels = null;
+                this.Filters.Clear();
+                this.Filters = null;
             }
         }
     }

@@ -3,62 +3,62 @@ using System.Collections.Generic;
 
 namespace Letter
 {
-    public sealed class ChannelGroupFactory<TChannelGroup, TChannel, TContext, TReader, TWriter> : IDisposable
+    public sealed class FilterGroupFactory<TFilterGroup, TFilter, TContext, TReader, TWriter> : IDisposable
         where TReader : struct
         where TWriter : struct
         where TContext : class, IContext
-        where TChannel : IChannel<TContext, TReader, TWriter>
-        where TChannelGroup : AChannelGroup<TChannel, TContext, TReader, TWriter>
+        where TFilter : IFilter<TContext, TReader, TWriter>
+        where TFilterGroup : AFilterGroup<TFilter, TContext, TReader, TWriter>
     {
-        public ChannelGroupFactory(Func<List<TChannel>, TChannelGroup> channelGroupCreator)
+        public FilterGroupFactory(Func<List<TFilter>, TFilterGroup> FilterGroupCreator)
         {
-            if (channelGroupCreator == null)
+            if (FilterGroupCreator == null)
             {
-                throw new ArgumentNullException(nameof(channelGroupCreator));
+                throw new ArgumentNullException(nameof(FilterGroupCreator));
             }
 
-            this.channelGroupCreator = channelGroupCreator;
+            this.FilterGroupCreator = FilterGroupCreator;
         }
         
-        private Func<List<TChannel>, TChannelGroup> channelGroupCreator;
-        private List<Func<TChannel>> channelFactorys = new List<Func<TChannel>>();
+        private Func<List<TFilter>, TFilterGroup> FilterGroupCreator;
+        private List<Func<TFilter>> FilterFactorys = new List<Func<TFilter>>();
 
-        public void AddChannelFactory(Func<TChannel> channelFactory)
+        public void AddFilterFactory(Func<TFilter> FilterFactory)
         {
-            if (channelFactory == null)
+            if (FilterFactory == null)
             {
-                throw new ArgumentNullException(nameof(channelFactory));
+                throw new ArgumentNullException(nameof(FilterFactory));
             }
             
-            this.channelFactorys.Add(channelFactory);
+            this.FilterFactorys.Add(FilterFactory);
         }
 
-        public TChannelGroup CreateChannelGroup()
+        public TFilterGroup CreateFilterGroup()
         {
-            List<TChannel> channels = new List<TChannel>();
-            int count = this.channelFactorys.Count;
+            List<TFilter> Filters = new List<TFilter>();
+            int count = this.FilterFactorys.Count;
             for (int i = 0; i < count; i++)
             {
-                var channel = this.channelFactorys[i]();
-                if (channel == null)
+                var Filter = this.FilterFactorys[i]();
+                if (Filter == null)
                 {
-                    throw new NullReferenceException(nameof(channel));
+                    throw new NullReferenceException(nameof(Filter));
                 }
                 
-                channels.Add(channel);
+                Filters.Add(Filter);
             }
 
-            return this.channelGroupCreator(channels);
+            return this.FilterGroupCreator(Filters);
         }
 
         public void Dispose()
         {
-            this.channelGroupCreator = null;
+            this.FilterGroupCreator = null;
             
-            if (this.channelFactorys != null)
+            if (this.FilterFactorys != null)
             {
-                this.channelFactorys.Clear();
-                this.channelFactorys = null;
+                this.FilterFactorys.Clear();
+                this.FilterFactorys = null;
             }
         }
     }

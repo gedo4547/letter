@@ -3,14 +3,12 @@ using System.Threading.Tasks;
 
 namespace Letter
 {
-    public interface IBootstrap<TOptions, TNetwork> : IAsyncDisposable
+    public interface IBootstrap<TOptions, TChannel> : IAsyncDisposable
         where TOptions : class, IOptions, new()
-        where TNetwork : INetwork
+        where TChannel : IChannel
     {
-        void ConfigurationNetwork(Action<TNetwork> configurator);
-        
         void ConfigurationOptions(Action<TOptions> optionsFactory);
         
-        Task<TNetwork> BuildAsync();
+        Task<TChannel> BuildAsync();
     }
 }

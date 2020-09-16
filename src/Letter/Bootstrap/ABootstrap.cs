@@ -4,28 +4,28 @@ using System.Threading.Tasks;
 
 namespace Letter
 {
-    public abstract class ABootstrap<TOptions, TChannelGroup, TChannel, TContext, TReader, TWriter> : IBootstrap<TOptions, TChannel, TContext, TReader, TWriter>
+    public abstract class ABootstrap<TOptions, TFilterGroup, TFilter, TContext, TReader, TWriter> : IBootstrap<TOptions, TFilter, TContext, TReader, TWriter>
         where TOptions: IOptions
         where TReader : struct
         where TWriter : struct
         where TContext : class, IContext
-        where TChannel : IChannel<TContext, TReader, TWriter>
-        where TChannelGroup : AChannelGroup<TChannel, TContext, TReader, TWriter>
+        where TFilter : IFilter<TContext, TReader, TWriter>
+        where TFilterGroup : AFilterGroup<TFilter, TContext, TReader, TWriter>
     {
         public ABootstrap()
         {
-            this.channelGroupFactory = new ChannelGroupFactory<TChannelGroup, TChannel, TContext, TReader, TWriter>(this.OnCreateChannelGroup);
+            this.FilterGroupFactory = new FilterGroupFactory<TFilterGroup, TFilter, TContext, TReader, TWriter>(this.OnCreateFilterGroup);
         }
         
         protected Action<TOptions> optionsFactory;
-        protected ChannelGroupFactory<TChannelGroup, TChannel, TContext, TReader, TWriter> channelGroupFactory;
+        protected FilterGroupFactory<TFilterGroup, TFilter, TContext, TReader, TWriter> FilterGroupFactory;
         
-        public void AddChannel(Func<TChannel> channelFactory)
+        public void AddFilter(Func<TFilter> FilterFactory)
         {
-            if (channelFactory == null)
-                throw new ArgumentNullException(nameof(channelFactory));
+            if (FilterFactory == null)
+                throw new ArgumentNullException(nameof(FilterFactory));
 
-            this.channelGroupFactory.AddChannelFactory(channelFactory);
+            this.FilterGroupFactory.AddFilterFactory(FilterFactory);
         }
 
         public void ConfigurationOptions(Action<TOptions> optionsFactory)
@@ -36,7 +36,7 @@ namespace Letter
             this.optionsFactory = optionsFactory;
         }
         
-        protected abstract TChannelGroup OnCreateChannelGroup(List<TChannel> channels);
+        protected abstract TFilterGroup OnCreateFilterGroup(List<TFilter> Filters);
         
         public virtual Task StopAsync()
         {

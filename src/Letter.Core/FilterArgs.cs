@@ -2,7 +2,7 @@
 
 namespace Letter
 {
-    public ref struct ChannelArgs
+    public ref struct FilterArgs
     {
         public object item;
         public ReadOnlySequence<byte> buffer;

@@ -2,7 +2,7 @@
 
 namespace Letter.Udp
 {
-    public interface IUdpChannel : IDgramChannel<IUdpSession>
+    public interface IUdpFilter : IDgramChannelFilter<IUdpSession>
     {
         
     }

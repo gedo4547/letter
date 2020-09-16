@@ -2,9 +2,7 @@
 
 namespace Letter
 {
-    public interface IChannelGroup<TSession, TChannel> : IAsyncDisposable
-        where TSession : ISession
-        where TChannel : IChannel<TSession>
+    public interface IChannelFilter<TSession> where TSession : ISession
     {
         void OnChannelActive(TSession session);
         void OnChannelInactive(TSession session);

@@ -2,7 +2,7 @@
 
 namespace Letter.Tcp
 {
-    public interface ITcpChannel : IChannel<ITcpContext, WrappedStreamReader, WrappedStreamWriter>
+    public interface ITcpFilter : IFilter<ITcpContext, WrappedStreamReader, WrappedStreamWriter>
     {
         
     }

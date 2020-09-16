@@ -1,11 +1,15 @@
-﻿namespace Letter
+﻿using System;
+
+namespace Letter
 {
-    public interface IStreamBootstrap<TOptions, TSession, TChannel, TNetwork> : IBootstrap<TOptions, TNetwork>
+    public interface IStreamBootstrap<TOptions, TSession, TFilter, TChannel> : IBootstrap<TOptions, TChannel>
         where TOptions : class, IOptions, new()
         where TSession : ISession
-        where TChannel : IStreamChannel<TSession>
-        where TNetwork : IStreamNetwork<TSession, TChannel>
+        where TFilter : IStreamChannelFilter<TSession>
+        where TChannel : IChannel
     {
+        void AddChannelFilter<TChannelFilter>() where TChannelFilter : TFilter, new();
         
+        void AddChannelFilter(Func<TFilter> filterFactory);
     }
 }

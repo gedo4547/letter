@@ -18,8 +18,8 @@ namespace tcp_test1
             {
                 
             });
-            server.AddChannel(() => { return new DefaultFixedSymbolChannel(symbol);});
-            server.AddChannel(() => { return new TcpTestChannel_Server("服务器");});
+            server.AddFilter(() => { return new DefaultFixedSymbolFilter(symbol);});
+            server.AddFilter(() => { return new TcpTestFilter_Server("服务器");});
             await server.StartAsync(address);
             
             var client = TcpFactory.ClientBootstrap();
@@ -27,8 +27,8 @@ namespace tcp_test1
             {
                 
             });
-            client.AddChannel(() => { return new DefaultFixedSymbolChannel(symbol);});
-            client.AddChannel(() => { return new TcpTestChannel_Client("客户端");});
+            client.AddFilter(() => { return new DefaultFixedSymbolFilter(symbol);});
+            client.AddFilter(() => { return new TcpTestFilter_Client("客户端");});
             await client.StartAsync(address);
             
             
