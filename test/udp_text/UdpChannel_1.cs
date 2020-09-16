@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Buffers;
 using System.Net;
-using System.Threading.Tasks;
 using Letter;
 using Letter.Udp;
 
@@ -24,12 +22,12 @@ namespace udp_text
             throw new NotImplementedException();
         }
 
-        public void OnChannelRead(IUdpSession session, ref WrappedDgramReader reader, ref ChannelArgs args)
+        public void OnChannelRead(IUdpSession session, EndPoint remoteAddress, ref WrappedDgramReader reader, ref ChannelArgs args)
         {
             throw new NotImplementedException();
         }
 
-        public void OnChannelWrite(IUdpSession session, ref WrappedDgramWriter writer, ref ChannelArgs args)
+        public void OnChannelWrite(IUdpSession session, EndPoint remoteAddress, ref WrappedDgramWriter writer, ref ChannelArgs args)
         {
             throw new NotImplementedException();
         }

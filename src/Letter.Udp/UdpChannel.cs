@@ -1,4 +1,5 @@
-﻿using System.Net;
+﻿using System.IO.Pipelines;
+using System.Net;
 using System.Net.Sockets;
 using System.Threading.Tasks;
 
@@ -13,33 +14,75 @@ namespace Letter.Udp
         }
 
         private Socket socket;
+        private UdpSession session;
         
         private UdpOptions options;
         private DgramChannelFilterGroupFactory<IUdpSession, IUdpChannelFilter> groupFactory;
+        
+        public async Task StartAsync(EndPoint bindAddress, EndPoint connectAddress)
+        {
+            await this.StartAsync(bindAddress);
 
+            await this.socket.ConnectAsync(connectAddress);
+            
+            this.Run();
+        }
+        
         public Task StartAsync(EndPoint bindAddress)
         {
             this.CreateSocket(bindAddress.AddressFamily);
+            
+            try
+            {
+                socket.Bind(bindAddress);
+            }
+            catch (SocketException e) when (e.SocketErrorCode == SocketError.AddressAlreadyInUse)
+            {
+                throw new AddressInUseException(e.Message, e);
+            }
+            
+            this.Run();
+            
             return Task.CompletedTask;
         }
-
-        public Task StartAsync(EndPoint bindAddress, EndPoint connectAddress)
-        {
-            this.CreateSocket(bindAddress.AddressFamily);
-            return Task.CompletedTask;
-        }
-
-        private Socket CreateSocket(AddressFamily family)
+        
+        private void CreateSocket(AddressFamily family)
         {
             this.socket = new Socket(family, SocketType.Dgram, ProtocolType.Udp);
-
-
-            return this.socket;
+            
+            // this.socket.SettingLingerState(this.options.LingerOption);
+            
+            if (this.options.RcvTimeout != null)
+                this.socket.SettingRcvTimeout(this.options.RcvTimeout.Value);
+            if (this.options.SndTimeout != null)
+                this.socket.SettingSndTimeout(this.options.SndTimeout.Value);
+            
+            if (this.options.RcvBufferSize != null)
+                this.socket.SettingRcvBufferSize(this.options.RcvBufferSize.Value);
+            if (this.options.SndBufferSize != null)
+                this.socket.SettingSndBufferSize(this.options.SndBufferSize.Value);
         }
 
-        public ValueTask DisposeAsync()
+        private void Run()
         {
-            throw new System.NotImplementedException();
+            var filterGroup = this.groupFactory.CreateFilterGroup();
+            var memoryPool = this.options.MemoryPoolFactory();
+            PipeScheduler scheduler = this.options.Allocator.Next();
+            
+            this.session = new UdpSession(this.options.Order, memoryPool, scheduler, filterGroup);
+            this.session.StartAsync(this.socket);
+        }
+        
+        public async ValueTask DisposeAsync()
+        {
+            if (this.session != null)
+            {
+                await this.session.CloseAsync();
+                this.socket = null;
+            }
+
+            this.options = null;
+            this.groupFactory = null;
         }
     }
 }

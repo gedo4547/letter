@@ -15,16 +15,13 @@ namespace System.Net.Sockets
 
         public EndPoint RemoteAddress
         {
-            get { return _socket.RemoteEndPoint; }
+            get { return _awaitableEventArgs.RemoteEndPoint; }
         }
 
         public EndPoint LocalAddress
         {
             get { return _socket.LocalEndPoint; }
         }
-
-
-
 
         public void Dispose() => _awaitableEventArgs.Dispose();
     }

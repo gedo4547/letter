@@ -15,7 +15,7 @@ namespace Letter
 
         protected List<TFilter> filters;
         
-        public void OnFilterActive(TSession session)
+        public void OnChannelActive(TSession session)
         {
             int count = filters.Count;
             for (int i = 0; i < count; ++i)
@@ -24,7 +24,7 @@ namespace Letter
             }
         }
 
-        public void OnFilterInactive(TSession session)
+        public void OnChannelInactive(TSession session)
         {
             int count = filters.Count;
             for (int i = 0; i < count; ++i)
@@ -33,7 +33,7 @@ namespace Letter
             }
         }
 
-        public void OnFilterException(TSession session, Exception ex)
+        public void OnChannelException(TSession session, Exception ex)
         {
             int count = this.filters.Count;
             for (int i = 0; i < count; ++i)

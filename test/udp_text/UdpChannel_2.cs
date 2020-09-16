@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Buffers;
+using System.Net;
 using Letter;
 using Letter.Udp;
 
@@ -8,27 +10,42 @@ namespace udp_text
     {
         public void OnChannelActive(IUdpSession session)
         {
-            throw new NotImplementedException();
+            Console.WriteLine($"{nameof(UdpFilter_2)}.{nameof(OnChannelActive)}" + session.LoaclAddress);
+            
+            if (session.LoaclAddress.ToString() == Program.c_p.ToString())
+            {
+                string str = "nihao";
+                var arr = System.Text.Encoding.UTF8.GetBytes(str);
+                ReadOnlySequence<byte> sequence = new ReadOnlySequence<byte>(arr);
+                
+                Console.WriteLine("发送");
+                session.WriteAsync(Program.s_p, ref sequence);
+            }
         }
 
         public void OnChannelInactive(IUdpSession session)
         {
-            throw new NotImplementedException();
+            Console.WriteLine($"{nameof(UdpFilter_2)}.{nameof(OnChannelInactive)}");
         }
 
         public void OnChannelException(IUdpSession session, Exception ex)
         {
-            throw new NotImplementedException();
+            Console.WriteLine($"{nameof(UdpFilter_2)}.{nameof(OnChannelException)}" + ex.ToString());
         }
 
-        public void OnChannelRead(IUdpSession session, ref WrappedDgramReader reader, ref ChannelArgs args)
+        public void OnChannelRead(IUdpSession session, EndPoint remoteAddress, ref WrappedDgramReader reader, ref ChannelArgs args)
         {
-            throw new NotImplementedException();
+            int length = reader.Length;
+            var buffer = reader.ReadRange(length);
+            string str= System.Text.Encoding.UTF8.GetString(buffer.Span);
+
+            Console.WriteLine($"{nameof(UdpFilter_2)}.{nameof(OnChannelRead)}>>LoaclAddress:{session.LoaclAddress}    remoteAddress:{remoteAddress}>>" + str);
         }
 
-        public void OnChannelWrite(IUdpSession session, ref WrappedDgramWriter writer, ref ChannelArgs args)
+        public void OnChannelWrite(IUdpSession session, EndPoint remoteAddress, ref WrappedDgramWriter writer, ref ChannelArgs args)
         {
-            throw new NotImplementedException();
+            Console.WriteLine($"{nameof(UdpFilter_2)}.{nameof(OnChannelWrite)}");
+            writer.Write(ref args.buffer);
         }
     }
 }

@@ -29,7 +29,7 @@ namespace Letter
                 {
                     throw new NullReferenceException(nameof(this.optionsFactory));
                 }
-                
+                this.options = new TOptions();
                 this.optionsFactory(this.options);
             }
 

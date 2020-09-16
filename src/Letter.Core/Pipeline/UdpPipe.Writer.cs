@@ -2,8 +2,9 @@
 using System.Buffers;
 using System.Net;
 using System.Threading;
+ using System.Threading.Tasks;
 
-namespace Letter
+ namespace Letter
 {
     public partial class UdpPipe : IUdpPipeWriter
     {
@@ -37,15 +38,22 @@ namespace Letter
             {
                 if (node == null)
                     throw new ArgumentNullException(nameof(node));
+                
                 if (node.Point == null)
                     throw new ArgumentNullException(nameof(node.Point));
+                
                 if (node.ReadableLength < 1)
-                    throw new Exception("The readable length of a node cannot be 0");
-
+                {
+                    Console.WriteLine("The readable length of a node cannot be 0");
+                    node.ReleaseAsync().NoAwait();
+                    return;
+                    // throw new Exception("The readable length of a node cannot be 0");
+                }
+                
                 if ((this.headNode == null && this.tailNode != null) ||
                     (this.headNode != null && this.tailNode == null))
                     throw new Exception("pipe exception");
-
+                
                 if (this.headNode == null && this.tailNode == null)
                 {
                     this.headNode = node;
@@ -57,7 +65,7 @@ namespace Letter
                     this.tailNode = node;
                 }
             }
-            
+
             if (Interlocked.CompareExchange(ref this.waiting, FALSE, TRUE) == TRUE)
             {
                 this.scheduler.Schedule(this.multiThreadedInvoke, null);

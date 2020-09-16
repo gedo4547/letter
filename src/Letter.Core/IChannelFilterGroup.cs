@@ -6,8 +6,8 @@ namespace Letter
         where TSession : ISession
         where TFilter : IChannelFilter<TSession>
     {
-        void OnFilterActive(TSession session);
-        void OnFilterInactive(TSession session);
-        void OnFilterException(TSession session, Exception ex);
+        void OnChannelActive(TSession session);
+        void OnChannelInactive(TSession session);
+        void OnChannelException(TSession session, Exception ex);
     }
 }

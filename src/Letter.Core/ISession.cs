@@ -1,4 +1,5 @@
 ﻿using System.Buffers;
+using System.IO.Pipelines;
 using System.Net;
 using System.Threading.Tasks;
 
@@ -13,6 +14,8 @@ namespace Letter
         EndPoint RemoteAddress { get; }
         
         MemoryPool<byte> MemoryPool { get; }
+
+        PipeScheduler Scheduler { get; }
 
         Task CloseAsync();
     }
