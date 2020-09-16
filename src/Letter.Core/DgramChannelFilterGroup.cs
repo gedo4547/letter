@@ -14,7 +14,7 @@ namespace Letter
 
         public void OnFilterRead(TSession session, ref WrappedDgramReader reader)
         {
-            FilterArgs args = new FilterArgs();
+            ChannelArgs args = new ChannelArgs();
             
             int count = this.filters.Count;
             for (int i = 0; i < count; i++)
@@ -26,7 +26,7 @@ namespace Letter
 
         public void OnFilterWrite(TSession session, ref WrappedDgramWriter writer, object obj)
         {
-            FilterArgs args = new FilterArgs();
+            ChannelArgs args = new ChannelArgs();
             args.item = obj;
             
             int count = this.filters.Count;
@@ -40,7 +40,7 @@ namespace Letter
 
         public void OnFilterWrite(TSession session, ref WrappedDgramWriter writer, ref ReadOnlySequence<byte> buffer)
         {
-            FilterArgs args = new FilterArgs();
+            ChannelArgs args = new ChannelArgs();
             args.buffer = buffer;
             
             int count = this.filters.Count;

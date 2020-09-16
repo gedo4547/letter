@@ -13,7 +13,7 @@ namespace Letter
 
         public void OnFilterRead(TSession session, ref WrappedStreamReader reader)
         {
-            FilterArgs args = new FilterArgs();
+            ChannelArgs args = new ChannelArgs();
             
             int count = this.filters.Count;
             for (int i = 0; i < count; ++i)
@@ -25,7 +25,7 @@ namespace Letter
 
         public void OnFilterWrite(TSession session, ref WrappedStreamWriter writer, object obj)
         {
-            FilterArgs args = new FilterArgs()
+            ChannelArgs args = new ChannelArgs()
             {
                 item = obj
             };
@@ -41,7 +41,7 @@ namespace Letter
 
         public void OnFilterWrite(TSession session, ref WrappedStreamWriter writer, ref ReadOnlySequence<byte> buffer)
         {
-            FilterArgs args = new FilterArgs()
+            ChannelArgs args = new ChannelArgs()
             {
                 buffer = buffer
             };
