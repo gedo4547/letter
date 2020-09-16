@@ -65,9 +65,7 @@ namespace Letter.Udp
             
             this.filterGroup.OnChannelActive(this);
         }
-
         
-
         public Task WriteAsync(EndPoint remoteAddress, object obj)
         {
             return this.WriteBufferAsync(remoteAddress, obj);

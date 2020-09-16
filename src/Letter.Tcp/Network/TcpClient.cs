@@ -11,7 +11,6 @@ namespace Letter.Tcp
 {
     class TcpClient : ATcpNetwork<TcpClientOptions>, ITcpClient
     {
-        public static readonly bool IsMacOS = OSPlatformHelper.IsOSX();
         public static readonly bool IsWindows = OSPlatformHelper.IsWindows();
         
         public TcpClient() : base(new TcpClientOptions())
@@ -401,8 +400,7 @@ namespace Letter.Tcp
             // ProtocolType can be removed once https://github.com/dotnet/corefx/issues/31927 is fixed.
             return errorCode == SocketError.ConnectionReset ||
                    errorCode == SocketError.Shutdown ||
-                   (errorCode == SocketError.ConnectionAborted && IsWindows) ||
-                   (errorCode == SocketError.ProtocolType && IsMacOS);
+                   (errorCode == SocketError.ConnectionAborted && IsWindows);
         }
 
         protected static bool IsConnectionAbortError(SocketError errorCode)

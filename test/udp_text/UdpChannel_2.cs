@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Buffers;
-using System.Net;
 using Letter;
 using Letter.Udp;
 
@@ -19,7 +18,10 @@ namespace udp_text
                 ReadOnlySequence<byte> sequence = new ReadOnlySequence<byte>(arr);
                 
                 Console.WriteLine("发送");
-                session.WriteAsync(Program.s_p, ref sequence);
+                for (int i = 0; i < 10; i++)
+                {
+                    session.WriteAsync(Program.s_p, ref sequence);    
+                }
             }
         }
 

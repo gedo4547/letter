@@ -50,6 +50,7 @@ namespace Letter.Udp
                 catch (Exception ex)
                 {
                     // base.SocketExceptionInspect(ex);
+                    this.filterGroup.OnChannelException(this, ex);
                     return;
                 }
             }
