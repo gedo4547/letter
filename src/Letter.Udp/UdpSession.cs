@@ -81,6 +81,8 @@ namespace Letter.Udp
         
         public Task CloseAsync()
         {
+            this.filterGroup.OnChannelInactive(this);
+
             this.Id = string.Empty;
 
 
