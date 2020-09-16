@@ -1,14 +1,14 @@
-﻿// using System.Threading.Tasks;
-// using Letter;
-//
-// namespace Letter.Udp
-// {
-//     public class UdpBootstrap : ADgramBootstrap<UdpOptions, IUdpSession, IUdpFilter, IUdpNetwork>, IUdpBootstrap
-//     {
-//         protected override Task<IUdpNetwork> NetworkCreator()
-//         {
-//             IUdpNetwork network = new UdpNetwork(this.options);
-//             return Task.FromResult(network);
-//         }
-//     }
-// }
+﻿using System.Threading.Tasks;
+
+namespace Letter.Udp
+{
+    public class UdpBootstrap : ADgramBootstrap<UdpOptions, IUdpSession, IUdpChannelFilter, IUdpChannel>, IUdpBootstrap
+    {
+        protected override Task<IUdpChannel> ChannelFactory(UdpOptions options, DgramChannelFilterGroupFactory<IUdpSession, IUdpChannelFilter> groupFactory)
+        {
+            IUdpChannel channel = new UdpChannel(options, groupFactory);
+
+            return Task.FromResult(channel);
+        }
+    }
+}

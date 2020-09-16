@@ -25,7 +25,7 @@ namespace Letter
         {
             if (this.options == null)
             {
-                if (this.optionsFactory != null)
+                if (this.optionsFactory == null)
                 {
                     throw new NullReferenceException(nameof(this.optionsFactory));
                 }

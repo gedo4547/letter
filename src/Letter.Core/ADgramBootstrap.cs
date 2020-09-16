@@ -15,10 +15,10 @@ namespace Letter
         {
             base.BuildAsync();
             
-            return this.ChannelFactory(this.options, this.groupFactory.CreateFilterGroup());
+            return this.ChannelFactory(this.options, this.groupFactory);
         }
 
-        protected abstract Task<TChannel> ChannelFactory(TOptions options, DgramChannelFilterGroup<TSession, TFilter> filterGroup);
+        protected abstract Task<TChannel> ChannelFactory(TOptions options, DgramChannelFilterGroupFactory<TSession, TFilter> groupFactory);
         
         public void AddChannelFilter<TChannelFilter>() where TChannelFilter : TFilter, new()
         {

@@ -1,9 +1,13 @@
-﻿using Letter;
+﻿using System.Net;
+using System.Threading.Tasks;
+using Letter;
 
 namespace Letter.Udp
 {
-    public interface IUdpFilter : IDgramChannelFilter<IUdpSession>
+    public interface IUdpChannel : IChannel
     {
-        
+        Task StartAsync(EndPoint bindAddress);
+
+        Task StartAsync(EndPoint bindAddress, EndPoint connectAddress);
     }
 }

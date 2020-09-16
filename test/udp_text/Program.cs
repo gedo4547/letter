@@ -1,12 +1,26 @@
 ﻿using System;
+using System.Threading.Tasks;
 using Letter.Udp;
 
 namespace udp_text
 {
     class Program
     {
-        static void Main(string[] args)
+        static async Task Main(string[] args)
         {
+            IUdpBootstrap bootstrap = UdpFactory.Bootstrap();
+            bootstrap.ConfigurationOptions((options =>
+            {
+                
+            }));
+            bootstrap.AddChannelFilter(() => { return new UdpFilter_1();});
+            bootstrap.AddChannelFilter<UdpFilter_2>();
+            
+            IUdpChannel channel = await bootstrap.BuildAsync();
+            
+            await channel.StartAsync(null);
+            await channel.DisposeAsync();
+            
             // var udp = UdpFactory.Create();
             // udp.ConfigurationNetwork(network =>
             // {
