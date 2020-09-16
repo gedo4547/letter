@@ -58,10 +58,11 @@ namespace Letter.Udp
             {
                 UdpMessageNode node = reader.Read();
                 if (node == null) break;
-                
+
+                this.RcvAddress = node.Point;
                 Memory<byte> memory = node.GetReadableBuffer();
                 var w_reader = new WrappedDgramReader(ref memory, ref this.order);
-                this.filterGroup.OnChannelRead(this, node.Point, ref w_reader);
+                this.filterGroup.OnChannelRead(this, ref w_reader);
                 node.ReleaseAsync().NoAwait();
             }
             

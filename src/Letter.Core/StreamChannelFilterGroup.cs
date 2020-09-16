@@ -12,19 +12,19 @@ namespace Letter
         {
         }
 
-        public void OnFilterRead(TSession session, EndPoint remoteAddress, ref WrappedStreamReader reader)
+        public void OnFilterRead(TSession session, ref WrappedStreamReader reader)
         {
             ChannelArgs args = new ChannelArgs();
             
             int count = this.filters.Count;
             for (int i = 0; i < count; ++i)
             {
-                this.filters[i].OnChannelRead(session, remoteAddress, ref reader, ref args);
+                this.filters[i].OnChannelRead(session, ref reader, ref args);
             }
             reader.Flush();
         }
 
-        public void OnFilterWrite(TSession session, EndPoint remoteAddress, ref WrappedStreamWriter writer, object obj)
+        public void OnFilterWrite(TSession session, ref WrappedStreamWriter writer, object obj)
         {
             ChannelArgs args = new ChannelArgs()
             {
@@ -34,13 +34,13 @@ namespace Letter
             int count = this.filters.Count;
             for (int i = 0; i < count; ++i)
             {
-                this.filters[i].OnChannelWrite(session, remoteAddress, ref writer, ref args);
+                this.filters[i].OnChannelWrite(session, ref writer, ref args);
             }
             
             writer.Flush();
         }
 
-        public void OnFilterWrite(TSession session, EndPoint remoteAddress, ref WrappedStreamWriter writer, ref ReadOnlySequence<byte> buffer)
+        public void OnFilterWrite(TSession session, ref WrappedStreamWriter writer, ref ReadOnlySequence<byte> buffer)
         {
             ChannelArgs args = new ChannelArgs()
             {
@@ -50,7 +50,7 @@ namespace Letter
             int count = this.filters.Count;
             for (int i = 0; i < count; ++i)
             {
-                this.filters[i].OnChannelWrite(session, remoteAddress, ref writer, ref args);
+                this.filters[i].OnChannelWrite(session, ref writer, ref args);
             }
             
             writer.Flush();

@@ -26,8 +26,12 @@ namespace Letter.Udp
 
         public EndPoint RemoteAddress
         {
-            get { throw new Exception("Udp does not support access to remote addresses");}
+            get { throw new Exception("Udp does not support direct use of RemoteAddress, please use IUdpSession.RcvAddress or IUdpSession.SndAddress");}
         }
+
+        public EndPoint RcvAddress { get; private set; }
+        public EndPoint SndAddress { get; private set; }
+        
         public PipeScheduler Scheduler { get; private set; }
         public MemoryPool<byte> MemoryPool { get; private set; }
 
@@ -60,9 +64,9 @@ namespace Letter.Udp
             this.memoryTask = this.ReaderMemoryPolledIOAsync();
             
             this.filterGroup.OnChannelActive(this);
-            
-            
         }
+
+        
 
         public Task WriteAsync(EndPoint remoteAddress, object obj)
         {

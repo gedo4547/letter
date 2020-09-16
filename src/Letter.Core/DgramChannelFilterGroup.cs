@@ -1,6 +1,5 @@
 ﻿using System.Buffers;
 using System.Collections.Generic;
-using System.Net;
 
 namespace Letter
 {
@@ -13,19 +12,19 @@ namespace Letter
         {
         }
 
-        public void OnChannelRead(TSession session, EndPoint remoteAddress, ref WrappedDgramReader reader)
+        public void OnChannelRead(TSession session, ref WrappedDgramReader reader)
         {
             ChannelArgs args = new ChannelArgs();
             
             int count = this.filters.Count;
             for (int i = 0; i < count; i++)
             {
-                this.filters[i].OnChannelRead(session, remoteAddress, ref reader, ref args);
+                this.filters[i].OnChannelRead(session, ref reader, ref args);
             }
             reader.Flush();
         }
 
-        public void OnChannelWrite(TSession session, EndPoint remoteAddress, ref WrappedDgramWriter writer, object obj)
+        public void OnChannelWrite(TSession session, ref WrappedDgramWriter writer, object obj)
         {
             ChannelArgs args = new ChannelArgs();
             args.item = obj;
@@ -33,13 +32,13 @@ namespace Letter
             int count = this.filters.Count;
             for (int i = 0; i < count; i++)
             {
-                this.filters[i].OnChannelWrite(session, remoteAddress, ref writer, ref args);
+                this.filters[i].OnChannelWrite(session, ref writer, ref args);
             }
             
             writer.Flush();
         }
 
-        public void OnChannelWrite(TSession session, EndPoint remoteAddress, ref WrappedDgramWriter writer, ref ReadOnlySequence<byte> buffer)
+        public void OnChannelWrite(TSession session, ref WrappedDgramWriter writer, ref ReadOnlySequence<byte> buffer)
         {
             ChannelArgs args = new ChannelArgs();
             args.buffer = buffer;
@@ -47,7 +46,7 @@ namespace Letter
             int count = this.filters.Count;
             for (int i = 0; i < count; i++)
             {
-                this.filters[i].OnChannelWrite(session, remoteAddress, ref writer, ref args);
+                this.filters[i].OnChannelWrite(session, ref writer, ref args);
             }
             writer.Flush();
         }

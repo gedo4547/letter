@@ -61,7 +61,7 @@ namespace Letter.Udp
         public Task WriteBufferAsync(EndPoint remotePoint, object obj)
         {
             var writer =  this.CreateDgramWriter(remotePoint);
-            this.filterGroup.OnChannelWrite(this, remotePoint, ref writer, obj);
+            this.filterGroup.OnChannelWrite(this, ref writer, obj);
             
             return Task.CompletedTask;
         }
@@ -70,7 +70,7 @@ namespace Letter.Udp
         public Task WriteBufferAsync(EndPoint remotePoint, ref ReadOnlySequence<byte> sequence)
         {
             var writer = this.CreateDgramWriter(remotePoint);
-            this.filterGroup.OnChannelWrite(this, remotePoint, ref writer, ref sequence);
+            this.filterGroup.OnChannelWrite(this, ref writer, ref sequence);
             
             return Task.CompletedTask;
         }
@@ -78,6 +78,7 @@ namespace Letter.Udp
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private WrappedDgramWriter CreateDgramWriter(EndPoint remotePoint)
         {
+            this.SndAddress = remotePoint;
             var node = this.SenderPipeWriter.GetDgramNode();
             node.SettingPoint(remotePoint);
             

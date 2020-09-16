@@ -7,8 +7,8 @@ namespace Letter
         where TSession : ISession
         where TFilter : IDgramChannelFilter<TSession>
     {
-        void OnChannelRead(TSession session, EndPoint remoteAddress, ref WrappedDgramReader reader);
-        void OnChannelWrite(TSession session, EndPoint remoteAddress, ref WrappedDgramWriter writer, object obj);
-        void OnChannelWrite(TSession session, EndPoint remoteAddress, ref WrappedDgramWriter writer, ref ReadOnlySequence<byte> buffer);
+        void OnChannelRead(TSession session, ref WrappedDgramReader reader);
+        void OnChannelWrite(TSession session, ref WrappedDgramWriter writer, object obj);
+        void OnChannelWrite(TSession session, ref WrappedDgramWriter writer, ref ReadOnlySequence<byte> buffer);
     }
 }

@@ -33,16 +33,16 @@ namespace udp_text
             Console.WriteLine($"{nameof(UdpFilter_2)}.{nameof(OnChannelException)}" + ex.ToString());
         }
 
-        public void OnChannelRead(IUdpSession session, EndPoint remoteAddress, ref WrappedDgramReader reader, ref ChannelArgs args)
+        public void OnChannelRead(IUdpSession session, ref WrappedDgramReader reader, ref ChannelArgs args)
         {
             int length = reader.Length;
             var buffer = reader.ReadRange(length);
             string str= System.Text.Encoding.UTF8.GetString(buffer.Span);
 
-            Console.WriteLine($"{nameof(UdpFilter_2)}.{nameof(OnChannelRead)}>>LoaclAddress:{session.LoaclAddress}    remoteAddress:{remoteAddress}>>" + str);
+            Console.WriteLine($"{nameof(UdpFilter_2)}.{nameof(OnChannelRead)}>>LoaclAddress:{session.LoaclAddress}    remoteAddress:{session.RcvAddress}>>" + str);
         }
 
-        public void OnChannelWrite(IUdpSession session, EndPoint remoteAddress, ref WrappedDgramWriter writer, ref ChannelArgs args)
+        public void OnChannelWrite(IUdpSession session, ref WrappedDgramWriter writer, ref ChannelArgs args)
         {
             Console.WriteLine($"{nameof(UdpFilter_2)}.{nameof(OnChannelWrite)}");
             writer.Write(ref args.buffer);
