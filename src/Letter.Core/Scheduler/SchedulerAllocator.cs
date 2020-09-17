@@ -36,6 +36,12 @@ namespace System.Threading
         private int schedulerIndex;
         private PipeScheduler[] schedulers;
 
+        public int Count
+        {
+            get { return this.schedulers.Length; }
+        }
+
+
         public PipeScheduler Next()
         {
             var scheduler = this.schedulers[this.schedulerIndex];

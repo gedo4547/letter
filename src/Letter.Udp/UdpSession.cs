@@ -57,7 +57,7 @@ namespace Letter.Udp
 
         protected long isDisposed = 0;
         
-        private object writerLock = new object();
+        private object writerSync = new object();
         
         public void StartAsync(Socket socket, string name)
         {
@@ -79,7 +79,7 @@ namespace Letter.Udp
         
         public Task WriteAsync(EndPoint remoteAddress, object obj)
         {
-            lock (writerLock)
+            lock (writerSync)
             {
                 if (Interlocked.Read(ref this.isDisposed) == 1)
                 {
@@ -92,7 +92,7 @@ namespace Letter.Udp
 
         public Task WriteAsync(EndPoint remoteAddress, ref ReadOnlySequence<byte> sequence)
         {
-            lock (writerLock)
+            lock (writerSync)
             {
                 if (Interlocked.Read(ref this.isDisposed) == 1)
                 {

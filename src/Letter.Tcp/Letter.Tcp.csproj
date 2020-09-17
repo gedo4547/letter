@@ -17,4 +17,8 @@
       <ProjectReference Include="..\Letter\Letter.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="Bootstrap" />
+    </ItemGroup>
+
 </Project>

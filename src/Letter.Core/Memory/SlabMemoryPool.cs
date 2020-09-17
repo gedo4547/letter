@@ -13,33 +13,45 @@ namespace System.Buffers
     /// </summary>
     public sealed class SlabMemoryPool : MemoryPool<byte>
     {
+        public SlabMemoryPool(int blockSize, int blockCount)
+        {
+            this._blockSize = blockSize;
+            this._blockCount = blockCount;
+            
+            this._slabLength = _blockSize * _blockCount;
+        }
+
+
         /// <summary>
         /// The size of a block. 4096 is chosen because most operating systems use 4k pages.
         /// </summary>
-        private const int _blockSize = 4096;
+        private readonly int _blockSize = 4096;
 
         /// <summary>
         /// Allocating 32 contiguous blocks per slab makes the slab size 128k. This is larger than the 85k size which will place the memory
         /// in the large object heap. This means the GC will not try to relocate this array, so the fact it remains pinned does not negatively
         /// affect memory management's compactification.
         /// </summary>
-        private const int _blockCount = 32;
+        private readonly int _blockCount = 32;
 
         /// <summary>
         /// Max allocation block size for pooled blocks,
         /// larger values can be leased but they will be disposed after use rather than returned to the pool.
         /// </summary>
-        public override int MaxBufferSize { get; } = _blockSize;
+        public override int MaxBufferSize
+        {
+            get { return _blockSize; }
+        }
 
         /// <summary>
         /// The size of a block. 4096 is chosen because most operating systems use 4k pages.
         /// </summary>
-        public static int BlockSize => _blockSize;
+        public int BlockSize => _blockSize;
 
         /// <summary>
         /// 4096 * 32 gives you a slabLength of 128k contiguous bytes allocated per slab
         /// </summary>
-        private static readonly int _slabLength = _blockSize * _blockCount;
+        private readonly int _slabLength;// = _blockSize * _blockCount;
 
         /// <summary>
         /// Thread-safe collection of blocks which are currently in the pool. A slab will pre-allocate all of the block tracking objects
@@ -116,7 +128,7 @@ namespace System.Buffers
             // Page align the blocks
             var offset = (int)((((ulong)basePtr + (uint)_blockSize - 1) & ~((uint)_blockSize - 1)) - (ulong)basePtr);
             // Ensure page aligned
-            Debug.Assert(((ulong)basePtr + (uint)offset) % _blockSize == 0);
+            // Debug.Assert(((ulong)basePtr + (uint)offset) % _blockSize == 0);
 
             var blockCount = (_slabLength - offset) / _blockSize;
             Interlocked.Add(ref _totalAllocatedBlocks, blockCount);
