@@ -3,6 +3,7 @@ using System.Buffers;
 using System.IO.Pipelines;
 using System.Net;
 using System.Net.Sockets;
+using System.Threading;
 using System.Threading.Tasks;
 
 using FilterGroup = Letter.DgramChannelFilterGroup<Letter.Udp.IUdpSession, Letter.Udp.IUdpChannelFilter>;
@@ -20,8 +21,8 @@ namespace Letter.Udp
             this.filterGroup = filterGroup;
 
             this.onMemoryWritePush = this.OnMemoryWritePush;
-            this.senderPipeline = new UdpPipe(this.MemoryPool, this.Scheduler, this.OnSenderPipelineReceiveBuffer);
-            this.receiverPipeline = new UdpPipe(this.MemoryPool, this.Scheduler, this.OnReceiverPipelineReceiveBuffer);
+            this.senderPipeline = new DgramPipeline(this.MemoryPool, this.Scheduler, this.OnSenderPipelineReceiveBuffer);
+            this.receiverPipeline = new DgramPipeline(this.MemoryPool, this.Scheduler, this.OnReceiverPipelineReceiveBuffer);
         }
         
         public string Id { get; private set; }
@@ -43,8 +44,8 @@ namespace Letter.Udp
         private UdpSocketSender socketSender;
         private UdpSocketReceiver socketReceiver;
         
-        private UdpPipe senderPipeline;
-        private UdpPipe receiverPipeline;
+        private DgramPipeline senderPipeline;
+        private DgramPipeline receiverPipeline;
 
         private BinaryOrder order;
         private FilterGroup filterGroup;
@@ -54,7 +55,9 @@ namespace Letter.Udp
 
         private string name;
 
-        protected long isClosed = 0;
+        protected long isDisposed = 0;
+        
+        private object writerLock = new object();
         
         public void StartAsync(Socket socket, string name)
         {
@@ -76,24 +79,39 @@ namespace Letter.Udp
         
         public Task WriteAsync(EndPoint remoteAddress, object obj)
         {
-            return this.WriteBufferAsync(remoteAddress, obj);
+            lock (writerLock)
+            {
+                if (Interlocked.Read(ref this.isDisposed) == 1)
+                {
+                    throw new ObjectDisposedException("UdpSession has been released");
+                }
+                
+                return this.WriteBufferAsync(remoteAddress, obj);    
+            }
         }
 
         public Task WriteAsync(EndPoint remoteAddress, ref ReadOnlySequence<byte> sequence)
         {
-            return this.WriteBufferAsync(remoteAddress, ref sequence);
+            lock (writerLock)
+            {
+                if (Interlocked.Read(ref this.isDisposed) == 1)
+                {
+                    throw new ObjectDisposedException("UdpSession has been released");
+                }
+                
+                return this.WriteBufferAsync(remoteAddress, ref sequence);    
+            }
         }
         
-
         public async ValueTask DisposeAsync()
         {
-            if (System.Threading.Interlocked.Read(ref this.isClosed) == 1)
+            if (Interlocked.Read(ref this.isDisposed) == 1)
             {
                 return;
             }
 
-            System.Threading.Interlocked.Exchange(ref this.isClosed, 1);
-            Console.WriteLine("close---close---close---close---close---close---close---");
+            Interlocked.Exchange(ref this.isDisposed, 1);
+            
             this.filterGroup.OnChannelInactive(this);
 
             this.Id = string.Empty;

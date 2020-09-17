@@ -5,9 +5,9 @@ using System.Threading.Tasks;
 
 namespace Letter
 {
-    public class UdpMessageNode : IUdpMessageNode, IDisposable
+    public class DgramMessageNode : IDgramMessageNode, IDisposable
     {
-        public UdpMessageNode(IMemoryOwner<byte> memoryOwner, Action<UdpMessageNode> onRelease)
+        public DgramMessageNode(IMemoryOwner<byte> memoryOwner, Action<DgramMessageNode> onRelease)
         {
             this.memoryOwner = memoryOwner;
             this.writeLength = 0;
@@ -16,10 +16,10 @@ namespace Letter
 
         private EndPoint point;
         private IMemoryOwner<byte> memoryOwner;
-        private Action<UdpMessageNode> onRelease;
+        private Action<DgramMessageNode> onRelease;
         private int writeLength;
         
-        public UdpMessageNode next;
+        public DgramMessageNode next;
         
         public int Length
         {

@@ -1,6 +1,4 @@
-﻿using System.Net;
-
-namespace Letter
+﻿namespace Letter
 {
     public interface IDgramChannelFilter<TSession> : IChannelFilter<TSession>
         where TSession : ISession

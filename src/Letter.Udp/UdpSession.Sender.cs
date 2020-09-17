@@ -10,13 +10,13 @@ namespace Letter.Udp
 {
     public partial class UdpSession
     {
-        public IUdpPipeReader SenderPipeReader
+        public IDgramPipeReader SenderPipeReader
         {
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             get { return this.senderPipeline; }
         }
 
-        public IUdpPipeWriter SenderPipeWriter
+        public IDgramPipeWriter SenderPipeWriter
         {
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             get { return this.senderPipeline; }
@@ -33,7 +33,7 @@ namespace Letter.Udp
             this.SenderPipeReader.ReceiveAsync();
         }
         
-        private async void OnSenderPipelineReceiveBuffer(IUdpPipeReader reader)
+        private async void OnSenderPipelineReceiveBuffer(IDgramPipeReader reader)
         {
             while (true)
             {
@@ -93,7 +93,7 @@ namespace Letter.Udp
             return new WrappedDgramWriter(node, ref this.order, this.onMemoryWritePush);
         }
 
-        private void OnMemoryWritePush(UdpMessageNode node)
+        private void OnMemoryWritePush(DgramMessageNode node)
         {
             this.SenderPipeWriter.Write(node);
         }

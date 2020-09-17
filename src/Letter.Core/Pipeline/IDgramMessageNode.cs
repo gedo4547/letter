@@ -3,7 +3,7 @@ using System.Net;
 
 namespace Letter
 {
-    interface IUdpMessageNode
+    interface IDgramMessageNode
     {
         int Length { get; }
         

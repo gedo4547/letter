@@ -1,14 +1,13 @@
-﻿﻿using System;
-using System.Buffers;
+﻿using System;
 using System.Net;
 using System.Threading;
- using System.Threading.Tasks;
+using System.Threading.Tasks;
 
- namespace Letter
+namespace Letter
 {
-    public partial class UdpPipe : IUdpPipeWriter
+    public partial class DgramPipeline : IDgramPipeWriter
     {
-        public UdpMessageNode GetDgramNode()
+        public DgramMessageNode GetDgramNode()
         {
             return this.CreationOrGetNode();
         }
@@ -32,7 +31,7 @@ using System.Threading;
             this.Write(node);
         }
 
-        public void Write(UdpMessageNode node)
+        public void Write(DgramMessageNode node)
         {
             lock (this.syncObj)
             {
