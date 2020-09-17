@@ -1,11 +1,12 @@
-﻿using System.Buffers;
+﻿using System;
+using System.Buffers;
 using System.IO.Pipelines;
 using System.Net;
 using System.Threading.Tasks;
 
 namespace Letter
 {
-    public interface ISession
+    public interface ISession : IAsyncDisposable
     {
         string Id { get; }
 
@@ -17,6 +18,5 @@ namespace Letter
 
         PipeScheduler Scheduler { get; }
 
-        Task CloseAsync();
     }
 }

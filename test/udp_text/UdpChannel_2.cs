@@ -18,13 +18,20 @@ namespace udp_text
                 ReadOnlySequence<byte> sequence = new ReadOnlySequence<byte>(arr);
                 
                 Console.WriteLine("发送");
-                for (int i = 0; i < 10; i++)
+                for (int i = 0; i < 8; i++)
                 {
                     await session.WriteAsync(Program.s_p, ref sequence);
                 }
                 
                 Console.WriteLine("关闭");
-                await session.CloseAsync();
+                await session.DisposeAsync();
+                // await Task.Run(async () =>
+                // {
+                //     await Task.Delay(3 * 1000);
+                //     Console.WriteLine("关闭");    
+                //     await session.CloseAsync();
+                // });
+                
             }
         }
 

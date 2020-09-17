@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Net.Sockets;
 using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 
 namespace Letter.Udp
@@ -40,38 +39,22 @@ namespace Letter.Udp
                 try
                 {
                     int transportBytes = await this.ReceiverSocketReceiver.ReceiveAsync(this.LoaclAddress, memory);
-                    
-                    if (transportBytes == 0)
-                    {
-                        Console.WriteLine($"{name}---Receiver-----1111111111111111111111111111>>>>");
-                        node.ReleaseAsync().NoAwait();
-                        this.CloseAsync().NoAwait();
-                        return;
-                    }
-                    
                     node.SettingPoint(this.ReceiverSocketReceiver.RemoteAddress);
                     node.SettingWriteLength(transportBytes);
                 }
-                catch (SocketException ex) when (SocketErrorHelper.IsConnectionResetError(ex.SocketErrorCode))
+                catch(Exception ex)
                 {
-                    Console.WriteLine($"{name}---Receiver-----222222222222222222222222>>>>");
-                    this.CloseAsync().NoAwait();
+                    await node.ReleaseAsync();
+                    if (SocketErrorHelper.IsSocketDisabledError(ex))
+                    {
+                        await this.DisposeAsync();
+                    }
+                    else
+                    {
+                        this.filterGroup.OnChannelException(this, ex);
+                    }
                     return;
                 }
-                catch (Exception ex) when ((ex is SocketException socketEx &&
-                                            SocketErrorHelper.IsConnectionAbortError(socketEx.SocketErrorCode)) ||
-                                            ex is ObjectDisposedException)
-                {
-                    Console.WriteLine($"{name}---Receiver------333333333333333333333333333>>>>");
-                    this.CloseAsync().NoAwait();
-                    return;
-                }
-                catch (Exception ex)
-                {
-                    this.filterGroup.OnChannelException(this, ex);
-                    return;
-                }
-
                 this.ReceiverPipeWriter.Write(node);
             }
         }

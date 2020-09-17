@@ -5,13 +5,15 @@ using System.Net;
 using System.Net.Sockets;
 using System.Threading.Tasks;
 
+using FilterGroup = Letter.DgramChannelFilterGroup<Letter.Udp.IUdpSession, Letter.Udp.IUdpChannelFilter>;
+
+
 namespace Letter.Udp
 {
     public partial class UdpSession : IUdpSession
     {
-        public UdpSession(BinaryOrder order, MemoryPool<byte> memoryPool, PipeScheduler scheduler, DgramChannelFilterGroup<IUdpSession, IUdpChannelFilter> filterGroup)
+        public UdpSession(BinaryOrder order, MemoryPool<byte> memoryPool, PipeScheduler scheduler, FilterGroup filterGroup)
         {
-            Console.WriteLine("session  创建");
             this.Id = IdGeneratorHelper.GetNextId();
             this.Scheduler = scheduler;
             this.MemoryPool = memoryPool;
@@ -24,20 +26,17 @@ namespace Letter.Udp
         
         public string Id { get; private set; }
         public EndPoint LoaclAddress { get; private set; }
-
-        public EndPoint RemoteAddress
-        {
-            get
-            {
-                throw new Exception("please use IUdpSession.RcvAddress or IUdpSession.SndAddress");
-            }
-        }
-
+        
         public EndPoint RcvAddress { get; private set; }
         public EndPoint SndAddress { get; private set; }
         
         public PipeScheduler Scheduler { get; private set; }
         public MemoryPool<byte> MemoryPool { get; private set; }
+        
+        public EndPoint RemoteAddress
+        {
+            get { throw new Exception("please use IUdpSession.RcvAddress or IUdpSession.SndAddress"); }
+        }
 
         private Socket socket;
         
@@ -48,7 +47,7 @@ namespace Letter.Udp
         private UdpPipe receiverPipeline;
 
         private BinaryOrder order;
-        private DgramChannelFilterGroup<IUdpSession, IUdpChannelFilter> filterGroup;
+        private FilterGroup filterGroup;
         private WrappedDgramWriter.MemoryWritePushDelegate onMemoryWritePush;
 
         private Task memoryTask;
@@ -85,7 +84,8 @@ namespace Letter.Udp
             return this.WriteBufferAsync(remoteAddress, ref sequence);
         }
         
-        public async Task CloseAsync()
+
+        public async ValueTask DisposeAsync()
         {
             if (System.Threading.Interlocked.Read(ref this.isClosed) == 1)
             {

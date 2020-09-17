@@ -3,11 +3,13 @@ using System.Net;
 using System.Net.Sockets;
 using System.Threading.Tasks;
 
+using FilterGroupFactory = Letter.DgramChannelFilterGroupFactory<Letter.Udp.IUdpSession, Letter.Udp.IUdpChannelFilter>;
+
 namespace Letter.Udp
 {
     public class UdpChannel : IUdpChannel
     {
-        public UdpChannel(UdpOptions options, DgramChannelFilterGroupFactory<IUdpSession, IUdpChannelFilter> groupFactory)
+        public UdpChannel(UdpOptions options, FilterGroupFactory groupFactory)
         {
             this.options = options;
             this.groupFactory = groupFactory;
@@ -17,7 +19,7 @@ namespace Letter.Udp
         private UdpSession session;
         
         private UdpOptions options;
-        private DgramChannelFilterGroupFactory<IUdpSession, IUdpChannelFilter> groupFactory;
+        private FilterGroupFactory groupFactory;
 
         private string name;
         
@@ -78,7 +80,7 @@ namespace Letter.Udp
         {
             if (this.session != null)
             {
-                await this.session.CloseAsync();
+                await this.session.DisposeAsync();
                 this.socket = null;
             }
 

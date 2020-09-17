@@ -24,8 +24,7 @@ namespace udp_text
             
             IUdpChannel c_channel = await bootstrap.BuildAsync();
             await c_channel.StartAsync(c_p, "client");
-           
-
+            
             Console.ReadKey();
         }
     }

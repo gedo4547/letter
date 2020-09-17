@@ -1,11 +1,25 @@
-﻿using System.Net.Sockets;
+﻿using System;
+using System.Net.Sockets;
 
 namespace Letter
 {
     public static class SocketErrorHelper
     {
         private static readonly bool IsWindows = OSPlatformHelper.IsWindows();
-        
+
+        public static bool IsSocketDisabledError(Exception ex)
+        {
+            if (ex is SocketException socketEx)
+            {
+                return IsConnectionResetError(socketEx.SocketErrorCode) ||
+                       IsConnectionAbortError(socketEx.SocketErrorCode);
+            }
+
+            return (ex is ObjectDisposedException);
+        }
+
+
+
         public static bool IsConnectionResetError(SocketError errorCode)
         {
             // A connection reset can be reported as SocketError.ConnectionAborted on Windows.

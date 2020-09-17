@@ -42,35 +42,23 @@ namespace Letter.Udp
 
                 var memory = node.GetReadableBuffer();
                 var sequence = new ReadOnlySequence<byte>(memory);
-                
+                var address = node.Point;
                 try
                 {
-                    int transportBytes = await this.SenderSocketSender.SendAsync(node.Point, sequence);
                     await node.ReleaseAsync();
-                    if (transportBytes == 0)
+                    int transportBytes = await this.SenderSocketSender.SendAsync(address, sequence);
+                }
+                catch(Exception ex)
+                {
+                    if (SocketErrorHelper.IsSocketDisabledError(ex))
                     {
-                        Console.WriteLine($"{name}---Sender----111111111111111111111>>");
-                        this.CloseAsync().NoAwait();
-                        return;
+                        await this.DisposeAsync();
                     }
-                }
-                catch (SocketException ex) when (SocketErrorHelper.IsConnectionResetError(ex.SocketErrorCode))
-                {
-                    Console.WriteLine($"{name}---Sender----22222222222222222222222>>");
-                    this.CloseAsync().NoAwait();
+                    else
+                    {
+                        this.filterGroup.OnChannelException(this, ex);
+                    }
                     return;
-                }
-                catch (Exception ex) when ((ex is SocketException socketEx &&
-                                            SocketErrorHelper.IsConnectionAbortError(socketEx.SocketErrorCode)) ||
-                                           ex is ObjectDisposedException)
-                {
-                    Console.WriteLine($"{name}---Sender----333333333333333333333333333>>");
-                    this.CloseAsync().NoAwait();
-                    return;
-                }
-                catch (Exception ex)
-                {
-                    this.filterGroup.OnChannelException(this, ex);
                 }
             }
             
