@@ -15,3 +15,5 @@
 /src/Letter.Udp/bin
 /test/tcp_test1/obj
 /test/tcp_test1/bin
+/test/udp_text/obj
+/test/udp_text/bin
