@@ -5,7 +5,9 @@ namespace Letter.Tcp
 {
     public class TcpClientChannel : ITcpClientChannel
     {
-        public Task ConnectAsync(EndPoint address)
+        public EndPoint ConnectAddress { get; }
+
+        public Task StartAsync(EndPoint address)
         {
             throw new System.NotImplementedException();
         }

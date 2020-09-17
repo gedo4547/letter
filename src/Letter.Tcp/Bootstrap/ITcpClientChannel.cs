@@ -5,6 +5,8 @@ namespace Letter.Tcp
 {
     public interface ITcpClientChannel : IChannel
     {
-        Task ConnectAsync(EndPoint address);
+        EndPoint ConnectAddress { get; }
+        
+        Task StartAsync(EndPoint address);
     }
 }

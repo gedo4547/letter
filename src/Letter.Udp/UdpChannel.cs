@@ -21,10 +21,11 @@ namespace Letter.Udp
         private UdpOptions options;
         private FilterGroupFactory groupFactory;
         
+        public EndPoint BindAddress { get; private set; }
         
         public async Task StartAsync(EndPoint bindAddress, EndPoint connectAddress)
         {
-            await this.StartAsync(bindAddress);
+            this.Bind(bindAddress);
 
             await this.socket.ConnectAsync(connectAddress);
             
@@ -33,22 +34,31 @@ namespace Letter.Udp
         
         public Task StartAsync(EndPoint bindAddress)
         {
-            this.CreateSocket(bindAddress.AddressFamily);
-            
-            try
-            {
-                socket.Bind(bindAddress);
-            }
-            catch (SocketException e) when (e.SocketErrorCode == SocketError.AddressAlreadyInUse)
-            {
-                throw new AddressInUseException(e.Message, e);
-            }
+            this.Bind(bindAddress);
             
             this.Run();
             
             return Task.CompletedTask;
         }
-        
+
+
+        private void Bind(EndPoint bindAddress)
+        {
+            this.CreateSocket(bindAddress.AddressFamily);
+            try
+            {
+                this.socket.Bind(bindAddress);
+            }
+            catch (SocketException e) when (e.SocketErrorCode == SocketError.AddressAlreadyInUse)
+            {
+                throw new AddressInUseException(e.Message, e);
+            }
+
+            this.BindAddress = this.socket.LocalEndPoint;
+        }
+
+
+
         private void CreateSocket(AddressFamily family)
         {
             this.socket = new Socket(family, SocketType.Dgram, ProtocolType.Udp);

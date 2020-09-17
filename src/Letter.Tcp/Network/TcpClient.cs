@@ -368,15 +368,15 @@ namespace Letter.Tcp
             }
         }
 
-        public override ValueTask CloseAsync(CancellationToken cancellationToken = default)
-        {
-            Shutdown(null);
-
-            // Cancel ProcessSends loop after calling shutdown to ensure the correct _shutdownReason gets set.
-            Output.CancelPendingRead();
-
-            return default;
-        }
+        // public override ValueTask CloseAsync(CancellationToken cancellationToken = default)
+        // {
+        //     Shutdown(null);
+        //
+        //     // Cancel ProcessSends loop after calling shutdown to ensure the correct _shutdownReason gets set.
+        //     Output.CancelPendingRead();
+        //
+        //     return default;
+        // }
 
         public override async ValueTask DisposeAsync()
         {

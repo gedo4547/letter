@@ -125,7 +125,7 @@ namespace Letter.Tcp
                 {
                     return null;
                 }
-                catch (SocketException)
+                catch (SocketException) 
                 {
                     // The connection got reset while it was in the backlog, so we try again.
                 }
@@ -141,8 +141,8 @@ namespace Letter.Tcp
         }
         
         private MemoryPool<byte> ClientMemoryPoolFactory() => this.memoryPool;
-
-        public override ValueTask CloseAsync(CancellationToken cancellationToken = default)
+        
+        public override ValueTask DisposeAsync()
         {
             if (this.listenSocket != null)
             {
@@ -156,14 +156,9 @@ namespace Letter.Tcp
                 this.socketHandle = null;
             }
 
-            return default;
-        }
-
-        public override async ValueTask DisposeAsync()
-        {
-            await CloseAsync();
-            
             this.memoryPool.Dispose();
+            this.memoryPool = null;
+            return default;
         }
     }
 }

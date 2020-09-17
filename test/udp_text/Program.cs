@@ -20,10 +20,10 @@ namespace udp_text
             bootstrap.AddChannelFilter<UdpFilter_2>();
             
             IUdpChannel s_channel = await bootstrap.BuildAsync();
-            await s_channel.StartAsync(s_p, "server");
+            await s_channel.StartAsync(s_p);
             
             IUdpChannel c_channel = await bootstrap.BuildAsync();
-            await c_channel.StartAsync(c_p, "client");
+            await c_channel.StartAsync(c_p);
             
             Console.ReadKey();
         }

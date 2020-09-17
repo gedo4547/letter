@@ -5,7 +5,9 @@ namespace Letter.Tcp
 {
     public class TcpServerChannel : ITcpServerChannel
     {
-        public Task BindAsync(EndPoint address)
+        public EndPoint BindAddress { get; }
+
+        public Task StartAsync(EndPoint address)
         {
             throw new System.NotImplementedException();
         }
