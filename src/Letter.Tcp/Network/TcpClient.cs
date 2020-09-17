@@ -98,8 +98,8 @@ namespace Letter.Tcp
             var awaiterScheduler = IsWindows ? scheduler : PipeScheduler.Inline;
             this.receiver = new TcpSocketReceiver(this.connectSocket, awaiterScheduler);
             this.sender = new TcpSocketSender(this.connectSocket, awaiterScheduler);
-            long maxReadBufferSize = this.options.MaxReadBufferSize == null ? 0 : this.options.MaxReadBufferSize.Value;
-            long maxWriteBufferSize = this.options.MaxWriteBufferSize == null ? 0 : this.options.MaxWriteBufferSize.Value;
+            long maxReadBufferSize = this.options.MaxPipelineReadBufferSize == null ? 0 : this.options.MaxPipelineReadBufferSize.Value;
+            long maxWriteBufferSize = this.options.MaxPipelineWriteBufferSize == null ? 0 : this.options.MaxPipelineWriteBufferSize.Value;
             var inputOptions = new PipeOptions(this.MemoryPool, PipeScheduler.ThreadPool, scheduler, maxReadBufferSize, maxReadBufferSize / 2, useSynchronizationContext: false);
             var outputOptions = new PipeOptions(this.MemoryPool, scheduler, PipeScheduler.ThreadPool, maxWriteBufferSize, maxWriteBufferSize / 2, useSynchronizationContext: false);
 

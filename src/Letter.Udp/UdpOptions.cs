@@ -25,13 +25,13 @@ namespace Letter.Udp
 
         public int SchedulerCount
         {
-            get { return SchedulerAllocator.shared.Count;}
+            get { return SchedulerAllocator.Count;}
             set
             {
                 int count = value;
-                if (count == SchedulerAllocator.shared.Count)
+                if (count == SchedulerAllocator.Count)
                     return;
-                this.Allocator = new SchedulerAllocator(count);
+                this.SchedulerAllocator = new SchedulerAllocator(count);
             }
         }
         
@@ -41,6 +41,6 @@ namespace Letter.Udp
         }
 
         internal Func<MemoryPool<byte>> MemoryPoolFactory { get; set; }
-        internal SchedulerAllocator Allocator { get; private set; } = SchedulerAllocator.shared;
+        internal SchedulerAllocator SchedulerAllocator { get; private set; } = SchedulerAllocator.threadPool;
     }
 }

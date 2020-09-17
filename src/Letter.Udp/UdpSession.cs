@@ -53,16 +53,12 @@ namespace Letter.Udp
 
         private Task memoryTask;
 
-        private string name;
-
         protected long isDisposed = 0;
         
         private object writerSync = new object();
         
-        public void StartAsync(Socket socket, string name)
+        public void StartAsync(Socket socket)
         {
-            this.name = name;
-            
             this.socket = socket;
             this.LoaclAddress = this.socket.LocalEndPoint;
             

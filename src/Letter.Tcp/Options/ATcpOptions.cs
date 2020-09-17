@@ -26,14 +26,15 @@ namespace Letter.Tcp
         /// Defaults to true.
         /// </remarks>
         public bool NoDelay { get; set; } = true;
-        public bool KeepAlive { get; set; } = true;
-        public long? MaxReadBufferSize { get; set; } = 1024 * 1024;
-        public long? MaxWriteBufferSize { get; set; } = 64 * 1024;
+        public bool KeepAlive { get; set; } = false;
         public int? RcvBufferSize { get; set; }
         public int? SndBufferSize { get; set; }
         public int? RcvTimeout { get; set; }
         public int? SndTimeout { get; set; }
         public LingerOption LingerOption { get; } = new LingerOption(false, 0);
+        
+        public long? MaxPipelineReadBufferSize { get; set; } = 1024 * 1024;
+        public long? MaxPipelineWriteBufferSize { get; set; } = 64 * 1024;
         
         public MemoryPoolOptions MemoryPoolOptions { get; set; } = new MemoryPoolOptions()
         {

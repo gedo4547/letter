@@ -29,10 +29,10 @@ namespace Letter.Tcp
                 int count = value;
                 if (count == SchedulerAllocator.shared.Count)
                     return;
-                this.Allocator = new SchedulerAllocator(count);
+                this.SchedulerAllocator = new SchedulerAllocator(count);
             }
         }
         
-        internal SchedulerAllocator Allocator { get; private set; } = SchedulerAllocator.shared;
+        internal SchedulerAllocator SchedulerAllocator { get; private set; } = SchedulerAllocator.shared;
     }
 }

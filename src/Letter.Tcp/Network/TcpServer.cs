@@ -135,8 +135,8 @@ namespace Letter.Tcp
         private void OnConfigureClientOptions(TcpClientOptions options)
         {
             options.WaitForDataBeforeAllocatingBuffer = this.options.WaitForDataBeforeAllocatingBuffer;
-            options.MaxReadBufferSize = this.options.MaxReadBufferSize;
-            options.MaxWriteBufferSize = this.options.MaxWriteBufferSize;
+            options.MaxPipelineReadBufferSize = this.options.MaxPipelineReadBufferSize;
+            options.MaxPipelineWriteBufferSize = this.options.MaxPipelineWriteBufferSize;
             options.MemoryPoolFactory = this.ClientMemoryPoolFactory;
         }
         

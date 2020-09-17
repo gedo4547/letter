@@ -20,21 +20,19 @@ namespace Letter.Udp
         
         private UdpOptions options;
         private FilterGroupFactory groupFactory;
-
-        private string name;
         
-        public async Task StartAsync(EndPoint bindAddress, EndPoint connectAddress, string name)
+        
+        public async Task StartAsync(EndPoint bindAddress, EndPoint connectAddress)
         {
-            await this.StartAsync(bindAddress, name);
+            await this.StartAsync(bindAddress);
 
             await this.socket.ConnectAsync(connectAddress);
             
             this.Run();
         }
         
-        public Task StartAsync(EndPoint bindAddress, string name)
+        public Task StartAsync(EndPoint bindAddress)
         {
-            this.name = name;
             this.CreateSocket(bindAddress.AddressFamily);
             
             try
@@ -70,10 +68,10 @@ namespace Letter.Udp
         {
             var filterGroup = this.groupFactory.CreateFilterGroup();
             var memoryPool = this.options.MemoryPoolFactory();
-            PipeScheduler scheduler = this.options.Allocator.Next();
+            PipeScheduler scheduler = this.options.SchedulerAllocator.Next();
             
             this.session = new UdpSession(this.options.Order, memoryPool, scheduler, filterGroup);
-            this.session.StartAsync(this.socket, name);
+            this.session.StartAsync(this.socket);
         }
         
         public async ValueTask DisposeAsync()
