@@ -13,12 +13,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\Letter.IO\Letter.IO.csproj" />
       <ProjectReference Include="..\Letter\Letter.csproj" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <Folder Include="Bootstrap" />
     </ItemGroup>
 
 </Project>

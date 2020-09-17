@@ -17,7 +17,7 @@ namespace Letter.Udp
         public int? SndTimeout { get; set; }
         public BinaryOrder Order { get; set; } = BinaryOrder.BigEndian;
         
-        public MemoryOptions MemoryOptions { get; set; } = new MemoryOptions()
+        public MemoryPoolOptions MemoryPoolOptions { get; set; } = new MemoryPoolOptions()
         {
             MemoryBlockSize = 4096, 
             MemoryBlockCount = 32
@@ -37,7 +37,7 @@ namespace Letter.Udp
         
         private MemoryPool<byte> OnCreateMemoryPool()
         {
-            return SlabMemoryPoolFactory.Create(this.MemoryOptions);
+            return SlabMemoryPoolFactory.Create(this.MemoryPoolOptions);
         }
 
         internal Func<MemoryPool<byte>> MemoryPoolFactory { get; set; }

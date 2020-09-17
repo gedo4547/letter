@@ -3,20 +3,19 @@ using System.Buffers;
 using System.Net;
 using System.Net.Sockets;
 using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 
 namespace Letter.Udp
 {
     public partial class UdpSession
     {
-        public IDgramPipeReader SenderPipeReader
+        public IDgramPipelineReader SenderPipeReader
         {
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             get { return this.senderPipeline; }
         }
 
-        public IDgramPipeWriter SenderPipeWriter
+        public IDgramPipelineWriter SenderPipeWriter
         {
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             get { return this.senderPipeline; }
@@ -33,7 +32,7 @@ namespace Letter.Udp
             this.SenderPipeReader.ReceiveAsync();
         }
         
-        private async void OnSenderPipelineReceiveBuffer(IDgramPipeReader reader)
+        private async void OnSenderPipelineReceiveBuffer(IDgramPipelineReader reader)
         {
             while (true)
             {
