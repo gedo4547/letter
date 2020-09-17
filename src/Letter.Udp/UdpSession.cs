@@ -11,6 +11,7 @@ namespace Letter.Udp
     {
         public UdpSession(BinaryOrder order, MemoryPool<byte> memoryPool, PipeScheduler scheduler, DgramChannelFilterGroup<IUdpSession, IUdpChannelFilter> filterGroup)
         {
+            Console.WriteLine("session  创建");
             this.Id = IdGeneratorHelper.GetNextId();
             this.Scheduler = scheduler;
             this.MemoryPool = memoryPool;
@@ -26,7 +27,7 @@ namespace Letter.Udp
 
         public EndPoint RemoteAddress
         {
-            get 
+            get
             {
                 throw new Exception("please use IUdpSession.RcvAddress or IUdpSession.SndAddress");
             }
@@ -51,20 +52,25 @@ namespace Letter.Udp
         private WrappedDgramWriter.MemoryWritePushDelegate onMemoryWritePush;
 
         private Task memoryTask;
+
+        private string name;
+
+        protected long isClosed = 0;
         
-        
-        public void StartAsync(Socket socket)
+        public void StartAsync(Socket socket, string name)
         {
+            this.name = name;
+            
             this.socket = socket;
             this.LoaclAddress = this.socket.LocalEndPoint;
             
             this.socketSender = new UdpSocketSender(this.socket, this.Scheduler);
             this.socketReceiver = new UdpSocketReceiver(this.socket, this.Scheduler);
 
-            this.SenderStartReceiveBuffer();
-            this.ReceiverStartReceiveBuffer();
+            this.StartReceiveSenderPipelineBuffer();
+            this.StartReceiveReceiverPipelineBuffer();
             
-            this.memoryTask = this.ReaderMemoryPolledIOAsync();
+            this.memoryTask = this.SocketReceiveAsync();
             
             this.filterGroup.OnChannelActive(this);
         }
@@ -79,16 +85,90 @@ namespace Letter.Udp
             return this.WriteBufferAsync(remoteAddress, ref sequence);
         }
         
-        public Task CloseAsync()
+        public async Task CloseAsync()
         {
+            if (System.Threading.Interlocked.Read(ref this.isClosed) == 1)
+            {
+                return;
+            }
+
+            System.Threading.Interlocked.Exchange(ref this.isClosed, 1);
+            Console.WriteLine("close---close---close---close---close---close---close---");
             this.filterGroup.OnChannelInactive(this);
 
             this.Id = string.Empty;
+            if (this.socket != null)
+            {
+                this.socket.Dispose();
+                this.socket = null;
+            }
+            
+            if (this.memoryTask != null)
+            {
+                await this.memoryTask;
+                this.memoryTask = null;
+            }
 
+            if (this.socketSender != null)
+            {
+                this.socketSender.Dispose();
+                this.socketSender = null;
+            }
 
+            if (this.socketReceiver != null)
+            {
+                this.socketReceiver.Dispose();
+                this.socketReceiver = null;
+            }
 
+            if (this.senderPipeline != null)
+            {
+                this.senderPipeline.Dispose();
+                this.senderPipeline = null;
+            }
 
-            return Task.CompletedTask;
+            if (this.receiverPipeline != null)
+            {
+                this.receiverPipeline.Dispose();
+                this.receiverPipeline = null;
+            }
+
+            if (this.filterGroup != null)
+            {
+                await this.filterGroup.DisposeAsync();
+                this.filterGroup = null;
+            }
+
+            if (this.onMemoryWritePush != null)
+            {
+                this.onMemoryWritePush = null;
+            }
+
+            if (this.LoaclAddress != null)
+            {
+                this.LoaclAddress = null;
+            }
+
+            if (this.RcvAddress != null)
+            {
+                this.RcvAddress = null;
+            }
+
+            if (this.SndAddress != null)
+            {
+                this.SndAddress = null;
+            }
+
+            if (this.Scheduler != null)
+            {
+                this.Scheduler = null;
+            }
+
+            if (this.MemoryPool != null)
+            {
+                this.MemoryPool.Dispose();
+                this.MemoryPool = null;
+            }
         }
     }
 }

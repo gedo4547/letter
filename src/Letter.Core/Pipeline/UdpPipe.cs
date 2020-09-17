@@ -75,25 +75,24 @@ using System.IO.Pipelines;
 
         public void Dispose()
         {
-            if (this.memoryPool != null)
+            UdpMessageNode tempNode = this.headNode;
+            while (tempNode != null)
             {
-                this.memoryPool.Dispose();
-                this.memoryPool = null;
+                var nextNode = tempNode.next;
+                tempNode.Dispose();
+                tempNode = nextNode;
             }
-
+            
             if (this.headNode != null)
             {
-                this.headNode.Dispose();
                 this.headNode = null;
             }
 
-
             if (this.tailNode != null)
             {
-                this.tailNode.Dispose();
                 this.tailNode = null;
             }
-
+            
             if (this.nodeStack != null)
             {
                 while (this.nodeStack.TryPop(out var node))
@@ -102,6 +101,11 @@ using System.IO.Pipelines;
                 }
 
                 this.nodeStack = null;
+            }
+            
+            if (this.memoryPool != null)
+            {
+                this.memoryPool = null;
             }
         }
     }

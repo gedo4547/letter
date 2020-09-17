@@ -7,9 +7,6 @@
   "targets": {
     "net5.0": {
       "Letter.Core/1.0.0": {
-        "dependencies": {
-          "System.IO.Pipelines": "5.0.0-preview.8.20407.11"
-        },
         "runtime": {
           "Letter.Core.dll": {}
         }

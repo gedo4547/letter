@@ -14,6 +14,8 @@ namespace Letter.Udp
         public int? SndTimeout { get; set; }
         
         public BinaryOrder Order { get; set; } = BinaryOrder.BigEndian;
+
+        public int MemoryBufferLength { get; set; }
         
         public Func<MemoryPool<byte>> MemoryPoolFactory { get; set; } = SlabMemoryPoolFactory.Create;
 

@@ -18,18 +18,21 @@ namespace Letter.Udp
         
         private UdpOptions options;
         private DgramChannelFilterGroupFactory<IUdpSession, IUdpChannelFilter> groupFactory;
+
+        private string name;
         
-        public async Task StartAsync(EndPoint bindAddress, EndPoint connectAddress)
+        public async Task StartAsync(EndPoint bindAddress, EndPoint connectAddress, string name)
         {
-            await this.StartAsync(bindAddress);
+            await this.StartAsync(bindAddress, name);
 
             await this.socket.ConnectAsync(connectAddress);
             
             this.Run();
         }
         
-        public Task StartAsync(EndPoint bindAddress)
+        public Task StartAsync(EndPoint bindAddress, string name)
         {
+            this.name = name;
             this.CreateSocket(bindAddress.AddressFamily);
             
             try
@@ -50,8 +53,6 @@ namespace Letter.Udp
         {
             this.socket = new Socket(family, SocketType.Dgram, ProtocolType.Udp);
             
-            // this.socket.SettingLingerState(this.options.LingerOption);
-            
             if (this.options.RcvTimeout != null)
                 this.socket.SettingRcvTimeout(this.options.RcvTimeout.Value);
             if (this.options.SndTimeout != null)
@@ -70,7 +71,7 @@ namespace Letter.Udp
             PipeScheduler scheduler = this.options.Allocator.Next();
             
             this.session = new UdpSession(this.options.Order, memoryPool, scheduler, filterGroup);
-            this.session.StartAsync(this.socket);
+            this.session.StartAsync(this.socket, name);
         }
         
         public async ValueTask DisposeAsync()

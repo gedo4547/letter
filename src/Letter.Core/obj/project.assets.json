@@ -1,7 +1,7 @@
 {
   "version": 3,
   "targets": {
-    "net5.0": {
+    ".NETCoreApp,Version=v5.0": {
       "System.IO.Pipelines/5.0.0-preview.8.20407.11": {
         "type": "package",
         "compile": {
@@ -41,38 +41,39 @@
     }
   },
   "projectFileDependencyGroups": {
-    "net5.0": [
+    ".NETCoreApp,Version=v5.0": [
       "System.IO.Pipelines >= 5.0.0-preview.8.20407.11"
     ]
   },
   "packageFolders": {
-    "/Users/guanyedong/.nuget/packages/": {},
-    "/usr/local/share/dotnet/sdk/NuGetFallbackFolder": {}
+    "C:\\Users\\pc\\.nuget\\packages\\": {},
+    "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "/Users/guanyedong/Projects/letter-github/src/Letter.Core/Letter.Core.csproj",
+      "projectUniqueName": "F:\\letter-github\\src\\Letter.Core\\Letter.Core.csproj",
       "projectName": "Letter.Core",
-      "projectPath": "/Users/guanyedong/Projects/letter-github/src/Letter.Core/Letter.Core.csproj",
-      "packagesPath": "/Users/guanyedong/.nuget/packages/",
-      "outputPath": "/Users/guanyedong/Projects/letter-github/src/Letter.Core/obj/",
+      "projectPath": "F:\\letter-github\\src\\Letter.Core\\Letter.Core.csproj",
+      "packagesPath": "C:\\Users\\pc\\.nuget\\packages\\",
+      "outputPath": "F:\\letter-github\\src\\Letter.Core\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
-        "/usr/local/share/dotnet/sdk/NuGetFallbackFolder"
+        "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
       ],
       "configFilePaths": [
-        "/Users/guanyedong/.nuget/NuGet/NuGet.Config"
+        "C:\\Users\\pc\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "originalTargetFrameworks": [
-        "net5.0"
+        "net50"
       ],
       "sources": {
+        "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
         "https://api.nuget.org/v3/index.json": {}
       },
       "frameworks": {
-        "net5.0": {
-          "targetAlias": "net5.0",
+        "netcoreapp5.0": {
           "projectReferences": {}
         }
       },
@@ -83,8 +84,7 @@
       }
     },
     "frameworks": {
-      "net5.0": {
-        "targetAlias": "net5.0",
+      "netcoreapp5.0": {
         "dependencies": {
           "System.IO.Pipelines": {
             "target": "Package",
@@ -106,7 +106,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/5.0.100-preview.8.20417.9/RuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\5.0.100-preview.8.20417.9\\RuntimeIdentifierGraph.json"
       }
     }
   }

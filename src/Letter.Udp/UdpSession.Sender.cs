@@ -3,6 +3,7 @@ using System.Buffers;
 using System.Net;
 using System.Net.Sockets;
 using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 
 namespace Letter.Udp
@@ -27,7 +28,7 @@ namespace Letter.Udp
             get { return this.socketSender; }
         }
         
-        public void SenderStartReceiveBuffer()
+        public void StartReceiveSenderPipelineBuffer()
         {
             this.SenderPipeReader.ReceiveAsync();
         }
@@ -46,12 +47,30 @@ namespace Letter.Udp
                 {
                     int transportBytes = await this.SenderSocketSender.SendAsync(node.Point, sequence);
                     await node.ReleaseAsync();
+                    if (transportBytes == 0)
+                    {
+                        Console.WriteLine($"{name}---Sender----111111111111111111111>>");
+                        this.CloseAsync().NoAwait();
+                        return;
+                    }
+                }
+                catch (SocketException ex) when (SocketErrorHelper.IsConnectionResetError(ex.SocketErrorCode))
+                {
+                    Console.WriteLine($"{name}---Sender----22222222222222222222222>>");
+                    this.CloseAsync().NoAwait();
+                    return;
+                }
+                catch (Exception ex) when ((ex is SocketException socketEx &&
+                                            SocketErrorHelper.IsConnectionAbortError(socketEx.SocketErrorCode)) ||
+                                           ex is ObjectDisposedException)
+                {
+                    Console.WriteLine($"{name}---Sender----333333333333333333333333333>>");
+                    this.CloseAsync().NoAwait();
+                    return;
                 }
                 catch (Exception ex)
                 {
-                    // base.SocketExceptionInspect(ex);
                     this.filterGroup.OnChannelException(this, ex);
-                    return;
                 }
             }
             

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Net.Sockets;
 using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 
 namespace Letter.Udp
@@ -25,12 +26,12 @@ namespace Letter.Udp
             get { return this.socketReceiver; }
         }
 
-        public void ReceiverStartReceiveBuffer()
+        public void StartReceiveReceiverPipelineBuffer()
         {
             this.ReceiverPipeReader.ReceiveAsync();
         }
         
-        private async Task ReaderMemoryPolledIOAsync()
+        private async Task SocketReceiveAsync()
         {
             while (true)
             {
@@ -39,8 +40,31 @@ namespace Letter.Udp
                 try
                 {
                     int transportBytes = await this.ReceiverSocketReceiver.ReceiveAsync(this.LoaclAddress, memory);
+                    
+                    if (transportBytes == 0)
+                    {
+                        Console.WriteLine($"{name}---Receiver-----1111111111111111111111111111>>>>");
+                        node.ReleaseAsync().NoAwait();
+                        this.CloseAsync().NoAwait();
+                        return;
+                    }
+                    
                     node.SettingPoint(this.ReceiverSocketReceiver.RemoteAddress);
                     node.SettingWriteLength(transportBytes);
+                }
+                catch (SocketException ex) when (SocketErrorHelper.IsConnectionResetError(ex.SocketErrorCode))
+                {
+                    Console.WriteLine($"{name}---Receiver-----222222222222222222222222>>>>");
+                    this.CloseAsync().NoAwait();
+                    return;
+                }
+                catch (Exception ex) when ((ex is SocketException socketEx &&
+                                            SocketErrorHelper.IsConnectionAbortError(socketEx.SocketErrorCode)) ||
+                                            ex is ObjectDisposedException)
+                {
+                    Console.WriteLine($"{name}---Receiver------333333333333333333333333333>>>>");
+                    this.CloseAsync().NoAwait();
+                    return;
                 }
                 catch (Exception ex)
                 {
@@ -51,7 +75,7 @@ namespace Letter.Udp
                 this.ReceiverPipeWriter.Write(node);
             }
         }
-        
+
         private void OnReceiverPipelineReceiveBuffer(IUdpPipeReader reader)
         {
             while (true)

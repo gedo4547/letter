@@ -7,7 +7,7 @@ namespace udp_text
 {
     public class UdpFilter_2 : IUdpChannelFilter
     {
-        public void OnChannelActive(IUdpSession session)
+        public async void OnChannelActive(IUdpSession session)
         {
             Console.WriteLine($"{nameof(UdpFilter_2)}.{nameof(OnChannelActive)}" + session.LoaclAddress);
             
@@ -20,8 +20,11 @@ namespace udp_text
                 Console.WriteLine("发送");
                 for (int i = 0; i < 10; i++)
                 {
-                    session.WriteAsync(Program.s_p, ref sequence);    
+                    await session.WriteAsync(Program.s_p, ref sequence);
                 }
+                
+                Console.WriteLine("关闭");
+                await session.CloseAsync();
             }
         }
 
