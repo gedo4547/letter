@@ -7,7 +7,7 @@ namespace Letter.Tcp
 {
     class TcpClientChannel : ATcpChannel, ITcpClientChannel
     {
-        public TcpClientChannel(FilterGroupFactory groupFactory, SslFeature sslFeature)
+        public TcpClientChannel(TcpClientOptions options, FilterGroupFactory groupFactory, SslFeature sslFeature)
             : base(groupFactory, sslFeature)
         {
         }
