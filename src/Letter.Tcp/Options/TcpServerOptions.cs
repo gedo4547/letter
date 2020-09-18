@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Threading;
 
 namespace Letter.Tcp
 {
@@ -20,19 +19,5 @@ namespace Letter.Tcp
         /// Defaults to 512.
         /// </remarks>
         public int Backlog { get; set; } = 512;
-        
-        public int SchedulerCount
-        {
-            get { return SchedulerAllocator.shared.Count;}
-            set
-            {
-                int count = value;
-                if (count == SchedulerAllocator.shared.Count)
-                    return;
-                this.SchedulerAllocator = new SchedulerAllocator(count);
-            }
-        }
-        
-        internal SchedulerAllocator SchedulerAllocator { get; private set; } = SchedulerAllocator.shared;
     }
 }

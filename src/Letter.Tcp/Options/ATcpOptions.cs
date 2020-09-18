@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Buffers;
 using System.Net.Sockets;
+using System.Threading;
 
 namespace Letter.Tcp
 {
@@ -42,11 +43,36 @@ namespace Letter.Tcp
             MemoryBlockCount = 32
         };
         
-        private MemoryPool<byte> OnCreateMemoryPool()
+        private SchedulerOptions schedulerOptions = new SchedulerOptions(SchedulerType.ThreadPool);
+        public SchedulerOptions SchedulerOptions
         {
-            return SlabMemoryPoolFactory.Create(this.MemoryPoolOptions);
+            get { return schedulerOptions;}
+            set
+            {
+                this.schedulerOptions = value;
+                switch (this.schedulerOptions.Type)
+                {
+                    case SchedulerType.Node:
+                        this.SchedulerAllocator = new SchedulerAllocator(this.schedulerOptions.SchedulerCount);
+                        break;
+                    
+                    case SchedulerType.Kestrel:
+                        this.SchedulerAllocator = SchedulerAllocator.kestrel;
+                        break;
+                    case SchedulerType.Processor:
+                        this.SchedulerAllocator = SchedulerAllocator.processor;
+                        break;
+                    case SchedulerType.ThreadPool:
+                        this.SchedulerAllocator = SchedulerAllocator.threadPool;
+                        break;
+                }
+            }
         }
-
-        internal Func<MemoryPool<byte>> MemoryPoolFactory { get; set; } 
+        
+        
+        internal Func<MemoryPool<byte>> MemoryPoolFactory { get; set; }
+        private MemoryPool<byte> OnCreateMemoryPool() => SlabMemoryPoolFactory.Create(this.MemoryPoolOptions);
+        
+        internal SchedulerAllocator SchedulerAllocator { get; private set; } = SchedulerAllocator.threadPool;
     }
 }

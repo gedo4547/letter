@@ -23,24 +23,35 @@ namespace Letter.Udp
             MemoryBlockCount = 32
         };
 
-        public int SchedulerCount
+        private SchedulerOptions schedulerOptions = new SchedulerOptions(SchedulerType.ThreadPool);
+        public SchedulerOptions SchedulerOptions
         {
-            get { return SchedulerAllocator.Count;}
+            get { return schedulerOptions;}
             set
             {
-                int count = value;
-                if (count == SchedulerAllocator.Count)
-                    return;
-                this.SchedulerAllocator = new SchedulerAllocator(count);
+                this.schedulerOptions = value;
+                switch (this.schedulerOptions.Type)
+                {
+                    case SchedulerType.Node:
+                        this.SchedulerAllocator = new SchedulerAllocator(this.schedulerOptions.SchedulerCount);
+                        break;
+                    
+                    case SchedulerType.Kestrel:
+                        this.SchedulerAllocator = SchedulerAllocator.kestrel;
+                        break;
+                    case SchedulerType.Processor:
+                        this.SchedulerAllocator = SchedulerAllocator.processor;
+                        break;
+                    case SchedulerType.ThreadPool:
+                        this.SchedulerAllocator = SchedulerAllocator.threadPool;
+                        break;
+                }
             }
         }
         
-        private MemoryPool<byte> OnCreateMemoryPool()
-        {
-            return SlabMemoryPoolFactory.Create(this.MemoryPoolOptions);
-        }
-
         internal Func<MemoryPool<byte>> MemoryPoolFactory { get; set; }
+        private MemoryPool<byte> OnCreateMemoryPool() => SlabMemoryPoolFactory.Create(this.MemoryPoolOptions);
+        
         internal SchedulerAllocator SchedulerAllocator { get; private set; } = SchedulerAllocator.threadPool;
     }
 }

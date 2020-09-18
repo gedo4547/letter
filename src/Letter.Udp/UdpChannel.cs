@@ -80,8 +80,14 @@ namespace Letter.Udp
             var memoryPool = this.options.MemoryPoolFactory();
             PipeScheduler scheduler = this.options.SchedulerAllocator.Next();
             
-            this.session = new UdpSession(this.options.Order, memoryPool, scheduler, filterGroup);
-            this.session.StartAsync(this.socket);
+            this.session = new UdpSession(
+                this.socket, 
+                this.options.Order, 
+                memoryPool,
+                scheduler, 
+                filterGroup);
+            
+            this.session.StartAsync();
         }
         
         public async ValueTask DisposeAsync()

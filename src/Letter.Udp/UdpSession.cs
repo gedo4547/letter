@@ -13,12 +13,18 @@ namespace Letter.Udp
 {
     public partial class UdpSession : IUdpSession
     {
-        public UdpSession(BinaryOrder order, MemoryPool<byte> memoryPool, PipeScheduler scheduler, FilterGroup filterGroup)
+        public UdpSession(Socket socket, BinaryOrder order, MemoryPool<byte> memoryPool, PipeScheduler scheduler, FilterGroup filterGroup)
         {
             this.Id = IdGeneratorHelper.GetNextId();
+            
+            this.socket = socket;
             this.Scheduler = scheduler;
             this.MemoryPool = memoryPool;
             this.filterGroup = filterGroup;
+            this.LoaclAddress = this.socket.LocalEndPoint;
+            
+            this.socketSender = new UdpSocketSender(this.socket, this.Scheduler);
+            this.socketReceiver = new UdpSocketReceiver(this.socket, this.Scheduler);
 
             this.onMemoryWritePush = this.OnMemoryWritePush;
             this.senderPipeline = new DgramPipeline(this.MemoryPool, this.Scheduler, this.OnSenderPipelineReceiveBuffer);
@@ -57,14 +63,8 @@ namespace Letter.Udp
         
         private object writerSync = new object();
         
-        public void StartAsync(Socket socket)
+        public void StartAsync()
         {
-            this.socket = socket;
-            this.LoaclAddress = this.socket.LocalEndPoint;
-            
-            this.socketSender = new UdpSocketSender(this.socket, this.Scheduler);
-            this.socketReceiver = new UdpSocketReceiver(this.socket, this.Scheduler);
-
             this.StartReceiveSenderPipelineBuffer();
             this.StartReceiveReceiverPipelineBuffer();
             
@@ -82,7 +82,7 @@ namespace Letter.Udp
                     throw new ObjectDisposedException("UdpSession has been released");
                 }
                 
-                return this.WriteBufferAsync(remoteAddress, obj);    
+                return this.WriteBufferAsync(remoteAddress, obj);
             }
         }
 
@@ -95,7 +95,7 @@ namespace Letter.Udp
                     throw new ObjectDisposedException("UdpSession has been released");
                 }
                 
-                return this.WriteBufferAsync(remoteAddress, ref sequence);    
+                return this.WriteBufferAsync(remoteAddress, ref sequence);
             }
         }
         
