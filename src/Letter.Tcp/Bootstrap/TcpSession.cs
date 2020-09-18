@@ -13,7 +13,6 @@ namespace Letter.Tcp
         public MemoryPool<byte> MemoryPool { get; }
         public PipeScheduler Scheduler { get; }
         
-        
         public Task WriteAsync(object obj)
         {
             throw new System.NotImplementedException();

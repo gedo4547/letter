@@ -3,7 +3,7 @@ using System.Runtime.CompilerServices;
 
 namespace Letter
 {
-    public interface IBinaryOrderConvertor
+    interface IBinaryOrderConvertor
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         short ReadInt16(in ReadOnlySpan<byte> span);

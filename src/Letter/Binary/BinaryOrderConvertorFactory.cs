@@ -1,6 +1,6 @@
 ﻿namespace Letter
 {
-    public static class BinaryOrderConvertorFactory
+    static class BinaryOrderConvertorFactory
     {
         private static IBinaryOrderConvertor bigEndian = new OrderConvertorBigEndianImpl();
         private static IBinaryOrderConvertor littleEndian = new OrderConvertorLittleEndianImpl();

@@ -7,7 +7,7 @@ using FilterGroupFactory = Letter.DgramChannelFilterGroupFactory<Letter.Udp.IUdp
 
 namespace Letter.Udp
 {
-    public class UdpChannel : IUdpChannel
+    sealed class UdpChannel : IUdpChannel
     {
         public UdpChannel(UdpOptions options, FilterGroupFactory groupFactory)
         {

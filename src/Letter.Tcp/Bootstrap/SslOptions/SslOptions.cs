@@ -2,9 +2,9 @@
 
 namespace Letter
 {
-    public abstract class TlsOptions
+    public abstract class SslOptions
     {
-        protected TlsOptions(SslProtocols enabledProtocols, bool checkCertificateRevocation)
+        protected SslOptions(SslProtocols enabledProtocols, bool checkCertificateRevocation)
         {
             this.EnabledProtocols = enabledProtocols;
             this.CheckCertificateRevocation = checkCertificateRevocation;

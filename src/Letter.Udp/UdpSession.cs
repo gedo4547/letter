@@ -11,7 +11,7 @@ using FilterGroup = Letter.DgramChannelFilterGroup<Letter.Udp.IUdpSession, Lette
 
 namespace Letter.Udp
 {
-    public partial class UdpSession : IUdpSession
+    partial class UdpSession : IUdpSession
     {
         public UdpSession(Socket socket, BinaryOrder order, MemoryPool<byte> memoryPool, PipeScheduler scheduler, FilterGroup filterGroup)
         {
@@ -59,7 +59,7 @@ namespace Letter.Udp
 
         private Task memoryTask;
 
-        protected long isDisposed = 0;
+        protected volatile bool isDisposed = false;
         
         private object writerSync = new object();
         
@@ -77,7 +77,7 @@ namespace Letter.Udp
         {
             lock (writerSync)
             {
-                if (Interlocked.Read(ref this.isDisposed) == 1)
+                if (this.isDisposed)
                 {
                     throw new ObjectDisposedException("UdpSession has been released");
                 }
@@ -90,7 +90,7 @@ namespace Letter.Udp
         {
             lock (writerSync)
             {
-                if (Interlocked.Read(ref this.isDisposed) == 1)
+                if (this.isDisposed)
                 {
                     throw new ObjectDisposedException("UdpSession has been released");
                 }
@@ -101,18 +101,26 @@ namespace Letter.Udp
         
         public async ValueTask DisposeAsync()
         {
-            if (Interlocked.Read(ref this.isDisposed) == 1)
+            if (this.isDisposed)
             {
                 return;
             }
 
-            Interlocked.Exchange(ref this.isDisposed, 1);
+            this.isDisposed = true;
             
             this.filterGroup.OnChannelInactive(this);
 
             this.Id = string.Empty;
             if (this.socket != null)
             {
+                try
+                {
+                    this.socket.Shutdown(SocketShutdown.Both);
+                }
+                catch
+                {
+                }
+                
                 this.socket.Dispose();
                 this.socket = null;
             }

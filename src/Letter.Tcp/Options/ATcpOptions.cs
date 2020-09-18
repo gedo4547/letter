@@ -68,8 +68,7 @@ namespace Letter.Tcp
                 }
             }
         }
-        
-        
+
         internal Func<MemoryPool<byte>> MemoryPoolFactory { get; set; }
         private MemoryPool<byte> OnCreateMemoryPool() => SlabMemoryPoolFactory.Create(this.MemoryPoolOptions);
         

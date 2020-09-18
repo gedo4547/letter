@@ -5,7 +5,7 @@ using FilterGroupFactory = Letter.DgramChannelFilterGroupFactory<Letter.Udp.IUdp
 
 namespace Letter.Udp
 {
-    public class UdpBootstrap : ADgramBootstrap<UdpOptions, IUdpSession, IUdpChannelFilter, IUdpChannel>, IUdpBootstrap
+    sealed class UdpBootstrap : ADgramBootstrap<UdpOptions, IUdpSession, IUdpChannelFilter, IUdpChannel>, IUdpBootstrap
     {
         protected override Task<IUdpChannel> ChannelFactory(UdpOptions options, FilterGroupFactory groupFactory)
         {

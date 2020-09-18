@@ -2,7 +2,7 @@
 
 namespace Letter
 {
-    public class RemoteSocketCloseException : Exception
+    public class RemoteSocketClosedException : Exception
     {
         
     }

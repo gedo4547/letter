@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Buffers;
-using System.IO.Pipelines;
 using System.Net;
 using System.Net.Sockets;
 using System.Threading;
@@ -19,34 +18,14 @@ namespace Letter.Tcp
         private Socket listenSocket;
         private SafeSocketHandle socketHandle;
         private MemoryPool<byte> memoryPool;
+        private SchedulerAllocator schedulerAllocator;
         
-        private int numSchedulers;
-        private int schedulerIndex;
-        private PipeScheduler[] schedulers;
-
         public override void Build()
         {
             base.Build();
             
             this.memoryPool = this.options.MemoryPoolFactory();
-            var ioQueueCount = options.IOQueueCount;
-
-            if (ioQueueCount > 0)
-            {
-                numSchedulers = ioQueueCount;
-                schedulers = new IOQueue[numSchedulers];
-
-                for (var i = 0; i < numSchedulers; i++)
-                {
-                    schedulers[i] = new IOQueue();
-                }
-            }
-            else
-            {
-                var directScheduler = new PipeScheduler[] { PipeScheduler.ThreadPool };
-                numSchedulers = directScheduler.Length;
-                schedulers = directScheduler;
-            }
+            this.schedulerAllocator = this.options.SchedulerAllocator;
         }
         
         public void Bind(EndPoint point)
@@ -111,10 +90,8 @@ namespace Letter.Tcp
                     TcpClient client = new TcpClient();
                     client.ConfigureOptions(this.OnConfigureClientOptions);
                     client.Build();
-                    client.Start(acceptSocket, this.schedulers[this.schedulerIndex]);
+                    client.Start(acceptSocket, this.schedulerAllocator.Next());
                     
-                    this.schedulerIndex = (this.schedulerIndex + 1) % this.numSchedulers;
-
                     return client;
                 }
                 catch (ObjectDisposedException)
@@ -134,9 +111,7 @@ namespace Letter.Tcp
 
         private void OnConfigureClientOptions(TcpClientOptions options)
         {
-            options.WaitForDataBeforeAllocatingBuffer = this.options.WaitForDataBeforeAllocatingBuffer;
-            options.MaxPipelineReadBufferSize = this.options.MaxPipelineReadBufferSize;
-            options.MaxPipelineWriteBufferSize = this.options.MaxPipelineWriteBufferSize;
+            options = (TcpClientOptions)(ATcpOptions)this.options;
             options.MemoryPoolFactory = this.ClientMemoryPoolFactory;
         }
         

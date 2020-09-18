@@ -5,7 +5,7 @@ using System.Runtime.CompilerServices;
 
 namespace Letter
 {
-    public class ObjectSequence<T> : ReadOnlySequenceSegment<T>
+    class ObjectSequence<T> : ReadOnlySequenceSegment<T>
     {
         private object _memoryOwner;
         private ObjectSequence<T> _next;

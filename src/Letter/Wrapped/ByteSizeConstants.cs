@@ -1,6 +1,6 @@
 ﻿namespace Letter
 {
-    public class ByteSizeConstants
+    class ByteSizeConstants
     {
         internal const int Size_1 = 1;
         internal const int Size_2 = 2;

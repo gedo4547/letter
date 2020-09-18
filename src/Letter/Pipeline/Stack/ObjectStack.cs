@@ -3,7 +3,7 @@ using System.Runtime.CompilerServices;
 
 namespace Letter
 {
-    public class ObjectStack<T>
+    class ObjectStack<T>
     {
         private ObjectAsValueType[] _array;
         private int _size;

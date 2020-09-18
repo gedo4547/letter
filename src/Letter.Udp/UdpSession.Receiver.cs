@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace Letter.Udp
 {
-    public partial class UdpSession
+    partial class UdpSession
     {
         public IDgramPipelineReader ReceiverPipeReader
         {

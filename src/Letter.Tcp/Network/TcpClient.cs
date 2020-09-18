@@ -24,7 +24,7 @@ namespace Letter.Tcp
         public IDuplexPipe Application { get; private set; }
         public MemoryPool<byte> MemoryPool { get; private set; }
 
-        private Action<Exception> onException;
+       
         
         
         private Socket connectSocket;
@@ -32,36 +32,36 @@ namespace Letter.Tcp
         private TcpSocketSender sender;
         private bool waitForData;
         private int minAllocBufferSize;
-        
         private Task _processingTask;
-        private readonly CancellationTokenSource _connectionClosedTokenSource = new CancellationTokenSource();
-        
-        private readonly object _shutdownLock = new object();
-        private volatile bool _socketDisposed;
-        private volatile Exception _shutdownReason;
-        private readonly TaskCompletionSource _waitForConnectionClosedTcs = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
-        private bool _connectionClosed;
+    
+        private volatile bool isDisposed = false;
 
+        private Action<ITcpClient> onClosed;
+        private Action<Exception> onException;
         
         public PipeWriter Input => Application.Output;
         public PipeReader Output => Application.Input;
         
+
+        public void AddClosedListener(Action<ITcpClient> onClosed)
+        {
+            if(onClosed == null)
+                 throw new ArgumentNullException(nameof(onClosed));
+            this.onClosed += onClosed;
+        }
+
         public void AddExceptionListener(Action<Exception> onException)
         {
             if (onException == null)
-            {
                 throw new ArgumentNullException(nameof(onException));
-            }
-
             this.onException += onException;
         }
+
 
         public void Start(Socket socket, PipeScheduler scheduler)
         {
             if (socket is null)
-            {
                 throw new ArgumentNullException(nameof(socket));
-            }
 
             this.connectSocket = socket;
             this.StartConfigurationConnect(scheduler);
@@ -80,9 +80,8 @@ namespace Letter.Tcp
                 this.connectSocket = new Socket(ipEndPoint.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
                 this.connectSocket.NoDelay = this.options.NoDelay;
             }
-            
-            await this.connectSocket.ConnectAsync(ipEndPoint);
             this.StartConfigurationConnect(PipeScheduler.ThreadPool);
+            await this.connectSocket.ConnectAsync(ipEndPoint);
 
             this.Run();
         }
@@ -93,6 +92,20 @@ namespace Letter.Tcp
             this.RemoteAddress = this.connectSocket.RemoteEndPoint;
             this.MemoryPool = this.options.MemoryPoolFactory();
             this.minAllocBufferSize = this.MemoryPool.MaxBufferSize / 2;
+
+            this.connectSocket.SettingNoDelay(this.options.NoDelay);
+            this.connectSocket.SettingKeepAlive(this.options.KeepAlive);
+            this.connectSocket.SettingLingerState(this.options.LingerOption);
+
+            if (this.options.SndBufferSize != null)
+                this.connectSocket.SettingSndBufferSize(this.options.SndBufferSize.Value);
+            if (this.options.RcvBufferSize != null)
+                this.connectSocket.SettingRcvBufferSize(this.options.RcvBufferSize.Value);
+            
+            if (this.options.SndTimeout != null)
+                this.connectSocket.SettingSndTimeout(this.options.SndTimeout.Value);
+            if (this.options.RcvTimeout != null)
+                this.connectSocket.SettingRcvTimeout(this.options.RcvTimeout.Value);
             
             this.waitForData = this.options.WaitForDataBeforeAllocatingBuffer;
             var awaiterScheduler = IsWindows ? scheduler : PipeScheduler.Inline;
@@ -120,11 +133,9 @@ namespace Letter.Tcp
         {
             try
             {
-                // Spawn send and receive logic
                 var receiveTask = DoReceive();
                 var sendTask = DoSend();
 
-                // Now wait for both to complete
                 await receiveTask;
                 await sendTask;
 
@@ -136,280 +147,126 @@ namespace Letter.Tcp
                 StringBuilder sb = new StringBuilder();
                 sb.AppendLine($"Unexpected exception in {nameof(TcpClient)}.{nameof(StartAsync)}.");
                 sb.AppendLine(ex.ToString());
-                // _trace.LogError(0, ex, $"Unexpected exception in {nameof(TcpSession)}.{nameof(StartAsync)}.");
                 this.onException?.Invoke(new Exception(sb.ToString()));
             }
         }
 
         private async Task DoReceive()
-        {
-            Exception error = null;
-            
+        {            
             try
             {
                 await ProcessReceives();
             }
-            catch (SocketException ex) when (IsConnectionResetError(ex.SocketErrorCode))
+            catch(Exception ex)
             {
-                error = new ConnectionResetException(ex.Message, ex);
-                if (!_socketDisposed)
+                if (SocketErrorHelper.IsSocketDisabledError(ex) || ex is RemoteSocketClosedException)
                 {
-                    this.onException?.Invoke(error);
+                    await this.DisposeAsync();
                 }
-            }
-            catch (Exception ex) when ((ex is SocketException socketEx && IsConnectionAbortError(socketEx.SocketErrorCode)) || ex is ObjectDisposedException)
-            {
-                // This exception should always be ignored because _shutdownReason should be set.
-                error = ex;
-
-                if (!_socketDisposed)
+                else
                 {
-                    // This is unexpected if the socket hasn't been disposed yet.
-                    this.onException?.Invoke(error);
+                    this.onException?.Invoke(ex);
                 }
-            }
-            catch (Exception ex)
-            {
-                // This is unexpected.
-                error = ex;
-                this.onException?.Invoke(error);
-            }
-            finally
-            {
-                // If Shutdown() has already bee called, assume that was the reason ProcessReceives() exited.
-                Input.Complete(_shutdownReason ?? error);
-
-                FireConnectionClosed();
-
-                await _waitForConnectionClosedTcs.Task;
             }
         }
         
         private async Task ProcessReceives()
         {
-            // Resolve `input` PipeWriter via the IDuplexPipe interface prior to loop start for performance.
             var input = Input;
             while (true)
             {
-                if (waitForData)
-                {
-                    // Wait for data before allocating a buffer.
-                    await receiver.WaitForDataAsync();
-                }
-                // Ensure we have some reasonable amount of buffer space
+                if (waitForData) await receiver.WaitForDataAsync();
+                
                 var buffer = input.GetMemory(minAllocBufferSize);
                 var bytesReceived = await receiver.ReceiveAsync(buffer);
-                if (bytesReceived == 0)
-                {
-                    // FIN
-                    this.onException?.Invoke(new ConnectionReadFinException());
-                    break;
-                }
+                
+                if (bytesReceived == 0) 
+                    throw new RemoteSocketClosedException();
 
                 input.Advance(bytesReceived);
-                var flushTask = input.FlushAsync();
-                // var paused = !flushTask.IsCompleted;
-                //
-                // if (paused)
-                // {
-                //     // _trace.ConnectionPause(this.Id);
-                // }
-
-                var result = await flushTask;
-
-                // if (paused)
-                // {
-                //     // _trace.ConnectionResume(this.Id);
-                // }
-
-                if (result.IsCompleted || result.IsCanceled)
-                {
-                    // Pipe consumer is shut down, do we stop writing
-                    break;
-                }
+                var result = await input.FlushAsync();
+                if (result.IsCompleted || result.IsCanceled) break;
             }
         }
         
-         private async Task DoSend()
+        private async Task DoSend()
         {
-            Exception shutdownReason = null;
-            Exception unexpectedError = null;
-
             try
             {
                 await ProcessSends();
             }
-            catch (SocketException ex) when (IsConnectionResetError(ex.SocketErrorCode))
+            catch(Exception ex)
             {
-                shutdownReason = new ConnectionResetException(ex.Message, ex);
-                this.onException?.Invoke(shutdownReason);
-            }
-            catch (Exception ex)
-                when ((ex is SocketException socketEx && IsConnectionAbortError(socketEx.SocketErrorCode)) ||
-                      ex is ObjectDisposedException)
-            {
-                // This should always be ignored since Shutdown() must have already been called by Abort().
-                shutdownReason = ex;
-                this.onException?.Invoke(shutdownReason);
-            }
-            catch (Exception ex)
-            {
-                shutdownReason = ex;
-                unexpectedError = ex;
-                this.onException?.Invoke(ex);
-            }
-            finally
-            {
-                Shutdown(shutdownReason);
-
-                // Complete the output after disposing the socket
-                Output.Complete(unexpectedError);
-
-                // Cancel any pending flushes so that the input loop is un-paused
-                Input.CancelPendingFlush();
+                if (SocketErrorHelper.IsSocketDisabledError(ex) || ex is RemoteSocketClosedException)
+                {
+                    await this.DisposeAsync();
+                }
+                else
+                {
+                    this.onException?.Invoke(ex);
+                }
             }
         }
         
         private async Task ProcessSends()
         {
-            // Resolve `output` PipeReader via the IDuplexPipe interface prior to loop start for performance.
             var output = Output;
             while (true)
             {
                 var result = await output.ReadAsync();
-
-                if (result.IsCanceled)
-                {
-                    break;
-                }
-
+                if (result.IsCanceled) break;
                 var buffer = result.Buffer;
-
                 var end = buffer.End;
                 var isCompleted = result.IsCompleted;
                 if (!buffer.IsEmpty)
                 {
-                    await sender.SendAsync(buffer);
+                    var bytesReceived = await sender.SendAsync(buffer);
+                    if (bytesReceived == 0)
+                        throw new RemoteSocketClosedException();
                 }
 
                 output.AdvanceTo(end);
-
-                if (isCompleted)
-                {
-                    break;
-                }
+                if (isCompleted) break;
             }
         }
         
-        private void Shutdown(Exception shutdownReason)
+        public override async ValueTask DisposeAsync()
         {
-            lock (_shutdownLock)
-            {
-                if (_socketDisposed)
-                {
-                    return;
-                }
-
-                // Make sure to close the connection only after the _aborted flag is set.
-                // Without this, the RequestsCanBeAbortedMidRead test will sometimes fail when
-                // a BadHttpRequestException is thrown instead of a TaskCanceledException.
-                _socketDisposed = true;
-
-                // shutdownReason should only be null if the output was completed gracefully, so no one should ever
-                // ever observe the nondescript ConnectionAbortedException except for connection middleware attempting
-                // to half close the connection which is currently unsupported.
-                _shutdownReason = shutdownReason ?? new ConnectionAbortedException("The Socket transport's send loop completed gracefully.");
-
-                // _trace.ConnectionWriteFin(this.Id, _shutdownReason.Message);
-
-                try
-                {
-                    // Try to gracefully close the socket even for aborts to match libuv behavior.
-                    connectSocket.Shutdown(SocketShutdown.Both);
-                }
-                catch
-                {
-                    // Ignore any errors from Socket.Shutdown() since we're tearing down the connection anyway.
-                }
-
-                connectSocket.Dispose();
-            }
-        }
-
-        private void FireConnectionClosed()
-        {
-            // Guard against scheduling this multiple times
-            if (_connectionClosed)
+            if(this.isDisposed)
             {
                 return;
             }
 
-            _connectionClosed = true;
+            this.isDisposed = true;
 
-            ThreadPool.UnsafeQueueUserWorkItem(state =>
-                {
-                    state.CancelConnectionClosedToken();
+            if(this.onClosed != null)
+            {
+                this.onClosed(this);
+            }
 
-                    state._waitForConnectionClosedTcs.TrySetResult();
-                },
-                this,
-                preferLocal: false);
-        }
-
-        private void CancelConnectionClosedToken()
-        {
+            this.Id = string.Empty;
             try
             {
-                _connectionClosedTokenSource.Cancel();
+                this.connectSocket.Shutdown(SocketShutdown.Both);
             }
-            catch (Exception ex)
+            catch
             {
-                // _trace.LogError(0, ex, $"Unexpected exception in {nameof(TcpSession)}.{nameof(CancelConnectionClosedToken)}.");
             }
-        }
 
-        // public override ValueTask CloseAsync(CancellationToken cancellationToken = default)
-        // {
-        //     Shutdown(null);
-        //
-        //     // Cancel ProcessSends loop after calling shutdown to ensure the correct _shutdownReason gets set.
-        //     Output.CancelPendingRead();
-        //
-        //     return default;
-        // }
-
-        public override async ValueTask DisposeAsync()
-        {
-            await base.DisposeAsync();
+            if (this._processingTask != null)
+            {
+                await this._processingTask;
+            }
             
-            Transport.Input.Complete();
-            Transport.Output.Complete();
+            this.Transport.Input.Complete();
+            this.Transport.Output.Complete();
+            this.Application.Input.Complete();
+            this.Application.Output.Complete();
+          
+            await base.DisposeAsync();
 
-            if (_processingTask != null)
-            {
-                await _processingTask;
-            }
-
-            _connectionClosedTokenSource.Dispose();
-        }
-        
-        
-        protected static bool IsConnectionResetError(SocketError errorCode)
-        {
-            // A connection reset can be reported as SocketError.ConnectionAborted on Windows.
-            // ProtocolType can be removed once https://github.com/dotnet/corefx/issues/31927 is fixed.
-            return errorCode == SocketError.ConnectionReset ||
-                   errorCode == SocketError.Shutdown ||
-                   (errorCode == SocketError.ConnectionAborted && IsWindows);
-        }
-
-        protected static bool IsConnectionAbortError(SocketError errorCode)
-        {
-            // Calling Dispose after ReceiveAsync can cause an "InvalidArgument" error on *nix.
-            return errorCode == SocketError.OperationAborted ||
-                   errorCode == SocketError.Interrupted ||
-                   (errorCode == SocketError.InvalidArgument && !IsWindows);
-        }
-        
+            this.connectSocket.Dispose();
+            this.connectSocket = null;
+        }        
     }
 }
