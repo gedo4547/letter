@@ -6,30 +6,21 @@ using FilterGroupFactory = Letter.StreamChannelFilterGroupFactory<Letter.Tcp.ITc
 
 namespace Letter.Tcp
 {
-    public class TcpServerChannel : ITcpServerChannel
+    class TcpServerChannel : ATcpChannel, ITcpServerChannel
     {
-        public TcpServerChannel(TcpServerOptions options, FilterGroupFactory groupFactory, SslFeature sslFeature)
+        public TcpServerChannel(TcpServerOptions options, FilterGroupFactory groupFactory, SslFeature sslFeature) 
+            : base(groupFactory, sslFeature)
         {
             this.options = options;
-            this.sslFeature = sslFeature;
-            this.groupFactory = groupFactory;
-
-            if(sslFeature == null)
-                this.sessionCreator = this.CreateTcpSession;
-            else
-                this.sessionCreator = this.CreateSslTcpSession;
         }
 
         public EndPoint BindAddress
         {
             get { return this.server.BindAddress; }
         }
-
-        private SslFeature sslFeature;
+        
         private TcpServerOptions options;
-        private FilterGroupFactory groupFactory;
-        private Func<ITcpClient, IInternalTcpSession> sessionCreator;
-
+        
         private ITcpServer server;
         private Task acceptTask;
 
@@ -62,36 +53,14 @@ namespace Letter.Tcp
                 await session.StartAsync();
             }
         }
-
-        private IInternalTcpSession CreateTcpSession(ITcpClient client)
-        {
-            var filterGroup = this.groupFactory.CreateFilterGroup();
-            TcpSession session = new TcpSession(client, client.Transport, filterGroup);
-
-            return session;
-        }
-
-        private IInternalTcpSession CreateSslTcpSession(ITcpClient client)
-        {
-            var inputPipeOptions = StreamPipeOptionsHelper.ReaderOptionsCreator(client.MemoryPool);
-            var outputPipeOptions = StreamPipeOptionsHelper.WriterOptionsCreator(client.MemoryPool);
-            var sslDuplexPipe = new SslStreamDuplexPipe(
-                client.Transport, 
-                inputPipeOptions, 
-                outputPipeOptions, 
-                this.sslFeature.sslStreamFactory);
-            
-            var filterGroup = this.groupFactory.CreateFilterGroup();
-            TcpSslSession session = new TcpSslSession(client, sslDuplexPipe, this.sslFeature, filterGroup);
-
-            return session;
-        }
         
         public async ValueTask DisposeAsync()
         {
             await this.server.DisposeAsync();
 
             await this.acceptTask;
+            
+            base.Dispose();
         }
     }
 }

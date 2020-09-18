@@ -3,8 +3,13 @@ using System.Threading.Tasks;
 
 namespace Letter.Tcp
 {
-    public class TcpClientChannel : ITcpClientChannel
+    class TcpClientChannel : ATcpChannel, ITcpClientChannel
     {
+        public TcpClientChannel(StreamChannelFilterGroupFactory<ITcpSession, ITcpChannelFilter> groupFactory, SslFeature sslFeature)
+            : base(groupFactory, sslFeature)
+        {
+        }
+        
         public EndPoint ConnectAddress { get; }
 
         public Task StartAsync(EndPoint address)
@@ -14,7 +19,11 @@ namespace Letter.Tcp
         
         public ValueTask DisposeAsync()
         {
-            throw new System.NotImplementedException();
+            
+            base.Dispose();
+
+            return default;
+
         }
     }
 }
