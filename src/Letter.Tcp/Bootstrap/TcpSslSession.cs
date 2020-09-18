@@ -3,27 +3,19 @@ using System.IO.Pipelines;
 using System.Net;
 using System.Threading.Tasks;
 
+using FilterGroup = Letter.StreamChannelFilterGroup<Letter.Tcp.ITcpSession, Letter.Tcp.ITcpChannelFilter>;
+
 namespace Letter.Tcp
 {
-    public class TcpSslSession : ITcpSession
+    class TcpSslSession : ATcpSession
     {
-        public string Id { get; }
-        public EndPoint LoaclAddress { get; }
-        public EndPoint RemoteAddress { get; }
-        public MemoryPool<byte> MemoryPool { get; }
-        public PipeScheduler Scheduler { get; }
-        
-        public Task WriteAsync(object obj)
+        public TcpSslSession(ITcpClient client, SslFeature sslFeature, FilterGroup filterGroup)
         {
-            throw new System.NotImplementedException();
+
         }
 
-        public Task WriteAsync(ref ReadOnlySequence<byte> sequence)
-        {
-            throw new System.NotImplementedException();
-        }
-        
-        public ValueTask DisposeAsync()
+
+        public override Task StartAsync()
         {
             throw new System.NotImplementedException();
         }

@@ -19,6 +19,7 @@ namespace Letter.Tcp
         
         EndPoint RemoteAddress { get; }
 
+        void AddClosedListener(Action<ITcpClient> onClosed);
         void AddExceptionListener(Action<Exception> onException);
         
         ValueTask ConnectAsync(EndPoint endpoint, CancellationToken cancellationToken = default);

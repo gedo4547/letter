@@ -1,31 +1,51 @@
-﻿using System.Buffers;
+﻿using System;
+using System.Buffers;
 using System.IO.Pipelines;
 using System.Net;
 using System.Threading.Tasks;
 
+using FilterGroup = Letter.StreamChannelFilterGroup<Letter.Tcp.ITcpSession, Letter.Tcp.ITcpChannelFilter>;
+
 namespace Letter.Tcp
 {
-    public class TcpSession : ITcpSession
+    class TcpSession : ATcpSession
     {
-        public string Id { get; }
-        public EndPoint LoaclAddress { get; }
-        public EndPoint RemoteAddress { get; }
-        public MemoryPool<byte> MemoryPool { get; }
-        public PipeScheduler Scheduler { get; }
-        
-        public Task WriteAsync(object obj)
+        public TcpSession(ITcpClient client, FilterGroup filterGroup)
         {
-            throw new System.NotImplementedException();
+            this.client = client;
+            this.filterGroup = filterGroup;
+
+            this.client.AddClosedListener(this.OnClientClosed);
+            this.client.AddExceptionListener(this.OnClientException);
         }
 
-        public Task WriteAsync(ref ReadOnlySequence<byte> sequence)
+        private ITcpClient client;
+        private FilterGroup filterGroup;
+
+        public override Task StartAsync()
         {
-            throw new System.NotImplementedException();
+            // this.client.Transport
+
+            this.filterGroup.OnChannelActive(this);
+            return Task.CompletedTask;
         }
-        
-        public ValueTask DisposeAsync()
+
+        private void OnClientException(Exception ex)
         {
-            throw new System.NotImplementedException();
+            this.filterGroup.OnChannelException(this, ex);
+        }
+
+        private void OnClientClosed(ITcpClient client)
+        {
+            this.DisposeAsync();
+        }
+
+        public override ValueTask DisposeAsync()
+        {
+            
+            this.filterGroup.OnChannelInactive(this);
+
+            return base.DisposeAsync();
         }
     }
 }
