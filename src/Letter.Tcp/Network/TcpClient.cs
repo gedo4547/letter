@@ -23,7 +23,7 @@ namespace Letter.Tcp
         public IDuplexPipe Transport { get; private set; }
         public IDuplexPipe Application { get; private set; }
         public MemoryPool<byte> MemoryPool { get; private set; }
-
+        public PipeScheduler Scheduler{get; private set;}
        
         
         
@@ -88,6 +88,7 @@ namespace Letter.Tcp
 
         private void StartConfigurationConnect(PipeScheduler scheduler)
         {
+            this.Scheduler = scheduler;
             this.LocalAddress = this.connectSocket.LocalEndPoint;
             this.RemoteAddress = this.connectSocket.RemoteEndPoint;
             this.MemoryPool = this.options.MemoryPoolFactory();

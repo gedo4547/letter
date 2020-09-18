@@ -11,7 +11,7 @@ namespace Letter
         {
         }
 
-        public void OnFilterRead(TSession session, ref WrappedStreamReader reader)
+        public void OnChannelRead(TSession session, ref WrappedStreamReader reader)
         {
             ChannelArgs args = new ChannelArgs();
             
@@ -23,7 +23,7 @@ namespace Letter
             reader.Flush();
         }
 
-        public void OnFilterWrite(TSession session, ref WrappedStreamWriter writer, object obj)
+        public void OnChannelWrite(TSession session, ref WrappedStreamWriter writer, object obj)
         {
             ChannelArgs args = new ChannelArgs()
             {
@@ -39,7 +39,7 @@ namespace Letter
             writer.Flush();
         }
 
-        public void OnFilterWrite(TSession session, ref WrappedStreamWriter writer, ref ReadOnlySequence<byte> buffer)
+        public void OnChannelWrite(TSession session, ref WrappedStreamWriter writer, ref ReadOnlySequence<byte> buffer)
         {
             ChannelArgs args = new ChannelArgs()
             {

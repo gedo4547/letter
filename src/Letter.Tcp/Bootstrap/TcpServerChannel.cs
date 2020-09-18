@@ -28,7 +28,7 @@ namespace Letter.Tcp
         private SslFeature sslFeature;
         private TcpServerOptions options;
         private FilterGroupFactory groupFactory;
-        private Func<ITcpClient, ATcpSession> sessionCreator;
+        private Func<ITcpClient, IInternalTcpSession> sessionCreator;
 
         private ITcpServer server;
         private Task acceptTask;
@@ -63,18 +63,26 @@ namespace Letter.Tcp
             }
         }
 
-        private ATcpSession CreateTcpSession(ITcpClient client)
+        private IInternalTcpSession CreateTcpSession(ITcpClient client)
         {
             var filterGroup = this.groupFactory.CreateFilterGroup();
-            TcpSession session = new TcpSession(client, filterGroup);
+            TcpSession session = new TcpSession(client, client.Transport, filterGroup);
 
             return session;
         }
 
-        private ATcpSession CreateSslTcpSession(ITcpClient client)
+        private IInternalTcpSession CreateSslTcpSession(ITcpClient client)
         {
+            var inputPipeOptions = StreamPipeOptionsHelper.ReaderOptionsCreator(client.MemoryPool);
+            var outputPipeOptions = StreamPipeOptionsHelper.WriterOptionsCreator(client.MemoryPool);
+            var sslDuplexPipe = new SslStreamDuplexPipe(
+                client.Transport, 
+                inputPipeOptions, 
+                outputPipeOptions, 
+                this.sslFeature.sslStreamFactory);
+            
             var filterGroup = this.groupFactory.CreateFilterGroup();
-            TcpSslSession session = new TcpSslSession(client, this.sslFeature, filterGroup);
+            TcpSslSession session = new TcpSslSession(client, sslDuplexPipe, this.sslFeature, filterGroup);
 
             return session;
         }

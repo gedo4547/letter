@@ -7,17 +7,41 @@ using FilterGroup = Letter.StreamChannelFilterGroup<Letter.Tcp.ITcpSession, Lett
 
 namespace Letter.Tcp
 {
-    class TcpSslSession : ATcpSession
+    class TcpSslSession : TcpSession
     {
-        public TcpSslSession(ITcpClient client, SslFeature sslFeature, FilterGroup filterGroup)
+        public TcpSslSession(ITcpClient client, SslStreamDuplexPipe transport, SslFeature sslFeature, FilterGroup filterGroup) :
+            base(client, transport, filterGroup)
         {
-
+            this.sslFeature = sslFeature;
+            this.sslDuplexPipe = transport;
         }
 
-
-        public override Task StartAsync()
+        private SslFeature sslFeature;
+        private SslStreamDuplexPipe sslDuplexPipe;
+        
+        public override async Task StartAsync()
         {
-            throw new System.NotImplementedException();
+            var tlsOptions = sslFeature.sslOptions;
+            switch (tlsOptions)
+            {
+                case SslServerOptions serverTlsOptions:
+                    await this.sslDuplexPipe.Stream.AuthenticateAsServerAsync(
+                        serverTlsOptions.Certificate,
+                        serverTlsOptions.NegotiateClientCertificate,
+                        serverTlsOptions.EnabledProtocols,
+                        serverTlsOptions.CheckCertificateRevocation);
+                    break;
+                case SslClientOptions clientTlsOptions:
+                    await this.sslDuplexPipe.Stream.AuthenticateAsClientAsync(
+                        clientTlsOptions.TargetHost,
+                        clientTlsOptions.X509CertificateCollection,
+                        clientTlsOptions.EnabledProtocols,
+                        clientTlsOptions.CheckCertificateRevocation);
+                    break;
+            }
+            
+            
+            await base.StartAsync();
         }
     }
 }
