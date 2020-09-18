@@ -1,8 +1,10 @@
+using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 namespace System.Net.Sockets
 {
+    [EditorBrowsable(EditorBrowsableState.Never)]
     public static class SocketExtension
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

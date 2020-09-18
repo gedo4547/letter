@@ -1,10 +1,12 @@
-﻿﻿using System;
+﻿using System;
 using System.Buffers;
+using System.ComponentModel;
 using System.Net;
 using System.Threading.Tasks;
 
 namespace Letter
 {
+    [EditorBrowsable(EditorBrowsableState.Never)]
     public class DgramMessageNode : IDgramMessageNode, IDisposable
     {
         public DgramMessageNode(IMemoryOwner<byte> memoryOwner, Action<DgramMessageNode> onRelease)

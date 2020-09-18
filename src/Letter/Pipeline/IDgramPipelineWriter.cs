@@ -1,8 +1,10 @@
 ﻿﻿using System;
-using System.Net;
+ using System.ComponentModel;
+ using System.Net;
 
 namespace Letter
 {
+    [EditorBrowsable(EditorBrowsableState.Never)]
     public interface IDgramPipelineWriter
     {
         DgramMessageNode GetDgramNode();

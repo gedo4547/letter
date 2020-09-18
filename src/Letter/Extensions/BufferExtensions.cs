@@ -1,9 +1,11 @@
 ﻿using System.Buffers;
+using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 namespace System
 {
+    [EditorBrowsable(EditorBrowsableState.Never)]
     public static class BufferExtensions
     {
          [MethodImpl(MethodImplOptions.AggressiveInlining)]

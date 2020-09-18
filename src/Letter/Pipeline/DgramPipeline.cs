@@ -1,9 +1,11 @@
 ﻿﻿using System;
 using System.Buffers;
-using System.IO.Pipelines;
-
- namespace Letter
+ using System.ComponentModel;
+ using System.IO.Pipelines;
+ 
+namespace Letter
 {
+    [EditorBrowsable(EditorBrowsableState.Never)]
     public partial class DgramPipeline : IDisposable
     {
         internal const int FALSE = 0;

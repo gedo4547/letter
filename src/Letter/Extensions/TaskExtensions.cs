@@ -1,7 +1,9 @@
-﻿﻿using System.Runtime.CompilerServices;
+﻿﻿using System.ComponentModel;
+ using System.Runtime.CompilerServices;
 
 namespace System.Threading.Tasks
 {
+    [EditorBrowsable(EditorBrowsableState.Never)]
     public static class TaskExtensions
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

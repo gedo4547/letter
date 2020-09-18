@@ -1,7 +1,9 @@
-﻿﻿using System.Runtime.CompilerServices;
+﻿﻿using System.ComponentModel;
+ using System.Runtime.CompilerServices;
 
 namespace System
 {
+    [EditorBrowsable(EditorBrowsableState.Never)]
     public static class SequencePositionExtensions
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

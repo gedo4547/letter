@@ -1,8 +1,10 @@
 ﻿using System;
+using System.ComponentModel;
 using System.Net.Sockets;
 
 namespace Letter
 {
+    [EditorBrowsable(EditorBrowsableState.Never)]
     public static class SocketErrorHelper
     {
         private static readonly bool IsWindows = OSPlatformHelper.IsWindows();

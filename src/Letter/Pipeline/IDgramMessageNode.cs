@@ -1,8 +1,10 @@
-﻿﻿using System;
+﻿using System;
+using System.ComponentModel;
 using System.Net;
 
 namespace Letter
 {
+    [EditorBrowsable(EditorBrowsableState.Never)]
     interface IDgramMessageNode
     {
         int Length { get; }
