@@ -5,7 +5,7 @@ using FilterGroupFactory = Letter.StreamChannelFilterGroupFactory<Letter.Tcp.ITc
 
 namespace Letter.Tcp
 {
-    public class TcpClientBootstrap : ATcpBootstrap<TcpClientOptions, ITcpClientChannel>, ITcpClientBootstrap
+    class TcpClientBootstrap : ATcpBootstrap<TcpClientOptions, ITcpClientChannel>, ITcpClientBootstrap
     {
         protected override Task<ITcpClientChannel> ChannelFactory(TcpClientOptions options, FilterGroupFactory groupFactory, SslFeature sslFeature)
         {

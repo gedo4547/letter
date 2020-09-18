@@ -9,6 +9,16 @@ namespace tcp_test1
         //
         static async Task Main(string[] args)
         {
+            var server_bootstrap = Letter.Tcp.TcpFactory.ServerBootstrap();
+            server_bootstrap.ConfigurationOptions(options=>
+            {
+
+            });
+            //
+            //
+            // server_bootstrap.AddChannelFilter<>
+            var channel = await server_bootstrap.BuildAsync(); 
+            
             
         //     var server = TcpFactory.ServerBootstrap();
         //     server.ConfigurationOptions((options) =>

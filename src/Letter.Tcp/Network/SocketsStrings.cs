@@ -1,6 +1,6 @@
 ﻿﻿namespace Letter.Tcp
 {
-    public class SocketsStrings
+    class SocketsStrings
     {
         internal static string @FileHandleEndPointNotSupported =>
             "The Socket transport does not support binding to file handles. Consider using the libuv transport instead.";

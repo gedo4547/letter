@@ -7,7 +7,7 @@ using FilterGroupFactory = Letter.StreamChannelFilterGroupFactory<Letter.Tcp.ITc
 
 namespace Letter.Tcp
 {
-    public abstract class ATcpBootstrap<TOptions, TChannel> : AStreamBootstrap<TOptions, ITcpSession, ITcpChannelFilter, TChannel>, ITcpBootstrap<TOptions, TChannel>
+    abstract class ATcpBootstrap<TOptions, TChannel> : AStreamBootstrap<TOptions, ITcpSession, ITcpChannelFilter, TChannel>, ITcpBootstrap<TOptions, TChannel>
         where TOptions : ATcpOptions, new()
         where TChannel : IChannel
     {
@@ -35,7 +35,7 @@ namespace Letter.Tcp
         protected abstract Task<TChannel> ChannelFactory(TOptions options, FilterGroupFactory groupFactory, SslFeature sslFeature);
     }
     
-    public class SslFeature
+    class SslFeature
     {
         public SslOptions sslOptions;
         public Func<Stream, SslStream> sslStreamFactory;
