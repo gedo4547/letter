@@ -31,6 +31,7 @@ namespace Letter.Tcp
             {
                 options = this.options;
             });
+            
             this.server.Build();
             this.server.Bind(address);
             
@@ -44,11 +45,12 @@ namespace Letter.Tcp
             while (true)
             {
                 var client = await this.server.AcceptAsync();
+                Console.WriteLine("AcceptAsync111111111111111111");
                 if (client == null)
                 {
                     break;
                 }
-                
+                Console.WriteLine("AcceptAsync22222222222222222");
                 var session = this.sessionCreator(client);
                 await session.StartAsync();
             }

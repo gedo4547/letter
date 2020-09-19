@@ -86,13 +86,14 @@ namespace Letter.Tcp
                     {
                         acceptSocket.NoDelay = this.options.NoDelay;
                     }
-                    
+                   
                     TcpClient client = new TcpClient();
                     client.ConfigureOptions(this.OnConfigureClientOptions);
                     client.Build();
                     client.Start(acceptSocket, this.schedulerAllocator.Next());
-                    
                     return client;
+                    
+                    
                 }
                 catch (ObjectDisposedException)
                 {
@@ -102,7 +103,7 @@ namespace Letter.Tcp
                 {
                     return null;
                 }
-                catch (SocketException) 
+                catch (SocketException)
                 {
                     // The connection got reset while it was in the backlog, so we try again.
                 }
@@ -111,8 +112,17 @@ namespace Letter.Tcp
 
         private void OnConfigureClientOptions(TcpClientOptions options)
         {
-            options = (TcpClientOptions)(ATcpOptions)this.options;
+            options.KeepAlive = this.options.KeepAlive;
+            options.LingerOption = this.options.LingerOption;
+            options.MaxPipelineReadBufferSize = this.options.MaxPipelineReadBufferSize;
+            options.MaxPipelineWriteBufferSize = this.options.MaxPipelineWriteBufferSize;
             options.MemoryPoolFactory = this.ClientMemoryPoolFactory;
+            options.NoDelay = this.options.NoDelay;
+            options.RcvBufferSize = this.options.RcvBufferSize;
+            options.RcvTimeout = this.options.RcvTimeout;
+            options.SndBufferSize = this.options.SndBufferSize;
+            options.SndTimeout = this.options.SndTimeout;
+            options.WaitForDataBeforeAllocatingBuffer = this.options.WaitForDataBeforeAllocatingBuffer;
         }
         
         private MemoryPool<byte> ClientMemoryPoolFactory() => this.memoryPool;

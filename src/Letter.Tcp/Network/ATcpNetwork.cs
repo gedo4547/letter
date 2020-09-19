@@ -37,7 +37,15 @@ namespace Letter.Tcp
                 throw new ArgumentNullException(nameof(optionsFactory));
             }
             
-            this.optionsFactory(this.options);
+            try
+            {
+                 this.optionsFactory(this.options);
+            }
+            catch (System.Exception ex)
+            {
+                Console.WriteLine($"当前的线程：{System.Threading.Thread.CurrentThread.ManagedThreadId},异常：{ex.ToString()}");
+                throw ex;
+            }
         }
         
         public virtual ValueTask DisposeAsync()

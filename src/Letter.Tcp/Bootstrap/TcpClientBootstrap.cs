@@ -9,10 +9,12 @@ namespace Letter.Tcp
     {
         protected override Task<ITcpClientChannel> ChannelFactory(TcpClientOptions options, FilterGroupFactory groupFactory, SslFeature sslFeature)
         {
-            ITcpClientChannel channel = new TcpClientChannel(
+            ITcpClientChannel channel = new TcpClientChannel
+            (
                 options,
                 groupFactory, 
-                sslFeature);
+                sslFeature
+            );
 
             return Task.FromResult(channel);
         }

@@ -32,7 +32,7 @@ namespace Letter.Tcp
         public int? SndBufferSize { get; set; }
         public int? RcvTimeout { get; set; }
         public int? SndTimeout { get; set; }
-        public LingerOption LingerOption { get; } = new LingerOption(false, 0);
+        public LingerOption LingerOption { get; set; } = new LingerOption(false, 0);
         
         public long? MaxPipelineReadBufferSize { get; set; } = 1024 * 1024;
         public long? MaxPipelineWriteBufferSize { get; set; } = 64 * 1024;

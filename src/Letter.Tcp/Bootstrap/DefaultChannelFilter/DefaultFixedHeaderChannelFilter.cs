@@ -34,6 +34,7 @@ namespace Letter.Tcp
 
         public void OnChannelRead(ITcpSession session, ref WrappedStreamReader reader, ref ChannelArgs args)
         {
+            Console.WriteLine(reader.Length);
             while (true)
             {
                 if (!reader.IsLengthEnough(this.currentReadLength))
