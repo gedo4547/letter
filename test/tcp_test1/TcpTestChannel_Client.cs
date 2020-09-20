@@ -10,11 +10,10 @@ namespace tcp_test1
     {
         public void OnChannelActive(ITcpSession session)
         {
-            var bytes = System.Text.Encoding.UTF8.GetBytes("nihao");
-            ReadOnlySequence<byte> buffer = new ReadOnlySequence<byte>(bytes);
-
             for (int i = 0; i < 10; i++)
             {
+                var bytes = System.Text.Encoding.UTF8.GetBytes("你好"+i);
+                ReadOnlySequence<byte> buffer = new ReadOnlySequence<byte>(bytes);
                 session.WriteAsync(ref buffer);
             }
             
