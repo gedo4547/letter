@@ -18,6 +18,8 @@ namespace tcp_test1
             }
             
             Console.WriteLine($"{nameof(TcpTestFilter_Client)}.{nameof(OnChannelActive)}");
+
+            session.DisposeAsync();
         }
 
         public void OnChannelException(ITcpSession session, Exception ex)

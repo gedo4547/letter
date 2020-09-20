@@ -47,6 +47,7 @@ namespace Letter.Tcp
 
         private Task readBufferTask;
         private object syncLock = new object();
+        private volatile bool isDispose;
 
         public virtual Task StartAsync()
         {
@@ -145,6 +146,7 @@ namespace Letter.Tcp
 
         public virtual ValueTask DisposeAsync()
         {
+            Console.WriteLine("DisposeAsyncDisposeAsyncDisposeAsync");
             this.filterGroup.OnChannelInactive(this);
 
             return default;
