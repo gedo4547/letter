@@ -2,6 +2,11 @@
 using System.Threading.Tasks;
 using Letter.Tcp;
 using System;
+using System.IO;
+using System.Linq;
+using System.Buffers;
+using System.Security.Cryptography.X509Certificates;
+using System.Net.Security;
 
 namespace tcp_test1
 {
@@ -12,11 +17,21 @@ namespace tcp_test1
         
         static async Task Main(string[] args)
         {
+            var cert = new X509Certificate2(Path.Combine(AppContext.BaseDirectory, "dotnetty.com.pfx"), "password");
+            string targetHost = cert.GetNameInfo(X509NameType.DnsName, false);
+
             var server_bootstrap = TcpFactory.ServerBootstrap();
             server_bootstrap.ConfigurationOptions(options=>
             {
             });
-            
+            server_bootstrap.ConfigurationSsl(
+                new SslServerOptions(cert, false, false),
+                (stream)=>
+                {
+                    return new SslStream(stream, true, (sender, certificate, chain, sslPolicyErrors) => true);
+                }
+            );
+
             server_bootstrap.AddChannelFilter<DefaultFixedHeaderChannelFilter>();
             server_bootstrap.AddChannelFilter<TcpTestFilter_Server>();
 
@@ -28,6 +43,14 @@ namespace tcp_test1
             client_bootstrap.ConfigurationOptions(options =>
             {
             });
+            client_bootstrap.ConfigurationSsl(
+                new SslClientOptions(targetHost),
+                (stream)=>
+                {
+                    return new SslStream(stream, true, (sender, certificate, chain, sslPolicyErrors) => true);
+                }
+            );
+
             client_bootstrap.AddChannelFilter<DefaultFixedHeaderChannelFilter>();
             client_bootstrap.AddChannelFilter<TcpTestFilter_Client>();
 

@@ -9,4 +9,10 @@
       <ProjectReference Include="..\..\src\Letter.Tcp\Letter.Tcp.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+        <None Include="..\..\shared\dotnetty.com.pfx" Link="dotnetty.com.pfx">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </None>
+    </ItemGroup>
+
 </Project>

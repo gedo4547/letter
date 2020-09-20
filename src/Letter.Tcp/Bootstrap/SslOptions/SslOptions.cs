@@ -1,6 +1,6 @@
 ﻿﻿using System.Security.Authentication;
 
-namespace Letter
+namespace Letter.Tcp
 {
     public abstract class SslOptions
     {

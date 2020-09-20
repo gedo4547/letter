@@ -2,7 +2,7 @@
 using System.Security.Authentication;
 using System.Security.Cryptography.X509Certificates;
 
-namespace Letter
+namespace Letter.Tcp
 {
     public sealed class SslClientOptions : SslOptions
     {

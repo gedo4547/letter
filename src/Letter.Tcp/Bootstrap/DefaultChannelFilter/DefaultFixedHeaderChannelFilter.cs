@@ -47,13 +47,12 @@ namespace Letter.Tcp
                     this.currentReadLength = reader.ReadInt32();
                     if (this.currentReadLength > this.maxPackLength)
                     {
-                        throw new Exception("error pack length！！！" + currentReadLength);
+                        throw new Exception("pack length error！！！" + currentReadLength);
                     }
                     this.currentReadPart = PackPart.Body;
                 }
                 else if (this.currentReadPart == PackPart.Body)
                 {
-                    Console.WriteLine("解包完成");
                     args.buffers.Add(reader.ReadRange(this.currentReadLength));
                     this.currentReadLength = PackHeaderBytesLen;
                     this.currentReadPart = PackPart.Head;
