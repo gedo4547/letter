@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Buffers;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -14,6 +15,10 @@ namespace Letter
         }
 
         protected List<TFilter> filters;
+        protected List<object> readObjects = new List<object>();
+        protected List<object> writeObjects = new List<object>();
+        protected List<ReadOnlySequence<byte>> readBuffers = new List<ReadOnlySequence<byte>>();
+        protected List<ReadOnlySequence<byte>> writeBuffers = new List<ReadOnlySequence<byte>>();
         
         public void OnChannelActive(TSession session)
         {

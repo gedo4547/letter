@@ -7,7 +7,7 @@ namespace tcp_test1
 {
     class Program
     {
-        
+
         private static IPEndPoint address = new IPEndPoint(IPAddress.Loopback, 20001);
         
         static async Task Main(string[] args)
@@ -35,20 +35,6 @@ namespace tcp_test1
             await c_channel.StartAsync(address);
             
             Console.ReadKey();
-        }
-
-        private static void OnRun(object obj)
-        {
-            try
-            {
-                throw new NotImplementedException();
-            }
-            catch (System.Exception ex)
-            {
-                
-                throw ex;
-            }
-            
         }
     }
 }

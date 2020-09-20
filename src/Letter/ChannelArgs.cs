@@ -5,7 +5,7 @@ namespace Letter
 {
     public ref struct ChannelArgs
     {
-        public object item;
+        public List<object> items;
 
         public List<ReadOnlySequence<byte>> buffers;
     }

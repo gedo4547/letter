@@ -11,18 +11,15 @@ namespace Letter
         {
         }
 
-        private List<ReadOnlySequence<byte>> readBuffers = new List<ReadOnlySequence<byte>>();
-        private List<ReadOnlySequence<byte>> writeBuffers = new List<ReadOnlySequence<byte>>();
-
-
         public void OnChannelRead(TSession session, ref WrappedStreamReader reader)
         {
             this.readBuffers.Clear();
+            this.readObjects.Clear();
 
-            ChannelArgs args = new ChannelArgs()
-            {
-                buffers = readBuffers
-            };
+            ChannelArgs args = new ChannelArgs();
+            args.buffers = this.readBuffers;
+            args.items = this.readObjects;
+           
             
             int count = this.filters.Count;
             for (int i = 0; i < count; ++i)
@@ -35,12 +32,13 @@ namespace Letter
         public void OnChannelWrite(TSession session, ref WrappedStreamWriter writer, object obj)
         {
             this.writeBuffers.Clear();
-            ChannelArgs args = new ChannelArgs()
-            {
-                item = obj,
-                buffers = this.writeBuffers
-            };
+            this.writeObjects.Clear();
 
+            this.writeObjects.Add(obj);
+            ChannelArgs args = new ChannelArgs();
+            args.buffers = this.writeBuffers;
+            args.items = this.writeObjects;
+        
             int count = this.filters.Count;
             for (int i = 0; i < count; ++i)
             {
@@ -53,12 +51,12 @@ namespace Letter
         public void OnChannelWrite(TSession session, ref WrappedStreamWriter writer, ref ReadOnlySequence<byte> buffer)
         {
             this.writeBuffers.Clear();
+            this.writeObjects.Clear();
 
             this.writeBuffers.Add(buffer);
-            ChannelArgs args = new ChannelArgs()
-            {
-                buffers = this.writeBuffers
-            };
+            ChannelArgs args = new ChannelArgs();
+            args.buffers = this.writeBuffers;
+            args.items = this.writeObjects;
 
             int count = this.filters.Count;
             for (int i = 0; i < count; ++i)

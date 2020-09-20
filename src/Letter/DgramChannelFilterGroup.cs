@@ -12,16 +12,14 @@ namespace Letter
         {
         }
 
-        private List<ReadOnlySequence<byte>> readBuffers = new List<ReadOnlySequence<byte>>();
-        private List<ReadOnlySequence<byte>> writeBuffers = new List<ReadOnlySequence<byte>>();
-
         public void OnChannelRead(TSession session, ref WrappedDgramReader reader)
         {
             this.readBuffers.Clear();
-            ChannelArgs args = new ChannelArgs()
-            {
-                buffers = this.readBuffers
-            };
+            this.writeObjects.Clear();
+
+            ChannelArgs args = new ChannelArgs();
+            args.buffers = this.readBuffers;
+            args.items = this.writeObjects;
             
             int count = this.filters.Count;
             for (int i = 0; i < count; i++)
@@ -34,8 +32,11 @@ namespace Letter
         public void OnChannelWrite(TSession session, ref WrappedDgramWriter writer, object obj)
         {
             this.writeBuffers.Clear();
+            this.writeObjects.Clear();
+
+            this.writeObjects.Add(obj);
             ChannelArgs args = new ChannelArgs();
-            args.item = obj;
+            args.items = this.writeObjects;
             args.buffers = this.writeBuffers;
             
             int count = this.filters.Count;
@@ -50,10 +51,12 @@ namespace Letter
         public void OnChannelWrite(TSession session, ref WrappedDgramWriter writer, ref ReadOnlySequence<byte> buffer)
         {
             this.writeBuffers.Clear();
+            this.writeObjects.Clear();
             this.writeBuffers.Add(buffer);
-            
+
             ChannelArgs args = new ChannelArgs();
             args.buffers = this.writeBuffers;
+            args.items = this.writeObjects;
             
             int count = this.filters.Count;
             for (int i = 0; i < count; i++)
