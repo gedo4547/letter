@@ -23,8 +23,14 @@ namespace tcp_test1
 
         public void OnChannelRead(ITcpSession session, ref WrappedStreamReader reader, ref ChannelArgs args)
         {
-             string str = System.Text.Encoding.UTF8.GetString(args.buffer.FirstSpan);
-            Console.WriteLine("收到》》"+str);
+            var buffers = args.buffers;
+            for (int i = 0; i < buffers.Count; i++)
+            {
+                var buffer = buffers[i];
+                string str = System.Text.Encoding.UTF8.GetString(buffer.FirstSpan);
+                Console.WriteLine("收到》》"+str);
+            }
+            
             Console.WriteLine($"{nameof(TcpTestFilter_Server)}.{nameof(OnChannelRead)}");
         }
 

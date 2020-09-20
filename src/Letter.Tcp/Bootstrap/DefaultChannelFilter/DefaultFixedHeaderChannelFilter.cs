@@ -53,7 +53,8 @@ namespace Letter.Tcp
                 }
                 else if (this.currentReadPart == PackPart.Body)
                 {
-                    args.buffer = reader.ReadRange(this.currentReadLength);
+                    Console.WriteLine("解包完成");
+                    args.buffers.Add(reader.ReadRange(this.currentReadLength));
                     this.currentReadLength = PackHeaderBytesLen;
                     this.currentReadPart = PackPart.Head;
                 }
@@ -62,7 +63,7 @@ namespace Letter.Tcp
 
         public void OnChannelWrite(ITcpSession session, ref WrappedStreamWriter writer, ref ChannelArgs args)
         {
-            var buffer = args.buffer;
+            var buffer = args.buffers[0];
             if (buffer.Length > this.maxPackLength)
             {
                 throw new Exception("pack length error！！！" + buffer.Length);

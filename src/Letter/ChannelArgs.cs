@@ -1,10 +1,12 @@
 ﻿using System.Buffers;
+using System.Collections.Generic;
 
 namespace Letter
 {
     public ref struct ChannelArgs
     {
         public object item;
-        public ReadOnlySequence<byte> buffer;
+
+        public List<ReadOnlySequence<byte>> buffers;
     }
 }

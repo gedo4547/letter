@@ -57,7 +57,8 @@ namespace udp_text
         public void OnChannelWrite(IUdpSession session, ref WrappedDgramWriter writer, ref ChannelArgs args)
         {
             Console.WriteLine($"{nameof(UdpFilter_2)}.{nameof(OnChannelWrite)}");
-            writer.Write(ref args.buffer);
+            var buffer = args.buffers[0];
+            writer.Write(ref buffer);
         }
     }
 }

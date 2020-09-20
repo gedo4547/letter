@@ -7,6 +7,7 @@ namespace tcp_test1
 {
     class Program
     {
+        
         private static IPEndPoint address = new IPEndPoint(IPAddress.Loopback, 20001);
         
         static async Task Main(string[] args)
@@ -18,7 +19,6 @@ namespace tcp_test1
             
             server_bootstrap.AddChannelFilter<DefaultFixedHeaderChannelFilter>();
             server_bootstrap.AddChannelFilter<TcpTestFilter_Server>();
-
 
             var s_channel = await server_bootstrap.BuildAsync(); 
             await s_channel.StartAsync(address);
@@ -33,9 +33,6 @@ namespace tcp_test1
 
             var c_channel = await client_bootstrap.BuildAsync();
             await c_channel.StartAsync(address);
-            
-
-
             
             Console.ReadKey();
         }

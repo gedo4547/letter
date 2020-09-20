@@ -11,9 +11,18 @@ namespace Letter
         {
         }
 
+        private List<ReadOnlySequence<byte>> readBuffers = new List<ReadOnlySequence<byte>>();
+        private List<ReadOnlySequence<byte>> writeBuffers = new List<ReadOnlySequence<byte>>();
+
+
         public void OnChannelRead(TSession session, ref WrappedStreamReader reader)
         {
-            ChannelArgs args = new ChannelArgs();
+            this.readBuffers.Clear();
+
+            ChannelArgs args = new ChannelArgs()
+            {
+                buffers = readBuffers
+            };
             
             int count = this.filters.Count;
             for (int i = 0; i < count; ++i)
@@ -25,9 +34,11 @@ namespace Letter
 
         public void OnChannelWrite(TSession session, ref WrappedStreamWriter writer, object obj)
         {
+            this.writeBuffers.Clear();
             ChannelArgs args = new ChannelArgs()
             {
-                item = obj
+                item = obj,
+                buffers = this.writeBuffers
             };
 
             int count = this.filters.Count;
@@ -41,9 +52,12 @@ namespace Letter
 
         public void OnChannelWrite(TSession session, ref WrappedStreamWriter writer, ref ReadOnlySequence<byte> buffer)
         {
+            this.writeBuffers.Clear();
+
+            this.writeBuffers.Add(buffer);
             ChannelArgs args = new ChannelArgs()
             {
-                buffer = buffer
+                buffers = this.writeBuffers
             };
 
             int count = this.filters.Count;

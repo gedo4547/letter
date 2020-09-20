@@ -38,13 +38,14 @@ namespace Letter.Tcp
             {
                 var buffer = reader.ReadRange(endPosition);
                 var length = buffer.Length - this.symbol.Length;
-                args.buffer = buffer.Slice(buffer.Start, length);
+                args.buffers.Add(buffer.Slice(buffer.Start, length));
             }
         }
 
         public void OnChannelWrite(ITcpSession session, ref WrappedStreamWriter writer, ref ChannelArgs args)
         {
-            writer.Write(ref args.buffer);
+            var buffer = args.buffers[0];
+            writer.Write(ref buffer);
             writer.Write(this.symbol);
         }
     }
