@@ -15,44 +15,53 @@ namespace Letter.Tcp
         {
             this.client = client;
             this.filterGroup = filterGroup;
-            this.Transport = transport;
+            this.transport = transport;
 
             this.client.AddClosedListener(this.OnClientClosed);
             this.client.AddExceptionListener(this.OnClientException);
         }
 
       
-        public string Id { get { return this.client.Id; } }
-
-        public EndPoint LoaclAddress { get { return this.client.LocalAddress; } }
-
-        public EndPoint RemoteAddress {get{return this.client.RemoteAddress;}}
-
-        public MemoryPool<byte> MemoryPool {get{return this.client.MemoryPool;}}
-
-        public PipeScheduler Scheduler {get{return this.client.Scheduler;}}
-
-        private IDuplexPipe Transport
+        public string Id
         {
-            get;
-            set;
+            get { return this.client.Id; }
+        }
+        public EndPoint LoaclAddress
+        {
+            get { return this.client.LocalAddress; }
+        }
+        public EndPoint RemoteAddress
+        {
+            get { return this.client.RemoteAddress; }
+        }
+        public MemoryPool<byte> MemoryPool
+        {
+            get { return this.client.MemoryPool; }
+        }
+        public PipeScheduler Scheduler
+        {
+            get { return this.client.Scheduler; }
         }
 
-        private ITcpClient client;
+        
+
+        protected ITcpClient client;
         private FilterGroup filterGroup;
         private BinaryOrder order;
-
+        
         private PipeReader input;
         private PipeWriter output;
-
-        private Task readBufferTask;
+        
+        protected Task readBufferTask;
         private object syncLock = new object();
-        private volatile bool isDispose;
+        
+        protected IDuplexPipe transport;
+        protected volatile bool isDispose = false;
 
         public virtual Task StartAsync()
         {
-            this.input = this.Transport.Input;
-            this.output = this.Transport.Output;
+            this.input = this.transport.Input;
+            this.output = this.transport.Output;
             
             this.readBufferTask = this.ReadSocketBufferAsync();
 
@@ -74,6 +83,13 @@ namespace Letter.Tcp
                 {
                     var buffer = result.Buffer;
                     var reader = new WrappedStreamReader(this.input, ref buffer, ref order);
+
+                    Console.WriteLine("isDispose>>>" + isDispose);
+                    
+                    if (this.isDispose)
+                    {
+                        break;
+                    }
                     this.filterGroup.OnChannelRead(this, ref reader);
                 }
                 catch (Exception e)
@@ -92,6 +108,11 @@ namespace Letter.Tcp
             {
                 lock (syncLock)
                 {
+                    if (this.isDispose)
+                    {
+                        return Task.CompletedTask;
+                    }
+                    
                     WrappedStreamWriter writer = new WrappedStreamWriter(this.output, ref this.order);
                     this.filterGroup.OnChannelWrite(this, ref writer, obj);
                 }
@@ -111,6 +132,11 @@ namespace Letter.Tcp
             {
                 lock (syncLock)
                 {
+                    if (this.isDispose)
+                    {
+                        return Task.CompletedTask;
+                    }
+                    
                     WrappedStreamWriter writer = new WrappedStreamWriter(this.output, ref this.order);
                     this.filterGroup.OnChannelWrite(this, ref writer, ref sequence);
                 }
@@ -139,17 +165,30 @@ namespace Letter.Tcp
             this.filterGroup.OnChannelException(this, ex);
         }
 
-        private void OnClientClosed(ITcpClient client)
+        private async void OnClientClosed(ITcpClient client)
         {
-            this.DisposeAsync();
+            Console.WriteLine("被动关闭session");
+            await this.DisposeAsync();
         }
 
-        public virtual ValueTask DisposeAsync()
+        public virtual async ValueTask DisposeAsync()
         {
-            Console.WriteLine("DisposeAsyncDisposeAsyncDisposeAsync");
-            this.filterGroup.OnChannelInactive(this);
+            if (this.isDispose)
+            {
+                return;
+            }
 
-            return default;
+            this.isDispose = true;
+            
+            this.filterGroup.OnChannelInactive(this);
+            
+            // this.transport.Input.Complete();
+            // this.transport.Output.Complete();
+            await this.client.DisposeAsync();
+            Console.WriteLine("session>>>111111111111111111111");
+          
+            
+            await this.readBufferTask;
         }
     }
 }

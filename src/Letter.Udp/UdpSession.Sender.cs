@@ -94,7 +94,14 @@ namespace Letter.Udp
 
         private void OnMemoryWritePush(DgramMessageNode node)
         {
-            this.SenderPipeWriter.Write(node);
+            try
+            {
+                this.SenderPipeWriter.Write(node);
+            }
+            catch (Exception e)
+            {
+               this.filterGroup.OnChannelException(this, e);
+            }
         }
     }
 }

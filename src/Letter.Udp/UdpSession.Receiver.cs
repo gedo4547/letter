@@ -41,6 +41,7 @@ namespace Letter.Udp
                     int transportBytes = await this.ReceiverSocketReceiver.ReceiveAsync(this.LoaclAddress, memory);
                     node.SettingPoint(this.ReceiverSocketReceiver.RemoteAddress);
                     node.SettingWriteLength(transportBytes);
+                    this.ReceiverPipeWriter.Write(node);
                 }
                 catch(Exception ex)
                 {
@@ -55,7 +56,6 @@ namespace Letter.Udp
                     }
                     return;
                 }
-                this.ReceiverPipeWriter.Write(node);
             }
         }
 

@@ -39,7 +39,7 @@ namespace Letter.Tcp
                 this.sslFeature.sslStreamFactory);
             
             var filterGroup = this.groupFactory.CreateFilterGroup();
-            TcpSslSession session = new TcpSslSession(client, sslDuplexPipe, this.sslFeature, filterGroup);
+            TcpSslSession session = new TcpSslSession(client, sslDuplexPipe, this.sslFeature.sslOptions, filterGroup);
 
             return session;
         }

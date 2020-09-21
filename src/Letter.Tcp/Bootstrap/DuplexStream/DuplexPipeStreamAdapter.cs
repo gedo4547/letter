@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.IO.Pipelines;
+using System.Threading.Tasks;
 
 namespace Letter
 {
@@ -32,19 +33,20 @@ namespace Letter
         public PipeReader Input { get; }
 
         public PipeWriter Output { get; }
-        
-        public void Reset()
+
+        public override ValueTask DisposeAsync()
         {
             lock (_disposeLock)
             {
                 if (_disposed)
                 {
-                    return;
+                    return default;
                 }
                 _disposed = true;
             }
             
             this.Stream.Dispose();
+            return base.DisposeAsync();
         }
     }
 }

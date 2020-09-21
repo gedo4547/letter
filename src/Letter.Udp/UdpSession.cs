@@ -122,74 +122,46 @@ namespace Letter.Udp
                 }
                 
                 this.socket.Dispose();
-                this.socket = null;
             }
             
             if (this.memoryTask != null)
             {
                 await this.memoryTask;
-                this.memoryTask = null;
             }
 
             if (this.socketSender != null)
             {
                 this.socketSender.Dispose();
-                this.socketSender = null;
             }
 
             if (this.socketReceiver != null)
             {
                 this.socketReceiver.Dispose();
-                this.socketReceiver = null;
             }
 
             if (this.senderPipeline != null)
             {
                 this.senderPipeline.Dispose();
-                this.senderPipeline = null;
             }
 
             if (this.receiverPipeline != null)
             {
                 this.receiverPipeline.Dispose();
-                this.receiverPipeline = null;
             }
 
             if (this.filterGroup != null)
             {
                 await this.filterGroup.DisposeAsync();
-                this.filterGroup = null;
             }
 
             if (this.onMemoryWritePush != null)
             {
                 this.onMemoryWritePush = null;
             }
-
-            if (this.LoaclAddress != null)
-            {
-                this.LoaclAddress = null;
-            }
-
-            if (this.RcvAddress != null)
-            {
-                this.RcvAddress = null;
-            }
-
-            if (this.SndAddress != null)
-            {
-                this.SndAddress = null;
-            }
-
-            if (this.Scheduler != null)
-            {
-                this.Scheduler = null;
-            }
-
+            
             if (this.MemoryPool != null)
             {
                 this.MemoryPool.Dispose();
-                this.MemoryPool = null;
             }
         }
     }

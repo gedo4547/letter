@@ -8,18 +8,16 @@ namespace tcp_test1
 {
     public class TcpTestFilter_Client : ITcpChannelFilter
     {
-        public void OnChannelActive(ITcpSession session)
+        public async void OnChannelActive(ITcpSession session)
         {
+            Console.WriteLine($"{nameof(TcpTestFilter_Client)}.{nameof(OnChannelActive)}");
             for (int i = 0; i < 10; i++)
             {
                 var bytes = System.Text.Encoding.UTF8.GetBytes("你好"+i);
                 ReadOnlySequence<byte> buffer = new ReadOnlySequence<byte>(bytes);
-                session.WriteAsync(ref buffer);
+                await session.WriteAsync(ref buffer);
             }
-            
-            Console.WriteLine($"{nameof(TcpTestFilter_Client)}.{nameof(OnChannelActive)}");
-
-            session.DisposeAsync();
+            await session.DisposeAsync();
         }
 
         public void OnChannelException(ITcpSession session, Exception ex)
@@ -34,6 +32,7 @@ namespace tcp_test1
 
         public void OnChannelRead(ITcpSession session, ref WrappedStreamReader reader, ref ChannelArgs args)
         {
+            Console.WriteLine($"{nameof(TcpTestFilter_Client)}.{nameof(OnChannelRead)}");
             var buffers = args.buffers;
             for (int i = 0; i < buffers.Count; i++)
             {
@@ -41,9 +40,6 @@ namespace tcp_test1
                 string str = System.Text.Encoding.UTF8.GetString(buffer.FirstSpan);
                 Console.WriteLine("收到》》"+str);
             }
-            
-
-            Console.WriteLine($"{nameof(TcpTestFilter_Client)}.{nameof(OnChannelRead)}");
         }
 
         public void OnChannelWrite(ITcpSession session, ref WrappedStreamWriter writer, ref ChannelArgs args)

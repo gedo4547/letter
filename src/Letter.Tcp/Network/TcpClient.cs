@@ -11,7 +11,7 @@ namespace Letter.Tcp
 {
     class TcpClient : ATcpNetwork<TcpClientOptions>, ITcpClient
     {
-        public static readonly bool IsWindows = OSPlatformHelper.IsWindows();
+        static readonly bool IsWindows = OSPlatformHelper.IsWindows();
         
         public TcpClient() : base(new TcpClientOptions())
         {
@@ -142,6 +142,7 @@ namespace Letter.Tcp
 
                 receiver.Dispose();
                 sender.Dispose();
+                Console.WriteLine("GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG");
             }
             catch (Exception ex)
             {
@@ -160,6 +161,7 @@ namespace Letter.Tcp
             }
             catch(Exception ex)
             {
+                Console.WriteLine("ZZZZZZZZZZZZZ>>"+ex.GetType());
                 if (SocketErrorHelper.IsSocketDisabledError(ex) || ex is RemoteSocketClosedException)
                 {
                     await this.DisposeAsync();
@@ -239,35 +241,33 @@ namespace Letter.Tcp
             }
 
             this.isDisposed = true;
-
             if(this.onClosed != null)
             {
                 this.onClosed(this);
+                this.onClosed = null;
             }
 
             this.Id = string.Empty;
-            try
+            if (this.connectSocket != null)
             {
-                this.connectSocket.Shutdown(SocketShutdown.Both);
+                try
+                {
+                    this.connectSocket.Shutdown(SocketShutdown.Both);
+                }
+                catch
+                {
+                }
+                this.connectSocket.Dispose();
             }
-            catch
-            {
-            }
-
             if (this._processingTask != null)
             {
                 await this._processingTask;
             }
-            
             this.Transport.Input.Complete();
             this.Transport.Output.Complete();
             this.Application.Input.Complete();
             this.Application.Output.Complete();
-          
             await base.DisposeAsync();
-
-            this.connectSocket.Dispose();
-            this.connectSocket = null;
-        }        
+        }
     }
 }

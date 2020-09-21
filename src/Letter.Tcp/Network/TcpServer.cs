@@ -132,17 +132,14 @@ namespace Letter.Tcp
             if (this.listenSocket != null)
             {
                 this.listenSocket.Dispose();
-                this.listenSocket = null;
             }
 
             if (this.socketHandle != null)
             {
                 this.socketHandle.Dispose();
-                this.socketHandle = null;
             }
 
             this.memoryPool.Dispose();
-            this.memoryPool = null;
             return default;
         }
     }
