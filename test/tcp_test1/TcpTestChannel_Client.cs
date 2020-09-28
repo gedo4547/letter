@@ -10,7 +10,7 @@ namespace tcp_test1
     {
         public async void OnChannelActive(ITcpSession session)
         {
-            Console.WriteLine($"{nameof(TcpTestFilter_Client)}.{nameof(OnChannelActive)}");
+            Console.WriteLine($"{nameof(TcpTestFilter_Client)}.{nameof(OnChannelActive)}" + session.Id);
             for (int i = 0; i < 10; i++)
             {
                 var bytes = System.Text.Encoding.UTF8.GetBytes("你好"+i);

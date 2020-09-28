@@ -10,7 +10,6 @@ namespace tcp_test1
 {
     class Program
     {
-
         private static bool isUseSsl = false;
         private static IPEndPoint address = new IPEndPoint(IPAddress.Loopback, 20001);
         

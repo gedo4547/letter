@@ -142,7 +142,6 @@ namespace Letter.Tcp
 
                 receiver.Dispose();
                 sender.Dispose();
-                Console.WriteLine("GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG");
             }
             catch (Exception ex)
             {
@@ -161,7 +160,6 @@ namespace Letter.Tcp
             }
             catch(Exception ex)
             {
-                Console.WriteLine("ZZZZZZZZZZZZZ>>"+ex.GetType());
                 if (SocketErrorHelper.IsSocketDisabledError(ex) || ex is RemoteSocketClosedException)
                 {
                     await this.DisposeAsync();
@@ -263,10 +261,13 @@ namespace Letter.Tcp
             {
                 await this._processingTask;
             }
+            
             this.Transport.Input.Complete();
             this.Transport.Output.Complete();
+            
             this.Application.Input.Complete();
             this.Application.Output.Complete();
+            
             await base.DisposeAsync();
         }
     }

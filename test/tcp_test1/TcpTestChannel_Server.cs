@@ -8,7 +8,7 @@ namespace tcp_test1
     {
         public void OnChannelActive(ITcpSession session)
         {
-            Console.WriteLine($"{nameof(TcpTestFilter_Server)}.{nameof(OnChannelActive)}");
+            Console.WriteLine($"{nameof(TcpTestFilter_Server)}.{nameof(OnChannelActive)}" + session.Id);
         }
 
         public void OnChannelException(ITcpSession session, Exception ex)

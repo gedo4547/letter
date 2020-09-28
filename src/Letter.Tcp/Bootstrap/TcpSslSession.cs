@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 
 using FilterGroup = Letter.StreamChannelFilterGroup<Letter.Tcp.ITcpSession, Letter.Tcp.ITcpChannelFilter>;
 
@@ -48,11 +49,14 @@ namespace Letter.Tcp
 
             this.isDispose = true;
             
+            this.filterGroup.OnChannelInactive(this);
+            
             var sslDuplexPipe = this.transport as SslStreamDuplexPipe;
             await sslDuplexPipe.DisposeAsync();
+            await this.client.DisposeAsync();
             
             await this.readBufferTask;
-            await this.client.DisposeAsync();
+            Console.WriteLine("SSlSession.Close");
         }
     }
 }

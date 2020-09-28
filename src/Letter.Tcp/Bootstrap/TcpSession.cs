@@ -19,12 +19,15 @@ namespace Letter.Tcp
 
             this.client.AddClosedListener(this.OnClientClosed);
             this.client.AddExceptionListener(this.OnClientException);
+
+            this.Id = client.Id;
         }
 
       
         public string Id
         {
-            get { return this.client.Id; }
+            get;
+            private set;
         }
         public EndPoint LoaclAddress
         {
@@ -42,18 +45,16 @@ namespace Letter.Tcp
         {
             get { return this.client.Scheduler; }
         }
-
         
-
         protected ITcpClient client;
-        private FilterGroup filterGroup;
-        private BinaryOrder order;
+        protected FilterGroup filterGroup;
+        protected BinaryOrder order;
         
-        private PipeReader input;
-        private PipeWriter output;
+        protected PipeReader input;
+        protected PipeWriter output;
         
         protected Task readBufferTask;
-        private object syncLock = new object();
+        protected object syncLock = new object();
         
         protected IDuplexPipe transport;
         protected volatile bool isDispose = false;
@@ -73,33 +74,51 @@ namespace Letter.Tcp
         {
             while (true)
             {
-                ReadResult result = await this.input.ReadAsync();
-                if (result.IsCanceled || result.IsCompleted)
-                {
-                    break;
-                }
-                
                 try
                 {
-                    var buffer = result.Buffer;
-                    var reader = new WrappedStreamReader(this.input, ref buffer, ref order);
-
-                    Console.WriteLine("isDispose>>>" + isDispose);
-                    
+                    Console.WriteLine("ReadSocketBufferAsync-----0>>" + Id + "        " + isDispose);
                     if (this.isDispose)
                     {
+                        return;
+                    }
+                    
+                    ReadResult result = await this.input.ReadAsync();
+                    
+                    if (result.IsCanceled || result.IsCompleted)
+                    {
+                        Console.WriteLine("ReadSocketBufferAsync-----1>>"+ Id);
                         break;
                     }
+                    Console.WriteLine("ReadSocketBufferAsync-----2>>"+ Id);
+                    var buffer = result.Buffer;
+                    var reader = new WrappedStreamReader(this.input, ref buffer, ref order);
+                    
                     this.filterGroup.OnChannelRead(this, ref reader);
+                }
+                catch (Exception e) when (e is ObjectDisposedException)
+                {
+                    Console.WriteLine("ReadSocketBufferAsync-----3>>"+ Id);
+                    break;
                 }
                 catch (Exception e)
                 {
-                   this.filterGroup.OnChannelException(this, e);
-                   break;
+                    Console.WriteLine("ReadSocketBufferAsync-----4>>"+ Id);
+                    this.filterGroup.OnChannelException(this, e);
+                    break;
                 }
             }
-        
-            this.input.Complete();
+            
+            Console.WriteLine("ReadSocketBufferAsync-----5>>"+ Id);
+            try
+            {
+                this.input.Complete();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                throw;
+            }
+            Console.WriteLine("ReadSocketBufferAsync-----6>>"+ Id);
         }
 
         public Task WriteAsync(object obj)
@@ -167,7 +186,6 @@ namespace Letter.Tcp
 
         private async void OnClientClosed(ITcpClient client)
         {
-            Console.WriteLine("被动关闭session");
             await this.DisposeAsync();
         }
 
@@ -179,16 +197,13 @@ namespace Letter.Tcp
             }
 
             this.isDispose = true;
+            Console.WriteLine(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>Session.Colse111111111111>>"+ Id);
+            await this.client.DisposeAsync();
+            Console.WriteLine(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>Session.Colse222222222222>>"+ Id);
+            await this.readBufferTask;
+            Console.WriteLine(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>Session.Colse333333333333>>"+ Id);
             
             this.filterGroup.OnChannelInactive(this);
-            
-            // this.transport.Input.Complete();
-            // this.transport.Output.Complete();
-            await this.client.DisposeAsync();
-            Console.WriteLine("session>>>111111111111111111111");
-          
-            
-            await this.readBufferTask;
         }
     }
 }
