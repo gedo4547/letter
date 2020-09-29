@@ -4,10 +4,11 @@ using System.Collections.Generic;
 using System.IO.Pipelines;
 using System.Net;
 using System.Net.Sockets;
+using System.Threading.Tasks;
 
 namespace Letter
 {
-    abstract class ASocket : IDisposable
+    abstract class ASocket : IAsyncDisposable
     {
         public ASocket(Socket socket, PipeScheduler scheduler)
         {
@@ -35,13 +36,27 @@ namespace Letter
             }
             return this.bufferList;
         }
-        
-        public void Dispose()
+
+        public ValueTask DisposeAsync()
         {
-            this.socket?.Dispose();
+            if (this.socket != null)
+            {
+                try
+                {
+                    this.socket.Shutdown(SocketShutdown.Both);
+                }
+                catch
+                {
+                }
+                
+                this.socket.Dispose();
+            }
+            
             this.rcvArgs?.Dispose();
             this.sndArgs?.Dispose();
             this.bufferList?.Clear();
+
+            return default;
         }
     }
 }
