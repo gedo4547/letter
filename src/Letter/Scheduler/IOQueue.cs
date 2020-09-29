@@ -5,11 +5,27 @@ using System.IO.Pipelines;
 namespace System.Threading
 {
     [EditorBrowsable(EditorBrowsableState.Never)]
-    public sealed class IOQueue : PipeScheduler, IThreadPoolWorkItem
+    public sealed class IOQueue : PipeScheduler
+#if NET5_0
+        , IThreadPoolWorkItem
+#endif
     {
+        public IOQueue()
+        {
+#if NETSTANDARD2_0
+            this.execute_callBack = this.Execute;
+#endif
+        }
+        
+        
         private readonly ConcurrentQueue<Work> _workItems = new ConcurrentQueue<Work>();
         private int _doingWork;
 
+#if NETSTANDARD2_0
+        private readonly WaitCallback execute_callBack;
+#endif
+        
+        
         public override void Schedule(Action<object> action, object state)
         {
             _workItems.Enqueue(new Work(action, state));
@@ -17,12 +33,19 @@ namespace System.Threading
             // Set working if it wasn't (via atomic Interlocked).
             if (Interlocked.CompareExchange(ref _doingWork, 1, 0) == 0)
             {
-                // Wasn't working, schedule.
+#if NETSTANDARD2_0
+                System.Threading.ThreadPool.UnsafeQueueUserWorkItem(this.execute_callBack, null);
+#elif NET5_0
                 System.Threading.ThreadPool.UnsafeQueueUserWorkItem(this, preferLocal: false);
+#endif
             }
         }
 
+#if NETSTANDARD2_0
+        private void Execute(object state)
+#elif NET5_0
         void IThreadPoolWorkItem.Execute()
+#endif
         {
             while (true)
             {

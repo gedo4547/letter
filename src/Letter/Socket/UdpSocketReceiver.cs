@@ -10,7 +10,12 @@ namespace System.Net.Sockets
         
         public SocketAwaitableEventArgs ReceiveAsync(EndPoint loacl, Memory<byte> buffer)
         {
-            _awaitableEventArgs.SetBuffer(buffer);
+#if NETSTANDARD2_0
+            ArraySegment<byte> segment = buffer.GetBinaryArray();
+            this._awaitableEventArgs.SetBuffer(segment.Array, segment.Offset, segment.Count);
+#elif NET5_0
+            this._awaitableEventArgs.SetBuffer(buffer);
+#endif
             _awaitableEventArgs.RemoteEndPoint = loacl;
             if (!_socket.ReceiveFromAsync(_awaitableEventArgs))
             {

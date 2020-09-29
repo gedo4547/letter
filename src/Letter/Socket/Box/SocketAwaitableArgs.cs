@@ -1,42 +1,43 @@
-﻿using System.Diagnostics;
+﻿using System;
 using System.IO.Pipelines;
+using System.Net.Sockets;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace System.Net.Sockets
+namespace Letter
 {
-    public sealed class SocketAwaitableEventArgs : SocketAsyncEventArgs, ICriticalNotifyCompletion
+    sealed class SocketAwaitableArgs : SocketAsyncEventArgs, ICriticalNotifyCompletion
     {
         private static readonly Action _callbackCompleted = () => { };
-
-        private readonly PipeScheduler _ioScheduler;
-
-        private Action _callback;
-
-        public SocketAwaitableEventArgs(PipeScheduler ioScheduler)
+        
+        public SocketAwaitableArgs(PipeScheduler ioScheduler)
 #if NET5_0
             : base(unsafeSuppressExecutionContextFlow: true)
 #endif
         {
-            _ioScheduler = ioScheduler;
+            this.ioScheduler = ioScheduler;
+            this.completedCallback = (o) => { ((Action) o)(); };
         }
+        
+        private Action _callback;
+        
+        private readonly PipeScheduler ioScheduler;
+        private readonly Action<object> completedCallback;
 
-        public SocketAwaitableEventArgs GetAwaiter() => this;
+        public SocketAwaitableArgs GetAwaiter() => this;
         public bool IsCompleted => ReferenceEquals(_callback, _callbackCompleted);
 
         public int GetResult()
         {
-            Debug.Assert(ReferenceEquals(_callback, _callbackCompleted));
-
             _callback = null;
 
             if (SocketError != SocketError.Success)
             {
                 throw new SocketException((int)SocketError);
             }
-
-            return BytesTransferred;
+            
+            return this.BytesTransferred;
         }
 
         public void OnCompleted(Action continuation)
@@ -64,7 +65,7 @@ namespace System.Net.Sockets
 
             if (continuation != null)
             {
-                _ioScheduler.Schedule(state => ((Action)state)(), continuation);
+                ioScheduler.Schedule(this.completedCallback, continuation);
             }
         }
     }

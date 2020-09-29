@@ -56,9 +56,7 @@ namespace Letter.Udp
 
             this.BindAddress = this.socket.LocalEndPoint;
         }
-
-
-
+        
         private void CreateSocket(AddressFamily family)
         {
             this.socket = new Socket(family, SocketType.Dgram, ProtocolType.Udp);

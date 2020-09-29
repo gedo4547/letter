@@ -17,10 +17,17 @@ namespace System.Net.Sockets
                 return SendAsync(buffers.First);
             }
 
+#if NETSTANDARD2_0
+            if (!Array.Empty<byte>().Equals(this._awaitableEventArgs.Buffer))
+            {
+                this._awaitableEventArgs.SetBuffer(null, 0, 0);
+            }
+#elif NET5_0
             if (!_awaitableEventArgs.MemoryBuffer.Equals(Memory<byte>.Empty))
             {
                 _awaitableEventArgs.SetBuffer(null, 0, 0);
             }
+#endif
 
             _awaitableEventArgs.BufferList = GetBufferList(buffers);
 
@@ -40,7 +47,12 @@ namespace System.Net.Sockets
                 _awaitableEventArgs.BufferList = null;
             }
 
-            _awaitableEventArgs.SetBuffer(MemoryMarshal.AsMemory(memory));
+#if NETSTANDARD2_0
+            var segment = memory.GetBinaryArray();
+            this._awaitableEventArgs.SetBuffer(segment.Array, segment.Offset, segment.Count);
+#elif NET5_0
+            this._awaitableEventArgs.SetBuffer(MemoryMarshal.AsMemory(memory));
+#endif
 
             if (!_socket.SendAsync(_awaitableEventArgs))
             {

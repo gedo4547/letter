@@ -7,8 +7,8 @@ namespace Letter.Tcp
 {
     class TcpSslSession : TcpSession
     {
-        public TcpSslSession(ITcpClient client, SslStreamDuplexPipe transport, SslOptions sslOptions, FilterGroup filterGroup) :
-            base(client, transport, filterGroup)
+        public TcpSslSession(ITcpClient client, SslStreamDuplexPipe transport, SslOptions sslOptions, FilterGroup filterGroup)
+            : base(client, transport, filterGroup)
         {
             this.sslOptions = sslOptions;
         }

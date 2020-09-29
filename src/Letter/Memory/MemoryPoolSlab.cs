@@ -28,10 +28,15 @@ namespace System.Buffers
         public static MemoryPoolSlab Create(int length)
         {
             // allocate requested memory length from the pinned memory heap
-            var pinnedArray = GC.AllocateUninitializedArray<byte>(length, pinned: true);
+            byte[] array = null;
+#if NET5_0
+            array = GC.AllocateUninitializedArray<byte>(length, pinned: true);
+#elif NETSTANDARD2_0
+            array = new byte[length];
+#endif
 
             // allocate and return slab tracking object
-            return new MemoryPoolSlab(pinnedArray);
+            return new MemoryPoolSlab(array);
         }
 
         public void Dispose()

@@ -10,8 +10,11 @@ namespace System.Net.Sockets
 
         public SocketAwaitableEventArgs WaitForDataAsync()
         {
+#if NETSTANDARD2_0
+            _awaitableEventArgs.SetBuffer(Array.Empty<byte>(), 0, 0); 
+#elif NET5_0
             _awaitableEventArgs.SetBuffer(Memory<byte>.Empty);
-
+#endif
             if (!_socket.ReceiveAsync(_awaitableEventArgs))
             {
                 _awaitableEventArgs.Complete();
@@ -22,7 +25,12 @@ namespace System.Net.Sockets
 
         public SocketAwaitableEventArgs ReceiveAsync(Memory<byte> buffer)
         {
-            _awaitableEventArgs.SetBuffer(buffer);
+#if NETSTANDARD2_0
+            ArraySegment<byte> segment = buffer.GetBinaryArray();
+            this._awaitableEventArgs.SetBuffer(segment.Array, segment.Offset, segment.Count);
+#elif NET5_0
+            this._awaitableEventArgs.SetBuffer(buffer);
+#endif
 
             if (!_socket.ReceiveAsync(_awaitableEventArgs))
             {
