@@ -4,11 +4,12 @@ using System.Collections.Generic;
 using System.IO.Pipelines;
 using System.Net;
 using System.Net.Sockets;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 
 namespace Letter
 {
-    abstract class ASocket : IAsyncDisposable
+    public abstract class ASocket : IAsyncDisposable
     {
         public ASocket(Socket socket, PipeScheduler scheduler)
         {
@@ -26,7 +27,23 @@ namespace Letter
 
         public EndPoint LocalAddress => this.socket.LocalEndPoint;
         public EndPoint RemoteAddress => this.socket.RemoteEndPoint;
+        
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void SettingRcvBufferSize(int rcvBufferSize) => this.socket.ReceiveBufferSize = rcvBufferSize;
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void SettingSndBufferSize(int sndBufferSize) => this.socket.SendBufferSize = sndBufferSize;
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void SettingRcvTimeout(int rcvTimeout) => this.socket.ReceiveTimeout = rcvTimeout;
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void SettingSndTimeout(int sndTimeout) => this.socket.SendTimeout = sndTimeout;
+        
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void SettingReuseAddress(bool reuseAddress)
+            => this.socket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, reuseAddress);
+        
         protected List<ArraySegment<byte>> GetBufferList(ref ReadOnlySequence<byte> buffer)
         {
             this.bufferList.Clear();

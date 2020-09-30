@@ -2,6 +2,7 @@
 using System.Buffers;
 using System.IO.Pipelines;
 using System.Net.Sockets;
+using System.Runtime.CompilerServices;
 
 #if NET5_0
 using System.Runtime.InteropServices;
@@ -9,12 +10,22 @@ using System.Runtime.InteropServices;
 
 namespace Letter
 {
-    sealed class TcpSocket : ASocket
+    public sealed class TcpSocket : ASocket
     {
         public TcpSocket(Socket socket, PipeScheduler scheduler) : base(socket, scheduler)
         {
             
         }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void SettingLingerState(LingerOption option) => this.socket.LingerState = option;
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void SettingNoDelay(bool noDelay) => this.socket.NoDelay = noDelay;
+        
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void SettingKeepAlive(bool keepAlive)
+            => this.socket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.KeepAlive, keepAlive);
 
         public SocketAwaitableArgs ReceiveAsync(ref Memory<byte> memory)
         {

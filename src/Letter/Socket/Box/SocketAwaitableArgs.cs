@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Letter
 {
-    sealed class SocketAwaitableArgs : SocketAsyncEventArgs, ICriticalNotifyCompletion
+    public sealed class SocketAwaitableArgs : SocketAsyncEventArgs, ICriticalNotifyCompletion
     {
         private static readonly Action _callbackCompleted = () => { };
         

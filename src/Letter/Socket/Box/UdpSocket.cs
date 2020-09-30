@@ -10,7 +10,7 @@ using System.Runtime.InteropServices;
 
 namespace Letter
 {
-    sealed class UdpSocket : ASocket
+    public sealed class UdpSocket : ASocket
     {
         public UdpSocket(Socket socket, PipeScheduler scheduler) : base(socket, scheduler)
         {
