@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Net.Sockets;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 
@@ -18,13 +17,7 @@ namespace Letter.Udp
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             get { return this.receiverPipeline; }
         }
-
-        public UdpSocketReceiver ReceiverSocketReceiver
-        {
-            [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            get { return this.socketReceiver; }
-        }
-
+        
         public void StartReceiveReceiverPipelineBuffer()
         {
             this.ReceiverPipeReader.ReceiveAsync();
@@ -38,8 +31,8 @@ namespace Letter.Udp
                 var memory = node.GetMomory();
                 try
                 {
-                    int transportBytes = await this.ReceiverSocketReceiver.ReceiveAsync(this.LoaclAddress, memory);
-                    node.SettingPoint(this.ReceiverSocketReceiver.RemoteAddress);
+                    int transportBytes = await this.udpSocket.ReceiveAsync(this.LoaclAddress, ref memory);
+                    node.SettingPoint(this.udpSocket.RemoteAddress);
                     node.SettingWriteLength(transportBytes);
                     this.ReceiverPipeWriter.Write(node);
                 }

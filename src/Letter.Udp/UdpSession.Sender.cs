@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Buffers;
 using System.Net;
-using System.Net.Sockets;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 
@@ -19,12 +18,6 @@ namespace Letter.Udp
         {
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             get { return this.senderPipeline; }
-        }
-        
-        public UdpSocketSender SenderSocketSender
-        {
-            [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            get { return this.socketSender; }
         }
         
         public void StartReceiveSenderPipelineBuffer()
@@ -45,7 +38,7 @@ namespace Letter.Udp
                 try
                 {
                     await node.ReleaseAsync();
-                    int transportBytes = await this.SenderSocketSender.SendAsync(address, sequence);
+                    int transportBytes = await this.udpSocket.SendAsync(address, ref sequence);
                 }
                 catch(Exception ex)
                 {

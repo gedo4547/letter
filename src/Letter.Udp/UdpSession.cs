@@ -16,15 +16,12 @@ namespace Letter.Udp
         public UdpSession(Socket socket, BinaryOrder order, MemoryPool<byte> memoryPool, PipeScheduler scheduler, FilterGroup filterGroup)
         {
             this.Id = IdGeneratorHelper.GetNextId();
+            this.udpSocket = new UdpSocket(socket, scheduler);
             
-            this.socket = socket;
             this.Scheduler = scheduler;
             this.MemoryPool = memoryPool;
             this.filterGroup = filterGroup;
-            this.LoaclAddress = this.socket.LocalEndPoint;
-            
-            this.socketSender = new UdpSocketSender(this.socket, this.Scheduler);
-            this.socketReceiver = new UdpSocketReceiver(this.socket, this.Scheduler);
+            this.LoaclAddress = this.udpSocket.LocalAddress;
 
             this.onMemoryWritePush = this.OnMemoryWritePush;
             this.senderPipeline = new DgramPipeline(this.MemoryPool, this.Scheduler, this.OnSenderPipelineReceiveBuffer);
@@ -45,11 +42,7 @@ namespace Letter.Udp
             get { throw new Exception("please use IUdpSession.RcvAddress or IUdpSession.SndAddress"); }
         }
 
-        private Socket socket;
-        
-        private UdpSocketSender socketSender;
-        private UdpSocketReceiver socketReceiver;
-        
+        private UdpSocket udpSocket;
         private DgramPipeline senderPipeline;
         private DgramPipeline receiverPipeline;
 
@@ -111,34 +104,14 @@ namespace Letter.Udp
             this.filterGroup.OnChannelInactive(this);
 
             this.Id = string.Empty;
-            if (this.socket != null)
-            {
-                try
-                {
-                    this.socket.Shutdown(SocketShutdown.Both);
-                }
-                catch
-                {
-                }
-                
-                this.socket.Dispose();
-            }
+            
+            await this.udpSocket.DisposeAsync();
             
             if (this.memoryTask != null)
             {
                 await this.memoryTask;
             }
-
-            if (this.socketSender != null)
-            {
-                this.socketSender.Dispose();
-            }
-
-            if (this.socketReceiver != null)
-            {
-                this.socketReceiver.Dispose();
-            }
-
+            
             if (this.senderPipeline != null)
             {
                 this.senderPipeline.Dispose();
