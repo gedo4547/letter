@@ -3,7 +3,6 @@ using System.Buffers;
 using System.IO.Pipelines;
 using System.Net;
 using System.Net.Sockets;
-using System.Threading;
 using System.Threading.Tasks;
 
 using FilterGroup = Letter.DgramChannelFilterGroup<Letter.Udp.IUdpSession, Letter.Udp.IUdpChannelFilter>;
@@ -13,19 +12,30 @@ namespace Letter.Udp
 {
     partial class UdpSession : IUdpSession
     {
-        public UdpSession(Socket socket, BinaryOrder order, MemoryPool<byte> memoryPool, PipeScheduler scheduler, FilterGroup filterGroup)
+        public UdpSession(Socket socket, UdpOptions options, MemoryPool<byte> memoryPool, PipeScheduler scheduler, FilterGroup filterGroup)
         {
             this.Id = IdGeneratorHelper.GetNextId();
-            this.udpSocket = new UdpSocket(socket, scheduler);
             
+            this.order = options.Order;
             this.Scheduler = scheduler;
             this.MemoryPool = memoryPool;
             this.filterGroup = filterGroup;
             this.LoaclAddress = this.udpSocket.LocalAddress;
-
+            
             this.onMemoryWritePush = this.OnMemoryWritePush;
             this.senderPipeline = new DgramPipeline(this.MemoryPool, this.Scheduler, this.OnSenderPipelineReceiveBuffer);
             this.receiverPipeline = new DgramPipeline(this.MemoryPool, this.Scheduler, this.OnReceiverPipelineReceiveBuffer);
+            
+            this.udpSocket = new UdpSocket(socket, scheduler);
+            if (options.RcvTimeout != null)
+                udpSocket.SettingRcvTimeout(options.RcvTimeout.Value);
+            if (options.SndTimeout != null)
+                udpSocket.SettingSndTimeout(options.SndTimeout.Value);
+            
+            if (options.RcvBufferSize != null)
+                udpSocket.SettingRcvBufferSize(options.RcvBufferSize.Value);
+            if (options.SndBufferSize != null)
+                udpSocket.SettingSndBufferSize(options.SndBufferSize.Value);
         }
         
         public string Id { get; private set; }

@@ -44,7 +44,7 @@ namespace Letter.Udp
 
         private void Bind(EndPoint bindAddress)
         {
-            this.CreateSocket(bindAddress.AddressFamily);
+            this.socket = new Socket(bindAddress.AddressFamily, SocketType.Dgram, ProtocolType.Udp);
             try
             {
                 this.socket.Bind(bindAddress);
@@ -57,33 +57,12 @@ namespace Letter.Udp
             this.BindAddress = this.socket.LocalEndPoint;
         }
         
-        private void CreateSocket(AddressFamily family)
-        {
-            this.socket = new Socket(family, SocketType.Dgram, ProtocolType.Udp);
-            
-            if (this.options.RcvTimeout != null)
-                this.socket.SettingRcvTimeout(this.options.RcvTimeout.Value);
-            if (this.options.SndTimeout != null)
-                this.socket.SettingSndTimeout(this.options.SndTimeout.Value);
-            
-            if (this.options.RcvBufferSize != null)
-                this.socket.SettingRcvBufferSize(this.options.RcvBufferSize.Value);
-            if (this.options.SndBufferSize != null)
-                this.socket.SettingSndBufferSize(this.options.SndBufferSize.Value);
-        }
-
         private void Run()
         {
             var filterGroup = this.groupFactory.CreateFilterGroup();
             var memoryPool = this.options.MemoryPoolFactory();
             PipeScheduler scheduler = this.options.SchedulerAllocator.Next();
-            
-            this.session = new UdpSession(
-                this.socket, 
-                this.options.Order, 
-                memoryPool,
-                scheduler, 
-                filterGroup);
+            this.session = new UdpSession(this.socket, this.options, memoryPool, scheduler, filterGroup);
             
             this.session.StartAsync();
         }
