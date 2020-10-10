@@ -14,24 +14,25 @@ namespace udp_text
             if (session.LoaclAddress.ToString() == Program.c_p.ToString())
             {
                 string str = "nihao";
-                var arr = System.Text.Encoding.UTF8.GetBytes(str);
-                ReadOnlySequence<byte> sequence = new ReadOnlySequence<byte>(arr);
                 
                 Console.WriteLine("发送");
                 for (int i = 0; i < 8; i++)
                 {
+                    string tempStr = str + "__" + i.ToString();
+                    var arr = System.Text.Encoding.UTF8.GetBytes(tempStr);
+                    ReadOnlySequence<byte> sequence = new ReadOnlySequence<byte>(arr);
                     await session.WriteAsync(Program.s_p, ref sequence);
                 }
                 
                 Console.WriteLine("关闭");
-                 // await session.DisposeAsync();
+                 await session.DisposeAsync();
                 // await Task.Run(async () =>
                 // {
                 //     await Task.Delay(3 * 1000);
                 //     Console.WriteLine("关闭");    
-                //     await session.CloseAsync();
+                //     await session.DisposeAsync();
                 // });
-                
+                //
             }
         }
 

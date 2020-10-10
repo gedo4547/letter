@@ -16,16 +16,6 @@ namespace Letter.Udp
         {
             this.Id = IdGeneratorHelper.GetNextId();
             
-            this.order = options.Order;
-            this.Scheduler = scheduler;
-            this.MemoryPool = memoryPool;
-            this.filterGroup = filterGroup;
-            this.LoaclAddress = this.udpSocket.LocalAddress;
-            
-            this.onMemoryWritePush = this.OnMemoryWritePush;
-            this.senderPipeline = new DgramPipeline(this.MemoryPool, this.Scheduler, this.OnSenderPipelineReceiveBuffer);
-            this.receiverPipeline = new DgramPipeline(this.MemoryPool, this.Scheduler, this.OnReceiverPipelineReceiveBuffer);
-            
             this.udpSocket = new UdpSocket(socket, scheduler);
             if (options.RcvTimeout != null)
                 udpSocket.SettingRcvTimeout(options.RcvTimeout.Value);
@@ -36,6 +26,16 @@ namespace Letter.Udp
                 udpSocket.SettingRcvBufferSize(options.RcvBufferSize.Value);
             if (options.SndBufferSize != null)
                 udpSocket.SettingSndBufferSize(options.SndBufferSize.Value);
+            
+            this.order = options.Order;
+            this.Scheduler = scheduler;
+            this.MemoryPool = memoryPool;
+            this.filterGroup = filterGroup;
+            this.LoaclAddress = this.udpSocket.LocalAddress;
+            
+            this.onMemoryWritePush = this.OnMemoryWritePush;
+            this.senderPipeline = new DgramPipeline(this.MemoryPool, this.Scheduler, this.OnSenderPipelineReceiveBuffer);
+            this.receiverPipeline = new DgramPipeline(this.MemoryPool, this.Scheduler, this.OnReceiverPipelineReceiveBuffer);
         }
         
         public string Id { get; private set; }

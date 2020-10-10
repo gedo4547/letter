@@ -26,7 +26,8 @@ namespace Letter
         private List<ArraySegment<byte>> bufferList;
 
         public EndPoint LocalAddress => this.socket.LocalEndPoint;
-        public EndPoint RemoteAddress => this.socket.RemoteEndPoint;
+
+        public EndPoint RemoteAddress => this.rcvArgs.RemoteEndPoint;
         
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void SettingRcvBufferSize(int rcvBufferSize) => this.socket.ReceiveBufferSize = rcvBufferSize;
