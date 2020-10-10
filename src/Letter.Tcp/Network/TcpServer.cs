@@ -92,8 +92,6 @@ namespace Letter.Tcp
                     client.Build();
                     client.Start(acceptSocket, this.schedulerAllocator.Next());
                     return client;
-                    
-                    
                 }
                 catch (ObjectDisposedException)
                 {

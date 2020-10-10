@@ -14,12 +14,12 @@ namespace Letter
         {
             this.order = order;
             this.pipeWriter = pipeWriter;
-            this.convertor = BinaryOrderConvertorFactory.GetConvertor(order);
+            this.operators = BinaryOrderOperatorsFactory.GetOperators(order);
         }
 
         private readonly BinaryOrder order;
         private readonly PipeWriter pipeWriter;
-        private readonly IBinaryOrderConvertor convertor; 
+        private readonly IBinaryOrderOperators operators; 
         
         public BinaryOrder Order
         {
@@ -45,7 +45,7 @@ namespace Letter
         public void Write(short value)
         {
             Span<byte> span = stackalloc byte[ByteSizeConstants.Size_2];
-            this.convertor.WriteInt16(span, ref value);
+            this.operators.WriteInt16(span, ref value);
             this.pipeWriter.Write(span);
         }
 
@@ -53,7 +53,7 @@ namespace Letter
         public void Write(ushort value)
         {
             Span<byte> span = stackalloc byte[ByteSizeConstants.Size_2];
-            this.convertor.WriteUInt16(span, ref value);
+            this.operators.WriteUInt16(span, ref value);
             this.pipeWriter.Write(span);
         }
 
@@ -61,7 +61,7 @@ namespace Letter
         public void Write(int value)
         {
             Span<byte> span = stackalloc byte[ByteSizeConstants.Size_4];
-            this.convertor.WriteInt32(span, ref value);
+            this.operators.WriteInt32(span, ref value);
             this.pipeWriter.Write(span);
         }
 
@@ -69,7 +69,7 @@ namespace Letter
         public void Write(uint value)
         {
             Span<byte> span = stackalloc byte[ByteSizeConstants.Size_4];
-            this.convertor.WriteUInt32(span, ref value);
+            this.operators.WriteUInt32(span, ref value);
             this.pipeWriter.Write(span);
         }
 
@@ -77,7 +77,7 @@ namespace Letter
         public void Write(long value)
         {
             Span<byte> span = stackalloc byte[ByteSizeConstants.Size_8];
-            this.convertor.WriteInt64(span, ref value);
+            this.operators.WriteInt64(span, ref value);
             this.pipeWriter.Write(span);
         }
 
@@ -85,7 +85,7 @@ namespace Letter
         public void Write(ulong value)
         {
             Span<byte> span = stackalloc byte[ByteSizeConstants.Size_8];
-            this.convertor.WriteUInt64(span, ref value);
+            this.operators.WriteUInt64(span, ref value);
             this.pipeWriter.Write(span);
         }
 

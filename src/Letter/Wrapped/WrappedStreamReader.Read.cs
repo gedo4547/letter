@@ -33,12 +33,12 @@ namespace Letter
             var segment = this.ReadRange(ByteSizeConstants.Size_2);
             
             if (segment.First.Length >= ByteSizeConstants.Size_2)
-                return this.convertor.ReadInt16(segment.First.Span);
+                return this.operators.ReadInt16(segment.First.Span);
             else
             {
                 Span<byte> local = stackalloc byte[ByteSizeConstants.Size_2];
                 segment.CopyTo(local);
-                return this.convertor.ReadInt16(local);
+                return this.operators.ReadInt16(local);
             }
         }
         
@@ -48,12 +48,12 @@ namespace Letter
             var segment = this.ReadRange(ByteSizeConstants.Size_2);
             
             if (segment.First.Length >= ByteSizeConstants.Size_2)
-                return this.convertor.ReadUInt16(segment.First.Span);
+                return this.operators.ReadUInt16(segment.First.Span);
             else
             {
                 Span<byte> local = stackalloc byte[ByteSizeConstants.Size_2];
                 segment.CopyTo(local);
-                return this.convertor.ReadUInt16(local);
+                return this.operators.ReadUInt16(local);
             }
         }
 
@@ -64,12 +64,12 @@ namespace Letter
             
             
             if (segment.First.Length >= ByteSizeConstants.Size_4)
-                return this.convertor.ReadInt32(segment.First.Span);
+                return this.operators.ReadInt32(segment.First.Span);
             else
             {
                 Span<byte> local = stackalloc byte[ByteSizeConstants.Size_4];
                 segment.CopyTo(local);
-                return this.convertor.ReadInt32(local);
+                return this.operators.ReadInt32(local);
             }
         }
 
@@ -79,12 +79,12 @@ namespace Letter
             var segment = this.ReadRange(ByteSizeConstants.Size_4);
             
             if (segment.First.Length >= ByteSizeConstants.Size_4)
-                return this.convertor.ReadUInt32(segment.First.Span);
+                return this.operators.ReadUInt32(segment.First.Span);
             else
             {
                 Span<byte> local = stackalloc byte[ByteSizeConstants.Size_4];
                 segment.CopyTo(local);
-                return this.convertor.ReadUInt32(local);
+                return this.operators.ReadUInt32(local);
             }
         }
 
@@ -94,12 +94,12 @@ namespace Letter
             var segment = this.ReadRange(ByteSizeConstants.Size_8);
             
             if (segment.First.Length >= ByteSizeConstants.Size_8)
-                return this.convertor.ReadInt64(segment.First.Span);
+                return this.operators.ReadInt64(segment.First.Span);
             else
             {
                 Span<byte> local = stackalloc byte[ByteSizeConstants.Size_8];
                 segment.CopyTo(local);
-                return this.convertor.ReadInt64(local);
+                return this.operators.ReadInt64(local);
             }
         }
 
@@ -109,12 +109,12 @@ namespace Letter
             var segment = this.ReadRange(ByteSizeConstants.Size_8);
             
             if (segment.First.Length >= ByteSizeConstants.Size_8)
-                return this.convertor.ReadUInt64(segment.First.Span);
+                return this.operators.ReadUInt64(segment.First.Span);
             else
             {
                 Span<byte> local = stackalloc byte[ByteSizeConstants.Size_8];
                 segment.CopyTo(local);
-                return this.convertor.ReadUInt64(local);
+                return this.operators.ReadUInt64(local);
             }
         }
 

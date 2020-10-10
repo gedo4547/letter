@@ -16,13 +16,13 @@ namespace Letter
             this.node = node;
             this.onMemoryPush = onMemoryPush;
             this.writeLength = 0;
-            this.convertor = BinaryOrderConvertorFactory.GetConvertor(order);
+            this.operators = BinaryOrderOperatorsFactory.GetOperators(order);
         }
 
         private BinaryOrder order;
         private DgramMessageNode node;
         private MemoryWritePushDelegate onMemoryPush;
-        private readonly IBinaryOrderConvertor convertor; 
+        private readonly IBinaryOrderOperators operators; 
 
         
         private int writeLength;
@@ -45,7 +45,7 @@ namespace Letter
         public void Write(short value)
         {
             Span<byte> local = stackalloc byte[ByteSizeConstants.Size_2];
-            this.convertor.WriteInt16(local, ref value);
+            this.operators.WriteInt16(local, ref value);
             InternalWriteSpan(local, ref this.writeLength, this.node);
         }
 
@@ -53,7 +53,7 @@ namespace Letter
         public void Write(ushort value)
         {
             Span<byte> local = stackalloc byte[ByteSizeConstants.Size_2];
-            this.convertor.WriteUInt16(local, ref value);
+            this.operators.WriteUInt16(local, ref value);
             InternalWriteSpan(local, ref this.writeLength, this.node);
         }
         
@@ -61,7 +61,7 @@ namespace Letter
         public void Write(int value)
         {
             Span<byte> local = stackalloc byte[ByteSizeConstants.Size_4];
-            this.convertor.WriteInt32(local, ref value);
+            this.operators.WriteInt32(local, ref value);
             InternalWriteSpan(local, ref this.writeLength, this.node);
         }
         
@@ -69,7 +69,7 @@ namespace Letter
         public void Write(uint value)
         {
             Span<byte> local = stackalloc byte[ByteSizeConstants.Size_4];
-            this.convertor.WriteUInt32(local, ref value);
+            this.operators.WriteUInt32(local, ref value);
             InternalWriteSpan(local, ref this.writeLength, this.node);
         }
 
@@ -77,7 +77,7 @@ namespace Letter
         public void Write(long value)
         {
             Span<byte> local = stackalloc byte[ByteSizeConstants.Size_8];
-            this.convertor.WriteInt64(local, ref value);
+            this.operators.WriteInt64(local, ref value);
             InternalWriteSpan(local, ref this.writeLength, this.node);
         }
         
@@ -85,7 +85,7 @@ namespace Letter
         public void Write(ulong value)
         {
             Span<byte> local = stackalloc byte[ByteSizeConstants.Size_8];
-            this.convertor.WriteUInt64(local, ref value);
+            this.operators.WriteUInt64(local, ref value);
             InternalWriteSpan(local, ref this.writeLength, this.node);
         }
         

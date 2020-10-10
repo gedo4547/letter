@@ -11,12 +11,12 @@ namespace Letter
             this.memory = memory;
             
             this.readIndex = 0;
-            this.convertor = BinaryOrderConvertorFactory.GetConvertor(order);
+            this.operators = BinaryOrderOperatorsFactory.GetOperators(order);
         }
 
         private readonly BinaryOrder order;
         private readonly Memory<byte> memory;
-        private readonly IBinaryOrderConvertor convertor; 
+        private readonly IBinaryOrderOperators operators; 
         
         private int readIndex;
 

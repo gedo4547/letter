@@ -4,7 +4,7 @@ using System.Runtime.CompilerServices;
 
 namespace Letter
 {
-    sealed class OrderConvertorLittleEndianImpl : IBinaryOrderConvertor
+    sealed class OrderOperatorsLittleEndianImpl : IBinaryOrderOperators
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public short ReadInt16(in ReadOnlySpan<byte> span) => BinaryPrimitives.ReadInt16LittleEndian(span);

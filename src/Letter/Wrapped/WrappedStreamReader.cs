@@ -13,13 +13,13 @@ namespace Letter
             this.order = order;
             this.buffer = buffer;
             this.pipeReader = pipeReader;
-            this.convertor = BinaryOrderConvertorFactory.GetConvertor(order);
+            this.operators = BinaryOrderOperatorsFactory.GetOperators(order);
 
         }
 
         private readonly BinaryOrder order;
         private readonly PipeReader pipeReader;
-        private readonly IBinaryOrderConvertor convertor; 
+        private readonly IBinaryOrderOperators operators; 
         
         
         public ReadOnlySequence<byte> buffer;
