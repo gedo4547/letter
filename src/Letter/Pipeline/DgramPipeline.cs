@@ -1,7 +1,7 @@
-﻿﻿using System;
+﻿using System;
 using System.Buffers;
- using System.ComponentModel;
- using System.IO.Pipelines;
+using System.ComponentModel;
+using System.IO.Pipelines;
  
 namespace Letter
 {

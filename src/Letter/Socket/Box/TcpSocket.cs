@@ -4,17 +4,12 @@ using System.IO.Pipelines;
 using System.Net.Sockets;
 using System.Runtime.CompilerServices;
 
-#if NET5_0
-using System.Runtime.InteropServices;
-#endif
-
 namespace Letter
 {
     public sealed class TcpSocket : ASocket
     {
         public TcpSocket(Socket socket, PipeScheduler scheduler) : base(socket, scheduler)
         {
-            
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -27,76 +22,28 @@ namespace Letter
         public void SettingKeepAlive(bool keepAlive)
             => this.socket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.KeepAlive, keepAlive);
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public SocketAwaitableArgs ReceiveAsync(ref Memory<byte> memory)
         {
-#if NETSTANDARD2_0
-            ArraySegment<byte> segment = memory.GetBinaryArray();
-            this.rcvArgs.SetBuffer(segment.Array, segment.Offset, segment.Count);
-#elif NET5_0
-            this.rcvArgs.SetBuffer(memory);
-#endif
-            if (!this.socket.ReceiveAsync(this.rcvArgs))
-            {
-                this.rcvArgs.Complete();
-            }
-
-            return this.rcvArgs;
+            return base.InternalReceiveAsync(ref memory);
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public SocketAwaitableArgs SendAsync(ref ReadOnlySequence<byte> buffers)
         {
-            if (buffers.IsSingleSegment)
-            {
-                var memory = buffers.First;
-                return this.SendSingleMessageAsync(ref memory);
-            }
-            else
-            {
-                return this.SendMultipleMessageAsync(ref buffers);
-            }
+            return base.InternalSendAsync(ref buffers);
         }
 
-        private SocketAwaitableArgs SendSingleMessageAsync(ref ReadOnlyMemory<byte> buffer)
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        protected override bool SocketAsyncRcvOperation(SocketAwaitableArgs args)
         {
-            if (this.sndArgs.BufferList != null)
-            {
-                this.sndArgs.BufferList = null;
-            }
-#if NETSTANDARD2_0
-            var segment = buffer.GetBinaryArray();
-            this.sndArgs.SetBuffer(segment.Array, segment.Offset, segment.Count);
-#elif NET5_0
-            this.sndArgs.SetBuffer(MemoryMarshal.AsMemory(buffer));
-#endif
-            if (!this.socket.SendAsync(this.sndArgs))
-            {
-                this.sndArgs.Complete();
-            }
-
-            return this.sndArgs;
+            return this.socket.ReceiveAsync(args);
         }
 
-        private SocketAwaitableArgs SendMultipleMessageAsync(ref ReadOnlySequence<byte> buffers)
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        protected override bool SocketAsyncSndOperation(SocketAwaitableArgs args)
         {
-#if NETSTANDARD2_0
-            if (!Array.Empty<byte>().Equals(this.sndArgs.Buffer))
-            {
-                this.sndArgs.SetBuffer(null, 0, 0);
-            }
-#elif NET5_0
-            if (!this.sndArgs.MemoryBuffer.Equals(Memory<byte>.Empty))
-            {
-                this.sndArgs.SetBuffer(null, 0, 0);
-            }
-#endif
-            
-            this.sndArgs.BufferList = this.GetBufferList(ref buffers);
-            if (!this.socket.SendAsync(this.sndArgs))
-            {
-                this.sndArgs.Complete();
-            }
-
-            return sndArgs;
+            return this.socket.SendAsync(args);
         }
     }
 }

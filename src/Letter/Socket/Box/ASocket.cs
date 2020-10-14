@@ -7,6 +7,10 @@ using System.Net.Sockets;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 
+#if NET5_0
+using System.Runtime.InteropServices;
+#endif
+
 namespace Letter
 {
     public abstract class ASocket : IAsyncDisposable
@@ -45,6 +49,88 @@ namespace Letter
         public void SettingReuseAddress(bool reuseAddress)
             => this.socket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, reuseAddress);
         
+         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        protected SocketAwaitableArgs InternalReceiveAsync(ref Memory<byte> memory)
+        {
+#if NETSTANDARD2_0
+            ArraySegment<byte> segment = memory.GetBinaryArray();
+            this.rcvArgs.SetBuffer(segment.Array, segment.Offset, segment.Count);
+#elif NET5_0
+            this.rcvArgs.SetBuffer(memory);
+#endif
+            if (!this.SocketAsyncRcvOperation(this.rcvArgs))
+            {
+                this.rcvArgs.Complete();
+            }
+
+            return this.rcvArgs;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        protected SocketAwaitableArgs InternalSendAsync(ref ReadOnlySequence<byte> buffers)
+        {
+            if (buffers.IsSingleSegment)
+            {
+                var memory = buffers.First;
+                return this.SendSingleMessageAsync(ref memory);
+            }
+            else
+            {
+                return this.SendMultipleMessageAsync(ref buffers);
+            }
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private SocketAwaitableArgs SendSingleMessageAsync(ref ReadOnlyMemory<byte> buffer)
+        {
+            if (this.sndArgs.BufferList != null)
+            {
+                this.sndArgs.BufferList = null;
+            }
+#if NETSTANDARD2_0
+            var segment = buffer.GetBinaryArray();
+            this.sndArgs.SetBuffer(segment.Array, segment.Offset, segment.Count);
+#elif NET5_0
+            this.sndArgs.SetBuffer(MemoryMarshal.AsMemory(buffer));
+#endif
+            if (!this.SocketAsyncSndOperation(this.sndArgs))
+            {
+                this.sndArgs.Complete();
+            }
+
+            return this.sndArgs;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private SocketAwaitableArgs SendMultipleMessageAsync(ref ReadOnlySequence<byte> buffers)
+        {
+#if NETSTANDARD2_0
+            if (!Array.Empty<byte>().Equals(this.sndArgs.Buffer))
+            {
+                this.sndArgs.SetBuffer(null, 0, 0);
+            }
+#elif NET5_0
+            if (!sndArgs.MemoryBuffer.Equals(Memory<byte>.Empty))
+            {
+                sndArgs.SetBuffer(null, 0, 0);
+            }
+#endif
+            
+            this.sndArgs.BufferList = this.GetBufferList(ref buffers);
+            if (!this.SocketAsyncSndOperation(this.sndArgs))
+            {
+                this.sndArgs.Complete();
+            }
+
+            return sndArgs;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        protected abstract bool SocketAsyncRcvOperation(SocketAwaitableArgs args);
+        
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        protected abstract bool SocketAsyncSndOperation(SocketAwaitableArgs args);
+
         protected List<ArraySegment<byte>> GetBufferList(ref ReadOnlySequence<byte> buffer)
         {
             this.bufferList.Clear();

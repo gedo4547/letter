@@ -24,8 +24,8 @@ namespace udp_text
                     await session.WriteAsync(Program.s_p, ref sequence);
                 }
                 
-                Console.WriteLine("关闭");
-                 await session.DisposeAsync();
+                // Console.WriteLine("关闭");
+                //  await session.DisposeAsync();
                 // await Task.Run(async () =>
                 // {
                 //     await Task.Delay(3 * 1000);

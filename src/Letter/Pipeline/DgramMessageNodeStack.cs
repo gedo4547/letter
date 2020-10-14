@@ -1,4 +1,4 @@
-﻿﻿namespace Letter
+﻿namespace Letter
 {
     class DgramMessageNodeStack : ObjectStack<DgramMessageNode>
     {
