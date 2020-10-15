@@ -14,11 +14,11 @@ namespace System.Threading
             if (ioQueueCount > 0)
             {
                 numSchedulers = ioQueueCount;
-                schedulers = new IOQueue[numSchedulers];
+                schedulers = new WorkScheduler[numSchedulers];
 
                 for (var i = 0; i < numSchedulers; i++)
                 {
-                    schedulers[i] = new IOQueue();
+                    schedulers[i] = new WorkScheduler();
                 }
             }
             else

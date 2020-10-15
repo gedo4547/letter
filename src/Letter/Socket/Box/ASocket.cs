@@ -26,30 +26,51 @@ namespace Letter
         protected Socket socket;
         protected SocketAwaitableArgs rcvArgs;
         protected SocketAwaitableArgs sndArgs;
-        
         private List<ArraySegment<byte>> bufferList;
-
-        public EndPoint LocalAddress => this.socket.LocalEndPoint;
-
-        public EndPoint RemoteAddress => this.rcvArgs.RemoteEndPoint;
         
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void SettingRcvBufferSize(int rcvBufferSize) => this.socket.ReceiveBufferSize = rcvBufferSize;
+        public EndPoint LocalAddress
+        {
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            get { return this.socket.LocalEndPoint; }
+        }
+
+        public EndPoint RemoteAddress
+        {
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            get { return this.rcvArgs.RemoteEndPoint; }
+        }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void SettingSndBufferSize(int sndBufferSize) => this.socket.SendBufferSize = sndBufferSize;
+        public void SettingRcvBufferSize(int rcvBufferSize)
+        {
+            this.socket.ReceiveBufferSize = rcvBufferSize;
+        }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void SettingRcvTimeout(int rcvTimeout) => this.socket.ReceiveTimeout = rcvTimeout;
+        public void SettingSndBufferSize(int sndBufferSize)
+        {
+            this.socket.SendBufferSize = sndBufferSize;
+        }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void SettingSndTimeout(int sndTimeout) => this.socket.SendTimeout = sndTimeout;
-        
+        public void SettingRcvTimeout(int rcvTimeout)
+        {
+            this.socket.ReceiveTimeout = rcvTimeout;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void SettingSndTimeout(int sndTimeout)
+        {
+            this.socket.SendTimeout = sndTimeout;
+        }
+
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void SettingReuseAddress(bool reuseAddress)
-            => this.socket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, reuseAddress);
-        
-         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        {
+            this.socket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, reuseAddress);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         protected SocketAwaitableArgs InternalReceiveAsync(ref Memory<byte> memory)
         {
 #if NETSTANDARD2_0

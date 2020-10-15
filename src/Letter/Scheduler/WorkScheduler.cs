@@ -5,12 +5,12 @@ using System.IO.Pipelines;
 namespace System.Threading
 {
     [EditorBrowsable(EditorBrowsableState.Never)]
-    public sealed class IOQueue : PipeScheduler
+    public sealed class WorkScheduler : PipeScheduler
 #if NET5_0
         , IThreadPoolWorkItem
 #endif
     {
-        public IOQueue()
+        public WorkScheduler()
         {
 #if NETSTANDARD2_0
             this.execute_callBack = this.Execute;

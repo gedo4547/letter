@@ -13,14 +13,22 @@ namespace Letter
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void SettingLingerState(LingerOption option) => this.socket.LingerState = option;
+        public void SettingLingerState(LingerOption option)
+        {
+            this.socket.LingerState = option;
+        }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void SettingNoDelay(bool noDelay) => this.socket.NoDelay = noDelay;
-        
+        public void SettingNoDelay(bool noDelay)
+        {
+            this.socket.NoDelay = noDelay;
+        }
+
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void SettingKeepAlive(bool keepAlive)
-            => this.socket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.KeepAlive, keepAlive);
+        {
+            this.socket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.KeepAlive, keepAlive);
+        }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public SocketAwaitableArgs ReceiveAsync(ref Memory<byte> memory)
