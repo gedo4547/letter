@@ -1,7 +1,7 @@
 ﻿#if NETSTANDARD2_0
 using System.Threading.Tasks;
 
-namespace Letter
+namespace System
 {
     public interface IAsyncDisposable
     {

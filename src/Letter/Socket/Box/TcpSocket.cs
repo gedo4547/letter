@@ -11,7 +11,7 @@ namespace Letter
         public TcpSocket(Socket socket, PipeScheduler scheduler) : base(socket, scheduler)
         {
         }
-
+        
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void SettingLingerState(LingerOption option)
         {
