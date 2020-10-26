@@ -19,7 +19,7 @@ namespace Letter
 
         private readonly BinaryOrder order;
         private readonly PipeWriter pipeWriter;
-        private readonly IBinaryOrderOperators operators; 
+        private readonly IBinaryOrderOperators operators;
         
         public BinaryOrder Order
         {

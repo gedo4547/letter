@@ -48,6 +48,8 @@ namespace System.IO.Pipelines
                 
                 this.readerCallback(this.WrappedReader, result.Buffer);
             }
+            
+            reader.Complete();
         }
         
         public ValueTask DisposeAsync()

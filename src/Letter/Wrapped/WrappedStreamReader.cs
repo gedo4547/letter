@@ -14,7 +14,6 @@ namespace Letter
             this.buffer = buffer;
             this.pipeReader = pipeReader;
             this.operators = BinaryOrderOperatorsFactory.GetOperators(order);
-
         }
 
         private readonly BinaryOrder order;
