@@ -34,8 +34,8 @@ namespace Letter.Udp
             this.LoaclAddress = this.udpSocket.LocalAddress;
             
             this.onMemoryWritePush = this.OnMemoryWritePush;
-            this.senderPipeline = new DgramPipeline(this.MemoryPool, this.Scheduler, this.OnSenderPipelineReceiveBuffer);
-            this.receiverPipeline = new DgramPipeline(this.MemoryPool, this.Scheduler, this.OnReceiverPipelineReceiveBuffer);
+            this.senderPipeline = new UdpPipeline(this.MemoryPool, this.Scheduler, this.OnSenderPipelineReceiveBuffer);
+            this.receiverPipeline = new UdpPipeline(this.MemoryPool, this.Scheduler, this.OnReceiverPipelineReceiveBuffer);
         }
         
         public string Id { get; private set; }
@@ -53,8 +53,8 @@ namespace Letter.Udp
         }
 
         private UdpSocket udpSocket;
-        private DgramPipeline senderPipeline;
-        private DgramPipeline receiverPipeline;
+        private UdpPipeline senderPipeline;
+        private UdpPipeline receiverPipeline;
 
         private BinaryOrder order;
         private FilterGroup filterGroup;

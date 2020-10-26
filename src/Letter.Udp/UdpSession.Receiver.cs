@@ -6,13 +6,13 @@ namespace Letter.Udp
 {
     partial class UdpSession
     {
-        public IDgramPipelineReader ReceiverPipeReader
+        public IUdpPipelineReader ReceiverPipeReader
         {
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             get { return this.receiverPipeline; }
         }
         
-        public IDgramPipelineWriter ReceiverPipeWriter
+        public IUdpPipelineWriter ReceiverPipeWriter
         {
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             get { return this.receiverPipeline; }
@@ -52,11 +52,11 @@ namespace Letter.Udp
             }
         }
 
-        private void OnReceiverPipelineReceiveBuffer(IDgramPipelineReader reader)
+        private void OnReceiverPipelineReceiveBuffer(IUdpPipelineReader reader)
         {
             while (true)
             {
-                DgramMessageNode node = reader.Read();
+                UdpMessageNode node = reader.Read();
                 if (node == null) break;
 
                 this.RcvAddress = node.Point;

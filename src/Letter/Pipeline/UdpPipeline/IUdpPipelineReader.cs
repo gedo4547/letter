@@ -3,10 +3,10 @@
 namespace Letter
 {
     [EditorBrowsable(EditorBrowsableState.Never)]
-    public interface IDgramPipelineReader
+    public interface IUdpPipelineReader
     {
         void ReceiveAsync();
 
-        DgramMessageNode Read();
+        UdpMessageNode Read();
     }
 }

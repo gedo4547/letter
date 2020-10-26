@@ -5,19 +5,19 @@ using System.Runtime.InteropServices;
 
 namespace Letter.Box
 {
-    internal delegate void WriterFlushDelegate();
+    internal delegate void WriterFlushDelegate(IPipeWriter writer);
     
     public ref struct WrappedWriter
     {
-        internal WrappedWriter(IWriter writer, BinaryOrder order, WriterFlushDelegate writerFlush)
+        internal WrappedWriter(IPipeWriter writer, BinaryOrder order, WriterFlushDelegate writerFlush)
         {
             this.writer = writer;
             this.writerFlush = writerFlush;
             this.operators = BinaryOrderOperatorsFactory.GetOperators(order);
         }
 
-        private IWriter writer;
-        private WriterFlushDelegate writerFlush;
+        private IPipeWriter writer;
+        private readonly WriterFlushDelegate writerFlush;
         private readonly IBinaryOrderOperators operators; 
         
          [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -161,7 +161,7 @@ namespace Letter.Box
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Flush()
         {
-            this.writerFlush();
+            this.writerFlush(this.writer);
         }
     }
 }

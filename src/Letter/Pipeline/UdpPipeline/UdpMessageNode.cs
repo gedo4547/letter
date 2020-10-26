@@ -7,9 +7,9 @@ using System.Threading.Tasks;
 namespace Letter
 {
     [EditorBrowsable(EditorBrowsableState.Never)]
-    public class DgramMessageNode : IDgramMessageNode, IDisposable
+    public class UdpMessageNode : IUdpMessageNode, IPipeWriter, IDisposable
     {
-        public DgramMessageNode(IMemoryOwner<byte> memoryOwner, Action<DgramMessageNode> onRelease)
+        public UdpMessageNode(IMemoryOwner<byte> memoryOwner, Action<UdpMessageNode> onRelease)
         {
             this.memoryOwner = memoryOwner;
             this.writeLength = 0;
@@ -18,10 +18,10 @@ namespace Letter
 
         private EndPoint point;
         private IMemoryOwner<byte> memoryOwner;
-        private Action<DgramMessageNode> onRelease;
+        private Action<UdpMessageNode> onRelease;
         private int writeLength;
         
-        public DgramMessageNode next;
+        public UdpMessageNode next;
         
         public int Length
         {
@@ -64,10 +64,10 @@ namespace Letter
         public void Write(ref ReadOnlyMemory<byte> memory)
         {
             var span = memory.Span;
-            this.Write(ref span);
+            this.Write(span);
         }
 
-        public void Write(ref ReadOnlySpan<byte> span)
+        public void Write(in ReadOnlySpan<byte> span)
         {
             int momoryLength = span.Length;
             
@@ -105,5 +105,7 @@ namespace Letter
             this.memoryOwner = null;
             this.onRelease = null;
         }
+
+        
     }
 }

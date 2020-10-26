@@ -8,9 +8,9 @@ namespace Letter
 {
     public struct WrappedDgramWriter
     {
-        public delegate void MemoryWritePushDelegate(DgramMessageNode node);
+        public delegate void MemoryWritePushDelegate(UdpMessageNode node);
         
-        public WrappedDgramWriter(DgramMessageNode node, ref BinaryOrder order, MemoryWritePushDelegate onMemoryPush)
+        public WrappedDgramWriter(UdpMessageNode node, ref BinaryOrder order, MemoryWritePushDelegate onMemoryPush)
         {
             this.order = order;
             this.node = node;
@@ -20,7 +20,7 @@ namespace Letter
         }
 
         private BinaryOrder order;
-        private DgramMessageNode node;
+        private UdpMessageNode node;
         private MemoryWritePushDelegate onMemoryPush;
         private readonly IBinaryOrderOperators operators; 
 
@@ -162,9 +162,9 @@ namespace Letter
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static void InternalWriteSpan(ReadOnlySpan<byte> span, ref int writeLength, DgramMessageNode node)
+        private static void InternalWriteSpan(in ReadOnlySpan<byte> span, ref int writeLength, UdpMessageNode node)
         {
-            node.Write(ref span);
+            node.Write(span);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

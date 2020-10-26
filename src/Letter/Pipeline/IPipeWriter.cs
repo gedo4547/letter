@@ -2,7 +2,7 @@
 
 namespace Letter
 {
-    public interface IWriter
+    public interface IPipeWriter
     {
         void Write(in ReadOnlySpan<byte> span);
     }

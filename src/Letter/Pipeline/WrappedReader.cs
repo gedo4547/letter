@@ -25,7 +25,7 @@ namespace Letter.Box
             get { return this.buffer.Length; }
         }
         
-         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool IsLengthEnough(long length)
         {
             return this.Length >= length;
