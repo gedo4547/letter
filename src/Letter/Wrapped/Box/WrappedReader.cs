@@ -244,8 +244,6 @@ namespace Letter.Box
             }
         }
         
-        
-        
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Flush()
         {
