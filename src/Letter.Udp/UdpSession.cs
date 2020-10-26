@@ -31,7 +31,7 @@ namespace Letter.Udp
             this.Scheduler = scheduler;
             this.MemoryPool = memoryPool;
             this.filterGroup = filterGroup;
-            this.LoaclAddress = this.udpSocket.LocalAddress;
+            this.LoaclAddress = this.udpSocket.BindAddress;
             
             this.onMemoryWritePush = this.OnMemoryWritePush;
             this.senderPipeline = new UdpPipeline(this.MemoryPool, this.Scheduler, this.OnSenderPipelineReceiveBuffer);

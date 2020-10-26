@@ -28,18 +28,18 @@ namespace Letter
         protected SocketAwaitableArgs sndArgs;
         private List<ArraySegment<byte>> bufferList;
         
-        public EndPoint LocalAddress
+        public EndPoint BindAddress
         {
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             get { return this.socket.LocalEndPoint; }
         }
-
+        
         public EndPoint RemoteAddress
         {
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             get { return this.rcvArgs.RemoteEndPoint; }
         }
-
+        
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void SettingRcvBufferSize(int rcvBufferSize)
         {
