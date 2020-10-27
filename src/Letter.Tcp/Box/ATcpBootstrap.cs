@@ -30,6 +30,11 @@ namespace Letter.Tcp.Box
         }
 
         protected abstract Task<TChannel> ChannelFactory(TOptions options, FilterGroupFactory groupFactory, SslFeature sslFeature);
+
+        public override ValueTask DisposeAsync()
+        {
+            return base.DisposeAsync();
+        }
     }
     
     class SslFeature

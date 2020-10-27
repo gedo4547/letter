@@ -9,7 +9,7 @@ namespace Letter.Tcp.Box
     {
         protected override Task<ITcpServerChannel> ChannelFactory(TcpServerOptions options, FilterGroupFactory groupFactory, SslFeature sslFeature)
         {
-            throw new System.NotImplementedException();
+            return Task.FromResult((ITcpServerChannel) new TcpServerChannel(options, groupFactory, sslFeature));
         }
     }
 }
