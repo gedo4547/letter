@@ -32,6 +32,9 @@ namespace Letter
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public override Span<byte> GetSpan(int sizeHint = 0) => this.writer.GetSpan(sizeHint);
 
+        
+        
+        
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Write(in ReadOnlySpan<byte> span) => this.writer.Write(span);
     }

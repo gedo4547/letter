@@ -40,7 +40,7 @@ namespace Letter.Box
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public byte ReadUInt8()
         {
-            var segment = this.ReadRange(ByteSizeConstants.Size_1);
+            var segment = this.ReadRange(1);
             var arr = segment.First.GetBinaryArray();
             return arr.Array[arr.Offset];
         }
@@ -49,13 +49,14 @@ namespace Letter.Box
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public short ReadInt16()
         {
-            var segment = this.ReadRange(ByteSizeConstants.Size_2);
+            int length = 2;
+            var segment = this.ReadRange(length);
             
-            if (segment.First.Length >= ByteSizeConstants.Size_2)
+            if (segment.First.Length >= length)
                 return this.operators.ReadInt16(segment.First.Span);
             else
             {
-                Span<byte> local = stackalloc byte[ByteSizeConstants.Size_2];
+                Span<byte> local = stackalloc byte[length];
                 segment.CopyTo(local);
                 return this.operators.ReadInt16(local);
             }
@@ -64,13 +65,13 @@ namespace Letter.Box
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public ushort ReadUInt16()
         {
-            var segment = this.ReadRange(ByteSizeConstants.Size_2);
-            
-            if (segment.First.Length >= ByteSizeConstants.Size_2)
+            int length = 2;
+            var segment = this.ReadRange(length);
+            if (segment.First.Length >= length)
                 return this.operators.ReadUInt16(segment.First.Span);
             else
             {
-                Span<byte> local = stackalloc byte[ByteSizeConstants.Size_2];
+                Span<byte> local = stackalloc byte[length];
                 segment.CopyTo(local);
                 return this.operators.ReadUInt16(local);
             }
@@ -79,14 +80,13 @@ namespace Letter.Box
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public int ReadInt32()
         {
-            var segment = this.ReadRange(ByteSizeConstants.Size_4);
-            
-            
-            if (segment.First.Length >= ByteSizeConstants.Size_4)
+            int length = 4;
+            var segment = this.ReadRange(length);
+            if (segment.First.Length >= length)
                 return this.operators.ReadInt32(segment.First.Span);
             else
             {
-                Span<byte> local = stackalloc byte[ByteSizeConstants.Size_4];
+                Span<byte> local = stackalloc byte[length];
                 segment.CopyTo(local);
                 return this.operators.ReadInt32(local);
             }
@@ -95,13 +95,13 @@ namespace Letter.Box
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public uint ReadUInt32()
         {
-            var segment = this.ReadRange(ByteSizeConstants.Size_4);
-            
-            if (segment.First.Length >= ByteSizeConstants.Size_4)
+            int length = 4;
+            var segment = this.ReadRange(length);
+            if (segment.First.Length >= length)
                 return this.operators.ReadUInt32(segment.First.Span);
             else
             {
-                Span<byte> local = stackalloc byte[ByteSizeConstants.Size_4];
+                Span<byte> local = stackalloc byte[length];
                 segment.CopyTo(local);
                 return this.operators.ReadUInt32(local);
             }
@@ -110,13 +110,14 @@ namespace Letter.Box
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public unsafe long ReadInt64()
         {
-            var segment = this.ReadRange(ByteSizeConstants.Size_8);
+            int length = 8;
+            var segment = this.ReadRange(length);
             
-            if (segment.First.Length >= ByteSizeConstants.Size_8)
+            if (segment.First.Length >= length)
                 return this.operators.ReadInt64(segment.First.Span);
             else
             {
-                Span<byte> local = stackalloc byte[ByteSizeConstants.Size_8];
+                Span<byte> local = stackalloc byte[length];
                 segment.CopyTo(local);
                 return this.operators.ReadInt64(local);
             }
@@ -125,13 +126,13 @@ namespace Letter.Box
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public ulong ReadUInt64()
         {
-            var segment = this.ReadRange(ByteSizeConstants.Size_8);
-            
-            if (segment.First.Length >= ByteSizeConstants.Size_8)
+            int length = 8;
+            var segment = this.ReadRange(length);
+            if (segment.First.Length >= length)
                 return this.operators.ReadUInt64(segment.First.Span);
             else
             {
-                Span<byte> local = stackalloc byte[ByteSizeConstants.Size_8];
+                Span<byte> local = stackalloc byte[length];
                 segment.CopyTo(local);
                 return this.operators.ReadUInt64(local);
             }

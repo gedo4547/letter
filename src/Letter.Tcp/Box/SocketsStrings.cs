@@ -1,4 +1,4 @@
-﻿﻿namespace Letter.Tcp
+﻿namespace Letter.Tcp
 {
     class SocketsStrings
     {

@@ -29,7 +29,7 @@ namespace Letter.Box
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Write(byte value)
         {
-            Span<byte> span = stackalloc byte[ByteSizeConstants.Size_1];
+            Span<byte> span = stackalloc byte[1];
             MemoryMarshal.Write<byte>(span, ref value);
             this.writer.Write(span);
         }
@@ -37,7 +37,7 @@ namespace Letter.Box
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Write(short value)
         {
-            Span<byte> span = stackalloc byte[ByteSizeConstants.Size_2];
+            Span<byte> span = stackalloc byte[2];
             this.operators.WriteInt16(span, ref value);
             this.writer.Write(span);
         }
@@ -45,7 +45,7 @@ namespace Letter.Box
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Write(ushort value)
         {
-            Span<byte> span = stackalloc byte[ByteSizeConstants.Size_2];
+            Span<byte> span = stackalloc byte[2];
             this.operators.WriteUInt16(span, ref value);
             this.writer.Write(span);
         }
@@ -53,7 +53,7 @@ namespace Letter.Box
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Write(int value)
         {
-            Span<byte> span = stackalloc byte[ByteSizeConstants.Size_4];
+            Span<byte> span = stackalloc byte[4];
             this.operators.WriteInt32(span, ref value);
             this.writer.Write(span);
         }
@@ -61,7 +61,7 @@ namespace Letter.Box
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Write(uint value)
         {
-            Span<byte> span = stackalloc byte[ByteSizeConstants.Size_4];
+            Span<byte> span = stackalloc byte[4];
             this.operators.WriteUInt32(span, ref value);
             this.writer.Write(span);
         }
@@ -69,7 +69,7 @@ namespace Letter.Box
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Write(long value)
         {
-            Span<byte> span = stackalloc byte[ByteSizeConstants.Size_8];
+            Span<byte> span = stackalloc byte[8];
             this.operators.WriteInt64(span, ref value);
             this.writer.Write(span);
         }
@@ -77,7 +77,7 @@ namespace Letter.Box
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Write(ulong value)
         {
-            Span<byte> span = stackalloc byte[ByteSizeConstants.Size_8];
+            Span<byte> span = stackalloc byte[8];
             this.operators.WriteUInt64(span, ref value);
             this.writer.Write(span);
         }
