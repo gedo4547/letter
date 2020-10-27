@@ -4,11 +4,11 @@ using System.Runtime.CompilerServices;
 
 namespace Letter.Box
 {
-    internal delegate void ReaderFlushDelegate(SequencePosition startPos, SequencePosition endPos);
+    public delegate void ReaderFlushDelegate(SequencePosition startPos, SequencePosition endPos);
 
     public ref struct WrappedReader
     {
-        internal WrappedReader(ReadOnlySequence<byte> buffer, BinaryOrder order, ReaderFlushDelegate readerFlush)
+        public WrappedReader(ReadOnlySequence<byte> buffer, BinaryOrder order, ReaderFlushDelegate readerFlush)
         {
             this.buffer = buffer;
             this.readerFlush = readerFlush;

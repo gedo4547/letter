@@ -12,20 +12,20 @@ namespace udp_text
         
         static async Task Main(string[] args)
         {
-            IUdpBootstrap bootstrap = UdpFactory.Bootstrap();
-            bootstrap.ConfigurationOptions(options =>
-            {
-                
-            });
-            bootstrap.AddChannelFilter<UdpFilter_2>();
-            
-            IUdpChannel s_channel = await bootstrap.BuildAsync();
-            await s_channel.StartAsync(s_p);
-            
-            IUdpChannel c_channel = await bootstrap.BuildAsync();
-            await c_channel.StartAsync(c_p);
-            
-            Console.ReadKey();
+            // IUdpBootstrap bootstrap = UdpFactory.Bootstrap();
+            // bootstrap.ConfigurationOptions(options =>
+            // {
+            //     
+            // });
+            // bootstrap.AddChannelFilter<UdpFilter_2>();
+            //
+            // IUdpChannel s_channel = await bootstrap.BuildAsync();
+            // await s_channel.StartAsync(s_p);
+            //
+            // IUdpChannel c_channel = await bootstrap.BuildAsync();
+            // await c_channel.StartAsync(c_p);
+            //
+            // Console.ReadKey();
         }
     }
 }

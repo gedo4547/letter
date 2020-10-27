@@ -5,16 +5,18 @@ using Letter.Box;
 
 namespace Letter.Bootstrap
 {
-    sealed class ChannelFilterGroup<TSession> : IAsyncDisposable where TSession : ISession
+    public sealed class ChannelFilterGroup<TSession, TChannelFilter> : IAsyncDisposable
+        where TSession : ISession
+        where TChannelFilter : IChannelFilter<TSession>
     {
-        public ChannelFilterGroup(List<IChannelFilter<TSession>> filters)
+        public ChannelFilterGroup(List<TChannelFilter> filters)
         {
             this.filters = filters;
         }
 
         private object readArgs;
         private object writeArgs;
-        private List<IChannelFilter<TSession>> filters;
+        private List<TChannelFilter> filters;
         
         public void OnChannelActive(TSession session)
         {
@@ -49,7 +51,7 @@ namespace Letter.Bootstrap
             int count = this.filters.Count;
             for (int i = 0; i < count; i++)
             {
-                this.filters[i].OnChannelRead(session, ref reader, readArgs);
+                this.filters[i].OnChannelRead(session, ref reader, this.readArgs);
             }
         }
         

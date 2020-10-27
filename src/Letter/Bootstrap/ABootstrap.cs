@@ -11,15 +11,14 @@ namespace Letter.Bootstrap
     {
         public ABootstrap()
         {
-            this.filterGroupFactory = new FilterGroupFactory<TSession, TChannelFilter>();
+            this.filterGroupFactory = new ChannelFilterGroupFactory<TSession, TChannelFilter>();
         }
 
         protected TOptions options;
         
         private Action<TOptions> optionsFactory;
-        private FilterGroupFactory<TSession, TChannelFilter> filterGroupFactory;
+        private ChannelFilterGroupFactory<TSession, TChannelFilter> filterGroupFactory;
         
-
         public void ConfigurationOptions(Action<TOptions> optionsFactory)
         {
             if (optionsFactory == null)
@@ -55,7 +54,7 @@ namespace Letter.Bootstrap
            this.filterGroupFactory.AddFilterCreator(func);
         }
         
-        protected abstract Task<TChannel> ChannelFactory(TOptions options, FilterGroupFactory<TSession, TChannelFilter> filterGroupFactory);
+        protected abstract Task<TChannel> ChannelFactory(TOptions options, ChannelFilterGroupFactory<TSession, TChannelFilter> filterGroupFactory);
 
         public virtual async ValueTask DisposeAsync()
         {

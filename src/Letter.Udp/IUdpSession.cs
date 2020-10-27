@@ -1,15 +1,14 @@
-﻿using System.Buffers;
-using System.Net;
+﻿using System.Net;
 using System.Threading.Tasks;
 
-namespace Letter.Udp
+namespace Letter.Udp.Box
 {
-    public interface IUdpSession : ISession
+    public interface IUdpSession : Letter.Bootstrap.ISession
     {
         EndPoint RcvAddress { get; }
         EndPoint SndAddress { get; }
-
+        
+        
         Task WriteAsync(EndPoint remoteAddress, object obj);
-        Task WriteAsync(EndPoint remoteAddress, ref ReadOnlySequence<byte> sequence);
     }
 }

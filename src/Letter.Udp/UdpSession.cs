@@ -3,149 +3,196 @@ using System.Buffers;
 using System.IO.Pipelines;
 using System.Net;
 using System.Net.Sockets;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
+using Letter.Box;
 
-using FilterGroup = Letter.DgramChannelFilterGroup<Letter.Udp.IUdpSession, Letter.Udp.IUdpChannelFilter>;
+using FilterGroup = Letter.Bootstrap.ChannelFilterGroup<Letter.Udp.Box.IUdpSession, Letter.Udp.Box.IUdpChannelFilter>;
 
-
-namespace Letter.Udp
+namespace Letter.Udp.Box
 {
-    partial class UdpSession : IUdpSession
+    public class UdpSession : IUdpSession
     {
         public UdpSession(Socket socket, UdpOptions options, MemoryPool<byte> memoryPool, PipeScheduler scheduler, FilterGroup filterGroup)
         {
             this.Id = IdGeneratorHelper.GetNextId();
+            this.socket = new UdpSocket(socket, scheduler);
+            this.SettingSocket(this.socket, options);
             
-            this.udpSocket = new UdpSocket(socket, scheduler);
-            if (options.RcvTimeout != null)
-                udpSocket.SettingRcvTimeout(options.RcvTimeout.Value);
-            if (options.SndTimeout != null)
-                udpSocket.SettingSndTimeout(options.SndTimeout.Value);
-            
-            if (options.RcvBufferSize != null)
-                udpSocket.SettingRcvBufferSize(options.RcvBufferSize.Value);
-            if (options.SndBufferSize != null)
-                udpSocket.SettingSndBufferSize(options.SndBufferSize.Value);
-            
-            this.order = options.Order;
+            this.Order = options.Order;
             this.Scheduler = scheduler;
             this.MemoryPool = memoryPool;
             this.filterGroup = filterGroup;
-            this.LoaclAddress = this.udpSocket.BindAddress;
+            this.LoaclAddress = this.socket.BindAddress;
             
-            this.onMemoryWritePush = this.OnMemoryWritePush;
-            this.senderPipeline = new UdpPipeline(this.MemoryPool, this.Scheduler, this.OnSenderPipelineReceiveBuffer);
-            this.receiverPipeline = new UdpPipeline(this.MemoryPool, this.Scheduler, this.OnReceiverPipelineReceiveBuffer);
+            this.rcvPipeline = new UdpPipeline(this.MemoryPool, scheduler, OnRcvPipelineRead);
+            this.sndPipeline = new UdpPipeline(this.MemoryPool, scheduler, OnSndPipelineRead);
+
+            this.readerFlushCallback = (startPos, endPos) => { };
+            this.writerFlushCallback = (writer) =>
+            {
+                this.SndPipeWriter.Write((UdpMessageNode) writer);
+            };
         }
+
+        private UdpSocket socket;
+        private FilterGroup filterGroup;
+        private UdpPipeline sndPipeline;
+        private UdpPipeline rcvPipeline;
+        private ReaderFlushDelegate readerFlushCallback;
+        private WriterFlushDelegate writerFlushCallback;
         
-        public string Id { get; private set; }
-        public EndPoint LoaclAddress { get; private set; }
+        private object sync = new object();
         
+        public string Id { get; }
+        public BinaryOrder Order { get; }
+        public EndPoint LoaclAddress { get; }
         public EndPoint RcvAddress { get; private set; }
         public EndPoint SndAddress { get; private set; }
-        
-        public PipeScheduler Scheduler { get; private set; }
-        public MemoryPool<byte> MemoryPool { get; private set; }
-        
         public EndPoint RemoteAddress
         {
             get { throw new Exception("please use IUdpSession.RcvAddress or IUdpSession.SndAddress"); }
         }
+        public MemoryPool<byte> MemoryPool { get; }
+        public PipeScheduler Scheduler { get; }
 
-        private UdpSocket udpSocket;
-        private UdpPipeline senderPipeline;
-        private UdpPipeline receiverPipeline;
-
-        private BinaryOrder order;
-        private FilterGroup filterGroup;
-        private WrappedDgramWriter.MemoryWritePushDelegate onMemoryWritePush;
-
-        private Task memoryTask;
-
-        protected volatile bool isDisposed = false;
-        
-        private object writerSync = new object();
-        
-        public void StartAsync()
+        public IUdpPipelineReader RcvPipeReader
         {
-            this.StartReceiveSenderPipelineBuffer();
-            this.StartReceiveReceiverPipelineBuffer();
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            get { return this.rcvPipeline; }
+        }
+        
+        public IUdpPipelineWriter RcvPipeWriter
+        {
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            get { return this.rcvPipeline; }
+        }
+        
+        public IUdpPipelineReader SndPipeReader
+        {
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            get { return this.sndPipeline; }
+        }
+
+        public IUdpPipelineWriter SndPipeWriter
+        {
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            get { return this.sndPipeline; }
+        }
+        
+        public void Start()
+        {
+            this.sndPipeline.ReceiveAsync();
+            this.rcvPipeline.ReceiveAsync();
+        }
+        
+        private async Task SocketReceiveAsync()
+        {
+            while (true)
+            {
+                var node = this.RcvPipeWriter.GetDgramNode();
+                var memory = node.GetMomory();
+                try
+                {
+                    int transportBytes = await this.socket.ReceiveAsync(this.LoaclAddress, ref memory);
+                    node.SettingPoint(this.socket.RemoteAddress);
+                    node.SettingWriteLength(transportBytes);
+                    this.RcvPipeWriter.Write(node);
+                }
+                catch(Exception ex)
+                {
+                    await node.ReleaseAsync();
+                    if (SocketErrorHelper.IsSocketDisabledError(ex) || ex is ObjectDisposedException)
+                    {
+                        await this.DisposeAsync();
+                    }
+                    else
+                    {
+                        this.filterGroup.OnChannelException(this, ex);
+                    }
+                    return;
+                }
+            }
+        }
+
+        private void OnRcvPipelineRead(IUdpPipelineReader reader)
+        {
+            while (true)
+            {
+                UdpMessageNode node = reader.Read();
+                if (node == null) break;
+
+                this.RcvAddress = node.Point;
+                Memory<byte> memory = node.GetReadableBuffer();
+                var w_reader = new WrappedReader(new ReadOnlySequence<byte>(memory), this.Order, this.readerFlushCallback);
+                this.filterGroup.OnChannelRead(this, ref w_reader);
+                node.ReleaseAsync().NoAwait();
+            }
             
-            this.memoryTask = this.SocketReceiveAsync();
-            
-            this.filterGroup.OnChannelActive(this);
+            this.RcvPipeReader.ReceiveAsync();
         }
         
         public Task WriteAsync(EndPoint remoteAddress, object obj)
         {
-            lock (writerSync)
+            lock (sync)
             {
-                if (this.isDisposed)
-                {
-                    throw new ObjectDisposedException("UdpSession has been released");
-                }
-                
-                return this.WriteBufferAsync(remoteAddress, obj);
+                this.SndAddress = remoteAddress;
+                var node = this.SndPipeWriter.GetDgramNode();
+                node.SettingPoint(remoteAddress);
+                var writer = new WrappedWriter(node, this.Order, this.writerFlushCallback);
+                this.filterGroup.OnChannelWrite(this, ref writer);
+
+                return Task.CompletedTask;
             }
         }
 
-        public Task WriteAsync(EndPoint remoteAddress, ref ReadOnlySequence<byte> sequence)
+        private async void OnSndPipelineRead(IUdpPipelineReader reader)
         {
-            lock (writerSync)
+            while (true)
             {
-                if (this.isDisposed)
-                {
-                    throw new ObjectDisposedException("UdpSession has been released");
-                }
+                var node = reader.Read();
+                if (node == null) break;
+
+                var memory = node.GetReadableBuffer();
+                var buffer = new ReadOnlySequence<byte>(memory);
+                var address = node.Point;
                 
-                return this.WriteBufferAsync(remoteAddress, ref sequence);
+                try
+                {
+                    await this.socket.SendAsync(address, ref buffer);
+                }
+                catch (Exception ex)
+                {
+                    if (!SocketErrorHelper.IsSocketDisabledError(ex) || ex is ObjectDisposedException)
+                    {
+                        this.filterGroup.OnChannelException(this, ex);
+                    }
+                }
+                finally
+                {
+                    await node.ReleaseAsync();
+                }
             }
+            
+            this.SndPipeReader.ReceiveAsync();
         }
         
-        public async ValueTask DisposeAsync()
+        private void SettingSocket(UdpSocket socket, UdpOptions options)
         {
-            if (this.isDisposed)
-            {
-                return;
-            }
-
-            this.isDisposed = true;
+            if (options.RcvTimeout != null)
+                socket.SettingRcvTimeout(options.RcvTimeout.Value);
+            if (options.SndTimeout != null)
+                socket.SettingSndTimeout(options.SndTimeout.Value);
             
-            this.filterGroup.OnChannelInactive(this);
+            if (options.RcvBufferSize != null)
+                socket.SettingRcvBufferSize(options.RcvBufferSize.Value);
+            if (options.SndBufferSize != null)
+                socket.SettingSndBufferSize(options.SndBufferSize.Value);
+        }
 
-            this.Id = string.Empty;
-            
-            await this.udpSocket.DisposeAsync();
-            
-            if (this.memoryTask != null)
-            {
-                await this.memoryTask;
-            }
-            
-            if (this.senderPipeline != null)
-            {
-                this.senderPipeline.Dispose();
-            }
-
-            if (this.receiverPipeline != null)
-            {
-                this.receiverPipeline.Dispose();
-            }
-
-            if (this.filterGroup != null)
-            {
-                await this.filterGroup.DisposeAsync();
-            }
-
-            if (this.onMemoryWritePush != null)
-            {
-                this.onMemoryWritePush = null;
-            }
-            
-            if (this.MemoryPool != null)
-            {
-                this.MemoryPool.Dispose();
-            }
+        public ValueTask DisposeAsync()
+        {
+            throw new System.NotImplementedException();
         }
     }
 }

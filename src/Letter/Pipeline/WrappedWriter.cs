@@ -5,18 +5,18 @@ using System.Runtime.InteropServices;
 
 namespace Letter.Box
 {
-    internal delegate void WriterFlushDelegate(IPipeWriter writer);
+    public delegate void WriterFlushDelegate(IWrappedWriter writer);
     
     public ref struct WrappedWriter
     {
-        internal WrappedWriter(IPipeWriter writer, BinaryOrder order, WriterFlushDelegate writerFlush)
+        public WrappedWriter(IWrappedWriter writer, BinaryOrder order, WriterFlushDelegate writerFlush)
         {
             this.writer = writer;
             this.writerFlush = writerFlush;
             this.operators = BinaryOrderOperatorsFactory.GetOperators(order);
         }
 
-        private IPipeWriter writer;
+        private readonly IWrappedWriter writer;
         private readonly WriterFlushDelegate writerFlush;
         private readonly IBinaryOrderOperators operators; 
         

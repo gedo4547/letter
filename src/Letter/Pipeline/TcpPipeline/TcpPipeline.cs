@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO.Pipelines;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 
 namespace Letter
@@ -19,11 +20,13 @@ namespace Letter
 
         public TcpPipelineReader Reader
         {
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
             get { return this.reader; }
         }
 
         public TcpPipelineWriter Writer
         {
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
             get { return this.writer; }
         }
 

@@ -9,6 +9,8 @@ namespace Letter.Bootstrap
     {
         string Id { get; }
 
+        BinaryOrder Order { get; }
+
         EndPoint LoaclAddress { get; }
         
         EndPoint RemoteAddress { get; }

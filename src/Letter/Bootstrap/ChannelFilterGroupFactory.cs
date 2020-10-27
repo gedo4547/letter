@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 
 namespace Letter.Bootstrap
 {
-    public sealed class FilterGroupFactory<TSession, TChannelFilter> : IAsyncDisposable 
+    public sealed class ChannelFilterGroupFactory<TSession, TChannelFilter> : IAsyncDisposable
         where TSession : ISession
         where TChannelFilter : IChannelFilter<TSession>
     {
@@ -20,7 +20,7 @@ namespace Letter.Bootstrap
             this.creators.Add(func);
         }
 
-        public ChannelFilterGroup<TSession> CreateFilters()
+        public ChannelFilterGroup<TSession, TChannelFilter> CreateGroup()
         {
             var filters = new List<TChannelFilter>();
             for (int i = 0; i < this.creators.Count; i++)
@@ -34,7 +34,7 @@ namespace Letter.Bootstrap
                 filters.Add(filter);
             }
 
-            return new ChannelFilterGroup<TSession>(filters);
+            return new ChannelFilterGroup<TSession, TChannelFilter>(filters);
         }
 
         public ValueTask DisposeAsync()

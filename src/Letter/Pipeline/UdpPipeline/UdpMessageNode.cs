@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace Letter
 {
     [EditorBrowsable(EditorBrowsableState.Never)]
-    public class UdpMessageNode : IUdpMessageNode, IPipeWriter, IDisposable
+    public class UdpMessageNode : IUdpMessageNode, IWrappedWriter, IDisposable
     {
         public UdpMessageNode(IMemoryOwner<byte> memoryOwner, Action<UdpMessageNode> onRelease)
         {

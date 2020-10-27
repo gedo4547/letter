@@ -1,17 +1,16 @@
 ﻿using System.Threading.Tasks;
+using Letter.Bootstrap;
 
-using FilterGroupFactory = Letter.DgramChannelFilterGroupFactory<Letter.Udp.IUdpSession, Letter.Udp.IUdpChannelFilter>;
+using FilterFactory = Letter.Bootstrap.ChannelFilterGroupFactory<Letter.Udp.Box.IUdpSession, Letter.Udp.Box.IUdpChannelFilter>;
 
-
-namespace Letter.Udp
+namespace Letter.Udp.Box
 {
-    sealed class UdpBootstrap : ADgramBootstrap<UdpOptions, IUdpSession, IUdpChannelFilter, IUdpChannel>, IUdpBootstrap
+    sealed class UdpBootstrap : Letter.Bootstrap.ABootstrap<UdpOptions, IUdpSession, IUdpChannel, IUdpChannelFilter>, IUdpBootstrap
     {
-        protected override Task<IUdpChannel> ChannelFactory(UdpOptions options, FilterGroupFactory groupFactory)
+        protected override Task<IUdpChannel> ChannelFactory(UdpOptions options, FilterFactory filterFactory)
         {
-            IUdpChannel channel = new UdpChannel(options, groupFactory);
-
-            return Task.FromResult(channel);
+            UdpChannel channel = new UdpChannel(options, filterFactory);
+            return Task.FromResult((IUdpChannel) channel);
         }
     }
 }
