@@ -103,7 +103,9 @@ namespace Letter.Tcp
         
         public abstract Task StartAsync();
 
-        public abstract Task WriteAsync(object obj);
+        public abstract void Write(object obj);
+
+        public abstract Task FlushAsync();
         
         protected void Run()
         {

@@ -51,7 +51,7 @@ namespace System.Threading
             {
                 while (_workItems.TryDequeue(out Work item))
                 {
-                    item.Callback(item.State);
+                    item.callback(item.state);
                 }
 
                 // All work done.
@@ -84,13 +84,13 @@ namespace System.Threading
 
         readonly struct Work
         {
-            public readonly Action<object> Callback;
-            public readonly object State;
-
+            public readonly object state;
+            public readonly Action<object> callback;
+            
             public Work(Action<object> callback, object state)
             {
-                Callback = callback;
-                State = state;
+                this.state = state;
+                this.callback = callback;
             }
         }
     }

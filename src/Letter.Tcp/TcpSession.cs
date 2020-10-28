@@ -63,19 +63,17 @@ namespace Letter.Tcp
             this.Input.AdvanceTo(startpos, endpos);
         }
 
-        public override Task WriteAsync(object o)
+        public override void Write(object o)
         {
             lock (sync)
             {
                 WrappedWriter writer = new WrappedWriter(this.Output, this.Order, this.writerFlushCallback);
                 this.filterPipeline.OnTransportWrite(this, ref writer, o);
             }
-
-            return this.WriteFlushAsync();
         }
-        
+
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private async Task WriteFlushAsync()
+        public async override Task FlushAsync()
         {
             FlushResult result = await this.Output.FlushAsync();
             if (result.IsCompleted || result.IsCanceled)
@@ -83,7 +81,7 @@ namespace Letter.Tcp
                 this.Output.Complete();
             }
         }
-
+        
         public override ValueTask DisposeAsync()
         {
             return base.DisposeAsync();

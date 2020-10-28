@@ -4,6 +4,8 @@ namespace Letter.Tcp
 {
     public interface ITcpSession : ISession
     {
-        Task WriteAsync(object o);
+        void Write(object o);
+
+        Task FlushAsync();
     }
 }

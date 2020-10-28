@@ -53,11 +53,14 @@ namespace Letter.Tcp
                         clientTlsOptions.CheckCertificateRevocation);
                     break;
             }
-            
-            
         }
 
-        public override Task WriteAsync(object obj)
+        public override void Write(object obj)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public override Task FlushAsync()
         {
             throw new System.NotImplementedException();
         }
