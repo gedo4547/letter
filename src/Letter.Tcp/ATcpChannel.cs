@@ -1,19 +1,16 @@
-﻿
-
-using System;
+﻿using System;
 using System.Buffers;
 using System.IO.Pipelines;
 using System.Net.Sockets;
-using FilterGroupFactory = Letter.ChannelFilterGroupFactory<Letter.Tcp.ITcpSession, Letter.Tcp.ITcpChannelFilter>;
 
 namespace Letter.Tcp
 {
     abstract class ATcpChannel
     {
-        public ATcpChannel(FilterGroupFactory groupFactory, SslFeature sslFeature)
+        public ATcpChannel(Action<IFilterPipeline<ITcpSession>> handler, SslFeature sslFeature)
         {
             this.sslFeature = sslFeature;
-            this.groupFactory = groupFactory;
+            this.handler = handler;
 
             if (sslFeature == null)
             {
@@ -26,19 +23,30 @@ namespace Letter.Tcp
         }
         
         private SslFeature sslFeature;
-        private FilterGroupFactory groupFactory;
+        private Action<IFilterPipeline<ITcpSession>> handler;
         protected Func<Socket, ATcpOptions, PipeScheduler, MemoryPool<byte>, ATcpSession> createSession;
         
         private ATcpSession CreateSession(Socket socket, ATcpOptions options, PipeScheduler scheduler, MemoryPool<byte> pool)
         {
-            var filterGroup = groupFactory.CreateGroup();
-            return new TcpSession(socket, options, scheduler, pool, filterGroup);
+            return new TcpSession(socket, options, scheduler, pool, this.CreateFilterPipeline());
         }
         
         private ATcpSession CreateSslSession(Socket socket, ATcpOptions options, PipeScheduler scheduler, MemoryPool<byte> pool)
         {
-            var filterGroup = groupFactory.CreateGroup();
-            return new TcpSslSession(socket, options, scheduler, pool, this.sslFeature, filterGroup);
+            return new TcpSslSession(socket, options, scheduler, pool, this.sslFeature, this.CreateFilterPipeline());
         }
+
+        private FilterPipeline<ITcpSession> CreateFilterPipeline()
+        {
+            FilterPipeline<ITcpSession> filterPipeline = new FilterPipeline<ITcpSession>();
+            if (this.handler != null)
+            {
+                this.handler(filterPipeline);
+            }
+
+            return filterPipeline;
+        }
+
+
     }
 }

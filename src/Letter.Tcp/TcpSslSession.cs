@@ -8,8 +8,8 @@ namespace Letter.Tcp
 {
     class TcpSslSession : ATcpSession
     {
-        public TcpSslSession(Socket socket, ATcpOptions options, PipeScheduler scheduler, MemoryPool<byte> pool, SslFeature sslFeature, ChannelFilterGroup<ITcpSession, ITcpChannelFilter> filterGroup)
-            : base(socket, options, scheduler, pool, filterGroup)
+        public TcpSslSession(Socket socket, ATcpOptions options, PipeScheduler scheduler, MemoryPool<byte> pool, SslFeature sslFeature, FilterPipeline<ITcpSession> filterPipeline)
+            : base(socket, options, scheduler, pool, filterPipeline)
         {
         }
 

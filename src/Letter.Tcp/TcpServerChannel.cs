@@ -5,14 +5,12 @@ using System.Net.Sockets;
 using System.Threading;
 using System.Threading.Tasks;
 
-using FilterGroupFactory = Letter.ChannelFilterGroupFactory<Letter.Tcp.ITcpSession, Letter.Tcp.ITcpChannelFilter>;
-
 namespace Letter.Tcp
 {
     class TcpServerChannel : ATcpChannel, ITcpServerChannel
     {
-        public TcpServerChannel(TcpServerOptions options, FilterGroupFactory groupFactory, SslFeature sslFeature)
-            : base(groupFactory, sslFeature)
+        public TcpServerChannel(TcpServerOptions options, Action<IFilterPipeline<ITcpSession>> handler, SslFeature sslFeature)
+            : base(handler, sslFeature)
         {
             this.options = options;
             this.memoryPool = this.options.MemoryPoolFactory();
@@ -122,7 +120,7 @@ namespace Letter.Tcp
             }
         }
         
-        public ValueTask DisposeAsync()
+        public async ValueTask DisposeAsync()
         {
             if (this.socketHandle != null)
             {
@@ -133,13 +131,13 @@ namespace Letter.Tcp
             {
                 this.listenSocket.Dispose();
             }
+            
+            await acceptTask;
 
             if (this.memoryPool != null)
             {
                 this.memoryPool.Dispose();
             }
-
-            return default;
         }
     }
 }

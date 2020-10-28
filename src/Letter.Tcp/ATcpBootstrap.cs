@@ -2,13 +2,10 @@
 using System.IO;
 using System.Net.Security;
 using System.Threading.Tasks;
-using Letter;
-
-using FilterGroupFactory = Letter.ChannelFilterGroupFactory<Letter.Tcp.ITcpSession, Letter.Tcp.ITcpChannelFilter>;
 
 namespace Letter.Tcp
 {
-    abstract class ATcpBootstrap<TOptions, TChannel> : ABootstrap<TOptions, ITcpSession, TChannel, ITcpChannelFilter>, ITcpBootstrap<TOptions, TChannel>
+    abstract class ATcpBootstrap<TOptions, TChannel> : ABootstrap<TOptions, ITcpSession, TChannel>, ITcpBootstrap<TOptions, TChannel>
         where TOptions : class, IOptions, new()
         where TChannel : IChannel
     {
@@ -23,13 +20,13 @@ namespace Letter.Tcp
             
             this.sslFeature = new SslFeature(sslOptions, sslStreamFactory);
         }
-        
-        protected override Task<TChannel> ChannelFactory(TOptions options, FilterGroupFactory groupFactory)
-        {
-            return this.ChannelFactory(options, groupFactory, this.sslFeature);
-        }
 
-        protected abstract Task<TChannel> ChannelFactory(TOptions options, FilterGroupFactory groupFactory, SslFeature sslFeature);
+        protected override Task<TChannel> ChannelFactory(TOptions options, Action<IFilterPipeline<ITcpSession>> handler)
+        {
+            return this.ChannelFactory(options, handler, this.sslFeature);
+        }
+        
+        protected abstract Task<TChannel> ChannelFactory(TOptions options, Action<IFilterPipeline<ITcpSession>> handler, SslFeature sslFeature);
 
         public override ValueTask DisposeAsync()
         {

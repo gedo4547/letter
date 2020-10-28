@@ -5,25 +5,24 @@ using System.Threading.Tasks;
 
 namespace Letter
 {
-    public sealed class ChannelFilterGroup<TSession, TChannelFilter> : IAsyncDisposable
-        where TSession : ISession
-        where TChannelFilter : IChannelFilter<TSession>
+    public sealed class FilterPipeline<TSession> : IFilterPipeline<TSession>, IAsyncDisposable where TSession : ISession
     {
-        public ChannelFilterGroup(List<TChannelFilter> filters)
-        {
-            this.filters = filters;
-        }
-
         private object readArgs;
         private object writeArgs;
-        private List<TChannelFilter> filters;
+        
+        private List<IFilter<TSession>> filters = new List<IFilter<TSession>>();
+        
+        public void Add(IFilter<TSession> filter)
+        {
+            this.filters.Add(filter);
+        }
         
         public void OnChannelActive(TSession session)
         {
             int count = this.filters.Count;
             for (int i = 0; i < count; i++)
             {
-                this.filters[i].OnChannelActive(session);
+                this.filters[i].OnTransportActive(session);
             }
         }
 
@@ -32,7 +31,7 @@ namespace Letter
             int count = this.filters.Count;
             for (int i = 0; i < count; i++)
             {
-                this.filters[i].OnChannelInactive(session);
+                this.filters[i].OnTransportInactive(session);
             }
         }
 
@@ -41,7 +40,7 @@ namespace Letter
             int count = this.filters.Count;
             for (int i = 0; i < count; i++)
             {
-                this.filters[i].OnChannelException(session, ex);
+                this.filters[i].OnTransportException(session, ex);
             }
         }
 
@@ -51,7 +50,7 @@ namespace Letter
             int count = this.filters.Count;
             for (int i = 0; i < count; i++)
             {
-                this.filters[i].OnChannelRead(session, ref reader, this.readArgs);
+                this.filters[i].OnTransportRead(session, ref reader, this.readArgs);
             }
         }
         
@@ -61,7 +60,7 @@ namespace Letter
             int count = this.filters.Count;
             for (int i = 0; i < count; i++)
             {
-                this.filters[i].OnChannelWrite(session, ref writer, this.writeArgs);
+                this.filters[i].OnTransportWrite(session, ref writer, this.writeArgs);
             }
         }
 

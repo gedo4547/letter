@@ -5,15 +5,12 @@ using System.Net.Sockets;
 using System.Threading;
 using System.Threading.Tasks;
 
-
-using FilterGroupFactory = Letter.ChannelFilterGroupFactory<Letter.Tcp.ITcpSession, Letter.Tcp.ITcpChannelFilter>;
-
 namespace Letter.Tcp
 {
     class TcpClientChannel : ATcpChannel, ITcpClientChannel
     {
-        public TcpClientChannel(TcpClientOptions options, FilterGroupFactory groupFactory, SslFeature sslFeature) 
-            : base(groupFactory, sslFeature)
+        public TcpClientChannel(TcpClientOptions options, Action<IFilterPipeline<ITcpSession>> handler, SslFeature sslFeature) 
+            : base(handler, sslFeature)
         {
             this.options = options;
             this.memoryPool = this.options.MemoryPoolFactory();

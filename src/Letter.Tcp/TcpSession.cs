@@ -7,8 +7,8 @@ namespace Letter.Tcp
 {
     class TcpSession : ATcpSession
     {
-        public TcpSession(Socket socket, ATcpOptions options, PipeScheduler scheduler, MemoryPool<byte> pool, ChannelFilterGroup<ITcpSession, ITcpChannelFilter> filterGroup) 
-            : base(socket, options, scheduler, pool, filterGroup)
+        public TcpSession(Socket socket, ATcpOptions options, PipeScheduler scheduler, MemoryPool<byte> pool, FilterPipeline<ITcpSession> filterPipeline) 
+            : base(socket, options, scheduler, pool, filterPipeline)
         {
         }
         

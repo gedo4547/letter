@@ -1,22 +1,22 @@
-﻿using System.Net;
+﻿using System;
+using System.Net;
 using System.Net.Sockets;
 using System.Threading.Tasks;
-
-using FilterFactory = Letter.ChannelFilterGroupFactory<Letter.Udp.IUdpSession, Letter.Udp.IUdpChannelFilter>;
 
 namespace Letter.Udp
 {
     sealed class UdpChannel : IUdpChannel
     {
-        public UdpChannel(UdpOptions options, FilterFactory groupFactory)
+        public UdpChannel(UdpOptions options, Action<IFilterPipeline<IUdpSession>> handler)
         {
             this.options = options;
-            this.groupFactory = groupFactory;
+            this.filterPipeline = new FilterPipeline<IUdpSession>();
+            if (handler != null) handler(this.filterPipeline);
         }
 
         private Socket socket;
         private UdpOptions options;
-        private FilterFactory groupFactory;
+        private FilterPipeline<IUdpSession> filterPipeline;
         
         public EndPoint BindAddress { get; private set; }
         

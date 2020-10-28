@@ -4,7 +4,7 @@ using System.Net.Security;
 
 namespace Letter.Tcp
 {
-    public interface ITcpBootstrap<TOptions, TChannel> : Letter.IBootstrap<TOptions, ITcpSession, TChannel, ITcpChannelFilter>
+    public interface ITcpBootstrap<TOptions, TChannel> : IBootstrap<TOptions, ITcpSession, TChannel>
         where TOptions : class, IOptions, new()
         where TChannel : IChannel
     {

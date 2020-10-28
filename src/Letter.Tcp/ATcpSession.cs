@@ -10,7 +10,7 @@ namespace Letter.Tcp
 {
     abstract class ATcpSession : ITcpSession
     {
-        public ATcpSession(Socket socket, ATcpOptions options, PipeScheduler scheduler, MemoryPool<byte> pool, ChannelFilterGroup<ITcpSession, ITcpChannelFilter> filterGroup)
+        public ATcpSession(Socket socket, ATcpOptions options, PipeScheduler scheduler, MemoryPool<byte> pool, FilterPipeline<ITcpSession> filterPipeline)
         {
             this.Id = IdGeneratorHelper.GetNextId();
             this.Order = options.Order;
@@ -19,7 +19,7 @@ namespace Letter.Tcp
             this.MemoryPool = pool;
             this.Scheduler = scheduler;
             
-            this.filterGroup = filterGroup;
+            this.filterPipeline = filterPipeline;
             this.socket = new TcpSocket(socket, scheduler);
             this.LoaclAddress = this.socket.BindAddress;
             this.RemoteAddress = this.socket.RemoteAddress;
@@ -41,8 +41,8 @@ namespace Letter.Tcp
         public PipeScheduler Scheduler { get; }
         
         private TcpSocket socket;
-        
-        protected ChannelFilterGroup<ITcpSession, ITcpChannelFilter> filterGroup;
+
+        protected FilterPipeline<ITcpSession> filterPipeline;
         
         
         public abstract Task StartAsync();

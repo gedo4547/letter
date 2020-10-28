@@ -2,22 +2,16 @@
 using System.Threading.Tasks;
 
 namespace Letter
-{
-    public abstract class ABootstrap<TOptions, TSession, TChannel, TChannelFilter> : IBootstrap<TOptions, TSession, TChannel, TChannelFilter>
+{ 
+    public abstract class ABootstrap<TOptions, TSession, TChannel> : IBootstrap<TOptions, TSession, TChannel>
         where TOptions : class, IOptions, new()
         where TChannel : IChannel
         where TSession : ISession
-        where TChannelFilter : IChannelFilter<TSession>
     {
-        public ABootstrap()
-        {
-            this.filterGroupFactory = new ChannelFilterGroupFactory<TSession, TChannelFilter>();
-        }
-
         protected TOptions options;
         
         private Action<TOptions> optionsFactory;
-        private ChannelFilterGroupFactory<TSession, TChannelFilter> filterGroupFactory;
+        private Action<IFilterPipeline<TSession>> filterPipelineHandler;
         
         public void ConfigurationOptions(Action<TOptions> optionsFactory)
         {
@@ -29,6 +23,16 @@ namespace Letter
             this.optionsFactory = optionsFactory;
         }
 
+        public void ConfigurationFilter(Action<IFilterPipeline<TSession>> handler)
+        {
+            if (handler == null)
+            {
+                throw new ArgumentNullException(nameof(handler));
+            }
+
+            this.filterPipelineHandler = handler;
+        }
+        
         public virtual Task<TChannel> BuildAsync()
         {
             if (this.options == null)
@@ -40,25 +44,15 @@ namespace Letter
                 this.options = new TOptions();
                 this.optionsFactory(this.options);
             }
-
-            return this.ChannelFactory(this.options, this.filterGroupFactory);
+            
+            return this.ChannelFactory(this.options, this.filterPipelineHandler);
         }
         
-        public void AddChannelFilter<TFilter>() where TFilter : TChannelFilter, new()
-        {
-            this.AddChannelFilter(() => { return new TFilter(); });
-        }
-
-        public void AddChannelFilter(Func<TChannelFilter> func)
-        {
-           this.filterGroupFactory.AddFilterCreator(func);
-        }
+        protected abstract Task<TChannel> ChannelFactory(TOptions options, Action<IFilterPipeline<TSession>> handler);
         
-        protected abstract Task<TChannel> ChannelFactory(TOptions options, ChannelFilterGroupFactory<TSession, TChannelFilter> filterGroupFactory);
-
-        public virtual async ValueTask DisposeAsync()
+        public virtual ValueTask DisposeAsync()
         {
-            await this.filterGroupFactory.DisposeAsync();
+            return default;
         }
     }
 }

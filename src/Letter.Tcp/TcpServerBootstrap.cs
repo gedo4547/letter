@@ -1,15 +1,13 @@
-﻿using System.Threading.Tasks;
-
-
-using FilterGroupFactory = Letter.ChannelFilterGroupFactory<Letter.Tcp.ITcpSession, Letter.Tcp.ITcpChannelFilter>;
+﻿using System;
+using System.Threading.Tasks;
 
 namespace Letter.Tcp
 {
     sealed class TcpServerBootstrap : ATcpBootstrap<TcpServerOptions, ITcpServerChannel>, ITcpServerBootstrap
     {
-        protected override Task<ITcpServerChannel> ChannelFactory(TcpServerOptions options, FilterGroupFactory groupFactory, SslFeature sslFeature)
+        protected override Task<ITcpServerChannel> ChannelFactory(TcpServerOptions options, Action<IFilterPipeline<ITcpSession>> handler, SslFeature sslFeature)
         {
-            return Task.FromResult((ITcpServerChannel) new TcpServerChannel(options, groupFactory, sslFeature));
+            return Task.FromResult((ITcpServerChannel) new TcpServerChannel(options, handler, sslFeature));
         }
     }
 }

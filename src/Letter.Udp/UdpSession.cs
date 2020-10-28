@@ -7,13 +7,16 @@ using System.Net.Sockets;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 
-using FilterGroup = Letter.ChannelFilterGroup<Letter.Udp.IUdpSession, Letter.Udp.IUdpChannelFilter>;
-
 namespace Letter.Udp
 {
     public class UdpSession : IUdpSession
     {
-        public UdpSession(Socket socket, UdpOptions options, MemoryPool<byte> memoryPool, PipeScheduler scheduler, FilterGroup filterGroup)
+        public UdpSession(
+            Socket socket, 
+            UdpOptions options, 
+            MemoryPool<byte> memoryPool, 
+            PipeScheduler scheduler, 
+            FilterPipeline<IUdpSession> filterPipeline)
         {
             this.Id = IdGeneratorHelper.GetNextId();
             this.socket = new UdpSocket(socket, scheduler);
@@ -22,7 +25,7 @@ namespace Letter.Udp
             this.Order = options.Order;
             this.Scheduler = scheduler;
             this.MemoryPool = memoryPool;
-            this.filterGroup = filterGroup;
+            this.filterPipeline = filterPipeline;
             this.LoaclAddress = this.socket.BindAddress;
             
             this.rcvPipeline = new DgramPipeline(this.MemoryPool, scheduler, OnRcvPipelineRead);
@@ -36,7 +39,7 @@ namespace Letter.Udp
         }
 
         private UdpSocket socket;
-        private FilterGroup filterGroup;
+        private FilterPipeline<IUdpSession> filterPipeline;
         private DgramPipeline sndPipeline;
         private DgramPipeline rcvPipeline;
         private ReaderFlushDelegate readerFlushCallback;
@@ -108,7 +111,7 @@ namespace Letter.Udp
                     }
                     else
                     {
-                        this.filterGroup.OnChannelException(this, ex);
+                        this.filterPipeline.OnChannelException(this, ex);
                     }
                     return;
                 }
@@ -125,7 +128,7 @@ namespace Letter.Udp
                 this.RcvAddress = node.Point;
                 Memory<byte> memory = node.GetReadableBuffer();
                 var w_reader = new WrappedReader(new ReadOnlySequence<byte>(memory), this.Order, this.readerFlushCallback);
-                this.filterGroup.OnChannelRead(this, ref w_reader);
+                this.filterPipeline.OnChannelRead(this, ref w_reader);
                 node.ReleaseAsync().NoAwait();
             }
             
@@ -140,7 +143,7 @@ namespace Letter.Udp
                 var node = this.SndPipeWriter.GetDgramNode();
                 node.SettingPoint(remoteAddress);
                 var writer = new WrappedWriter(node, this.Order, this.writerFlushCallback);
-                this.filterGroup.OnChannelWrite(this, ref writer);
+                this.filterPipeline.OnChannelWrite(this, ref writer);
 
                 return Task.CompletedTask;
             }
@@ -165,7 +168,7 @@ namespace Letter.Udp
                 {
                     if (!SocketErrorHelper.IsSocketDisabledError(ex) || ex is ObjectDisposedException)
                     {
-                        this.filterGroup.OnChannelException(this, ex);
+                        this.filterPipeline.OnChannelException(this, ex);
                     }
                 }
                 finally

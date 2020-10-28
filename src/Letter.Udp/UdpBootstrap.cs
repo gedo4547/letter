@@ -1,14 +1,14 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 
-using FilterFactory = Letter.ChannelFilterGroupFactory<Letter.Udp.IUdpSession, Letter.Udp.IUdpChannelFilter>;
 
 namespace Letter.Udp
 {
-    sealed class UdpBootstrap : ABootstrap<UdpOptions, IUdpSession, IUdpChannel, IUdpChannelFilter>, IUdpBootstrap
+    sealed class UdpBootstrap : ABootstrap<UdpOptions, IUdpSession, IUdpChannel>, IUdpBootstrap
     {
-        protected override Task<IUdpChannel> ChannelFactory(UdpOptions options, FilterFactory filterFactory)
+        protected override Task<IUdpChannel> ChannelFactory(UdpOptions options, Action<IFilterPipeline<IUdpSession>> handler)
         {
-            UdpChannel channel = new UdpChannel(options, filterFactory);
+            UdpChannel channel = new UdpChannel(options, handler);
             return Task.FromResult((IUdpChannel) channel);
         }
     }

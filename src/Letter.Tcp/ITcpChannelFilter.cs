@@ -1,6 +1,6 @@
 ﻿namespace Letter.Tcp
 {
-    public interface ITcpChannelFilter : IChannelFilter<ITcpSession>
+    public interface ITcpChannelFilter : IFilter<ITcpSession>
     {
         
     }

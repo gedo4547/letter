@@ -3,14 +3,14 @@ using System.Threading.Tasks;
 
 namespace Letter
 {
-    public interface IBootstrap<TOptions, TSession, TChannel, TChannelFilter> : IAsyncDisposable
+    public interface IBootstrap<TOptions, TSession, TChannel> : IAsyncDisposable
         where TOptions : class, IOptions, new()
         where TChannel : IChannel
         where TSession : ISession
-        where TChannelFilter : IChannelFilter<TSession>
     {
-        void ConfigurationOptions(Action<TOptions> optionsFactory);
-        
+        void ConfigurationOptions(Action<TOptions> handler);
+        void ConfigurationFilter(Action<IFilterPipeline<TSession>> handler);
+
         Task<TChannel> BuildAsync();
     }
 }
