@@ -21,7 +21,7 @@ namespace System.IO.Pipelines
         private readonly WriterFlushDelegate writerFlush;
         private readonly IBinaryOrderOperators operators; 
         
-         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Write(sbyte value)
         {
             this.Write((byte)value);

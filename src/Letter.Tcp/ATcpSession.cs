@@ -4,7 +4,6 @@ using System.IO.Pipelines;
 using System.Net;
 using System.Net.Sockets;
 using System.Threading.Tasks;
-using Letter;
 
 namespace Letter.Tcp
 {
@@ -23,14 +22,9 @@ namespace Letter.Tcp
             this.socket = new TcpSocket(socket, scheduler);
             this.LoaclAddress = this.socket.BindAddress;
             this.RemoteAddress = this.socket.RemoteAddress;
-            
-            long maxReadBufferSize = options.MaxPipelineReadBufferSize == null ? 0 : options.MaxPipelineReadBufferSize.Value;
-            long maxWriteBufferSize = options.MaxPipelineWriteBufferSize == null ? 0 : options.MaxPipelineWriteBufferSize.Value;
-            var inputOptions = new PipeOptions(this.MemoryPool, PipeScheduler.ThreadPool, scheduler, maxReadBufferSize, maxReadBufferSize / 2, useSynchronizationContext: false);
-            var outputOptions = new PipeOptions(this.MemoryPool, scheduler, PipeScheduler.ThreadPool, maxWriteBufferSize, maxWriteBufferSize / 2, useSynchronizationContext: false);
 
-            
             this.SettingSocket(this.socket, options);
+            this.SettingPipeline(options.MaxPipelineReadBufferSize, options.MaxPipelineWriteBufferSize);
         }
         
         public string Id { get; }
@@ -40,15 +34,24 @@ namespace Letter.Tcp
         public MemoryPool<byte> MemoryPool { get; }
         public PipeScheduler Scheduler { get; }
         
+        protected IDuplexPipe Transport { get; private set; }
+        protected IDuplexPipe Application { get; private set; }
+        
+        
         private TcpSocket socket;
-
         protected FilterPipeline<ITcpSession> filterPipeline;
         
         
         public abstract Task StartAsync();
 
         public abstract Task WriteAsync(object obj);
-        
+
+
+        protected Task SocketStartAsync()
+        {
+            return null;
+        }
+
         private void SettingSocket(TcpSocket socket, ATcpOptions options)
         {
             this.socket.SettingKeepAlive(options.KeepAlive);
@@ -65,16 +68,17 @@ namespace Letter.Tcp
                 this.socket.SettingSndBufferSize(options.SndBufferSize.Value);
         }
 
-        private void SettingPipeline()
+        private void SettingPipeline(long? MaxPipelineReadBufferSize, long? MaxPipelineWriteBufferSize)
         {
-            
+            long maxReadBufferSize = MaxPipelineReadBufferSize == null ? 0 : MaxPipelineReadBufferSize.Value;
+            long maxWriteBufferSize = MaxPipelineWriteBufferSize == null ? 0 : MaxPipelineWriteBufferSize.Value;
+            var inputOptions = new PipeOptions(this.MemoryPool, PipeScheduler.ThreadPool, Scheduler, maxReadBufferSize, maxReadBufferSize / 2, useSynchronizationContext: false);
+            var outputOptions = new PipeOptions(this.MemoryPool, Scheduler, PipeScheduler.ThreadPool, maxWriteBufferSize, maxWriteBufferSize / 2, useSynchronizationContext: false);
+
+            var pair = DuplexPipe.CreateConnectionPair(inputOptions, outputOptions);
+            this.Transport = pair.Transport;
+            this.Application = pair.Application;
         }
-
-
-
-
-
-
 
         public virtual ValueTask DisposeAsync()
         {

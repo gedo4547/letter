@@ -92,7 +92,13 @@ namespace Letter.Tcp
                 {
                     break;
                 }
-                var session = this.createSession(acceptSocket, options, schedulerAllocator.Next(), this.memoryPool);
+                var scheduler = this.schedulerAllocator.Next();
+                var session = this.createSession(
+                    acceptSocket, 
+                    options, 
+                    scheduler, 
+                    this.memoryPool);
+                
                 await session.StartAsync();
             }
         }

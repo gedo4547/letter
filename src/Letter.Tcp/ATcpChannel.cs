@@ -46,7 +46,5 @@ namespace Letter.Tcp
 
             return filterPipeline;
         }
-
-
     }
 }
