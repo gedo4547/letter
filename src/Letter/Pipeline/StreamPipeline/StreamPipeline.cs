@@ -1,6 +1,4 @@
-﻿using System;
-using System.IO.Pipelines;
-using System.Runtime.CompilerServices;
+﻿using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 
 namespace System.IO.Pipelines
@@ -9,12 +7,12 @@ namespace System.IO.Pipelines
     {
         public StreamPipeline(PipeOptions options)
         {
-            this.tcpPipe = new Pipe(options);
-            this.reader = new StreamPipelineReader(this.tcpPipe.Reader);
-            this.writer = new StreamPipelineWriter(this.tcpPipe.Writer);
+            this.pipe = new Pipe(options);
+            this.reader = new StreamPipelineReader(this.pipe.Reader);
+            this.writer = new StreamPipelineWriter(this.pipe.Writer);
         }
-
-        private Pipe tcpPipe;
+        
+        private Pipe pipe;
         private StreamPipelineReader reader;
         private StreamPipelineWriter writer;
 

@@ -17,7 +17,7 @@ namespace Letter
             this.filters.Add(filter);
         }
         
-        public void OnChannelActive(TSession session)
+        public void OnTransportActive(TSession session)
         {
             int count = this.filters.Count;
             for (int i = 0; i < count; i++)
@@ -26,7 +26,7 @@ namespace Letter
             }
         }
 
-        public void OnChannelInactive(TSession session)
+        public void OnTransportInactive(TSession session)
         {
             int count = this.filters.Count;
             for (int i = 0; i < count; i++)
@@ -35,7 +35,7 @@ namespace Letter
             }
         }
 
-        public void OnChannelException(TSession session, Exception ex)
+        public void OnTransportException(TSession session, Exception ex)
         {
             int count = this.filters.Count;
             for (int i = 0; i < count; i++)
@@ -44,7 +44,7 @@ namespace Letter
             }
         }
 
-        public void OnChannelRead(TSession session, ref WrappedReader reader)
+        public void OnTransportRead(TSession session, ref WrappedReader reader)
         {
             this.readArgs = null;
             int count = this.filters.Count;
@@ -54,9 +54,9 @@ namespace Letter
             }
         }
         
-        public void OnChannelWrite(TSession session, ref WrappedWriter writer)
+        public void OnTransportWrite(TSession session, ref WrappedWriter writer, object o)
         {
-            this.writeArgs = null;
+            this.writeArgs = o;
             int count = this.filters.Count;
             for (int i = 0; i < count; i++)
             {

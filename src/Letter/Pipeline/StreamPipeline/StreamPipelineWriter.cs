@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace System.IO.Pipelines
 {
-    public class StreamPipelineWriter : PipeWriter, IWrappedWriter
+    public sealed class StreamPipelineWriter : PipeWriter, IWrappedWriter
     {
         public StreamPipelineWriter(PipeWriter writer) => this.writer = writer;
 

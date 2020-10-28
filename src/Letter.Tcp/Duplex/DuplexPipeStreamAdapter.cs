@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.IO.Pipelines;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 
 namespace Letter
@@ -9,7 +10,7 @@ namespace Letter
     /// A helper for wrapping a Stream decorator from an <see cref="IDuplexPipe"/>.
     /// </summary>
     /// <typeparam name="TStream"></typeparam>
-    internal class DuplexPipeStreamAdapter<TStream> : DuplexPipeStream, IDuplexPipe where TStream : Stream
+    internal class DuplexPipeStreamAdapter<TStream> : DuplexPipeStream, IWrappedDuplexPipe where TStream : Stream
     {
         private bool _disposed;
         private readonly object _disposeLock = new object();
@@ -24,15 +25,42 @@ namespace Letter
         {
             var stream = createStream(this);
             Stream = stream;
-            Input = PipeReader.Create(stream, readerOptions);
-            Output = PipeWriter.Create(stream, writerOptions);
+            
+            this.WrappedInput = new StreamPipelineReader(PipeReader.Create(stream, readerOptions));
+            this.WrappedOutput = new StreamPipelineWriter(PipeWriter.Create(stream, writerOptions));
+            
+            // Input = PipeReader.Create(stream, readerOptions);
+            // Output = PipeWriter.Create(stream, writerOptions);
         }
 
         public TStream Stream { get; }
 
-        public PipeReader Input { get; }
+        public StreamPipelineReader WrappedInput
+        {
+            get;
+        }
 
-        public PipeWriter Output { get; }
+        public StreamPipelineWriter WrappedOutput
+        {
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            get;
+        }
+
+        
+        public PipeReader Input
+        {
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            get { return this.WrappedInput; }
+        }
+        
+        public PipeWriter Output
+        {
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            get { return this.WrappedOutput; }
+        }
+        
+        
+        
 
         public override ValueTask DisposeAsync()
         {
@@ -48,5 +76,7 @@ namespace Letter
             this.Stream.Dispose();
             return base.DisposeAsync();
         }
+
+      
     }
 }

@@ -1,8 +1,10 @@
-﻿using System.Buffers;
+﻿using System;
+using System.Buffers;
 using System.Buffers.Binary;
 using System.IO.Pipelines;
 using System.Net;
 using System.Net.Sockets;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 
 namespace Letter.Tcp
@@ -17,39 +19,186 @@ namespace Letter.Tcp
             this.Scheduler = scheduler;
             this.MemoryPool = pool;
             this.Scheduler = scheduler;
+            this.minAllocBufferSize = this.MemoryPool.MaxBufferSize / 2;
             
             this.filterPipeline = filterPipeline;
             this.socket = new TcpSocket(socket, scheduler);
-            this.LoaclAddress = this.socket.BindAddress;
+            this.LocalAddress = this.socket.BindAddress;
             this.RemoteAddress = this.socket.RemoteAddress;
 
             this.SettingSocket(this.socket, options);
             this.SettingPipeline(options.MaxPipelineReadBufferSize, options.MaxPipelineWriteBufferSize);
         }
-        
-        public string Id { get; }
-        public BinaryOrder Order { get; }
-        public EndPoint LoaclAddress { get; }
-        public EndPoint RemoteAddress { get; }
-        public MemoryPool<byte> MemoryPool { get; }
-        public PipeScheduler Scheduler { get; }
-        
-        protected IDuplexPipe Transport { get; private set; }
-        protected IDuplexPipe Application { get; private set; }
-        
-        
+
+        public string Id
+        {
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            get;
+        }
+
+        public BinaryOrder Order
+        {
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            get;
+        }
+
+        public EndPoint LocalAddress
+        {
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            get;
+        }
+
+        public EndPoint RemoteAddress
+        {
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            get;
+        }
+
+        public MemoryPool<byte> MemoryPool
+        {
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            get;
+        }
+
+        public PipeScheduler Scheduler
+        {
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            get;
+        }
+
+        protected IWrappedDuplexPipe Transport
+        {
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            get;
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            private set;
+        }
+
+        protected IWrappedDuplexPipe Application
+        {
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            get;
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            private set;
+        }
+
+        private PipeWriter Input
+        {
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            get { return this.Application.Output; }
+        }
+
+        private PipeReader Output
+        {
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            get { return this.Application.Input;}
+        }
+
+
         private TcpSocket socket;
         protected FilterPipeline<ITcpSession> filterPipeline;
         
+        private Task processingTask;
+        private int minAllocBufferSize;
         
         public abstract Task StartAsync();
 
         public abstract Task WriteAsync(object obj);
-
-
-        protected Task SocketStartAsync()
+        
+        protected void Run()
         {
-            return null;
+            this.processingTask = SocketStartAsync(); 
+        }
+        
+        private async Task SocketStartAsync()
+        {
+            try
+            {
+                var receiveTask = DoReceive();
+                var sendTask = DoSend();
+
+                await receiveTask;
+                await sendTask;
+
+                await this.socket.DisposeAsync();
+            }
+            catch (Exception ex)
+            {
+                this.filterPipeline.OnTransportException(this, ex);
+            }
+        }
+
+        private async Task DoReceive()
+        {            
+            try
+            {
+                await ProcessReceives();
+            }
+            catch (Exception ex)
+            {
+                if (SocketErrorHelper.IsSocketDisabledError(ex) || ex is RemoteSocketClosedException)
+                {
+                    await this.DisposeAsync();
+                }
+                else
+                {
+                    this.filterPipeline.OnTransportException(this, ex);
+                }
+            }
+        }
+        
+        private async Task ProcessReceives()
+        {
+            var input = Input;
+            while (true)
+            {
+                var buffer = input.GetMemory(minAllocBufferSize);
+                var bytesReceived = await this.socket.ReceiveAsync(ref buffer);
+                
+                if (bytesReceived == 0) 
+                    throw new RemoteSocketClosedException();
+
+                input.Advance(bytesReceived);
+                var result = await input.FlushAsync();
+                if (result.IsCompleted || result.IsCanceled) break;
+            }
+        }
+        
+        private async Task DoSend()
+        {
+            try
+            {
+                await ProcessSends();
+            }
+            catch(Exception ex)
+            {
+                if (!(SocketErrorHelper.IsSocketDisabledError(ex) || ex is RemoteSocketClosedException))
+                {
+                    this.filterPipeline.OnTransportException(this, ex);
+                }
+            }
+        }
+        
+        private async Task ProcessSends()
+        {
+            var output = Output;
+            while (true)
+            {
+                var result = await output.ReadAsync();
+                if (result.IsCanceled) break;
+                var buffer = result.Buffer;
+                var end = buffer.End;
+                var isCompleted = result.IsCompleted;
+                if (!buffer.IsEmpty)
+                {
+                    var bytesReceived = await this.socket.SendAsync(ref buffer);
+                    if (bytesReceived == 0)
+                        throw new RemoteSocketClosedException();
+                }
+
+                output.AdvanceTo(end);
+                if (isCompleted) break;
+            }
         }
 
         private void SettingSocket(TcpSocket socket, ATcpOptions options)
@@ -80,9 +229,9 @@ namespace Letter.Tcp
             this.Application = pair.Application;
         }
 
-        public virtual ValueTask DisposeAsync()
+        public async virtual ValueTask DisposeAsync()
         {
-            throw new System.NotImplementedException();
+            await this.socket.DisposeAsync();
         }
     }
 }

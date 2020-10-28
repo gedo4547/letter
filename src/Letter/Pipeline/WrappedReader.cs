@@ -7,7 +7,7 @@ namespace System.IO.Pipelines
 {
     public delegate void ReaderFlushDelegate(SequencePosition startPos, SequencePosition endPos);
 
-    public ref struct WrappedReader
+    public struct WrappedReader
     {
         public WrappedReader(ReadOnlySequence<byte> buffer, BinaryOrder order, ReaderFlushDelegate readerFlush)
         {

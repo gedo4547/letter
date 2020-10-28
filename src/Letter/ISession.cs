@@ -12,7 +12,7 @@ namespace Letter
 
         BinaryOrder Order { get; }
 
-        EndPoint LoaclAddress { get; }
+        EndPoint LocalAddress { get; }
         
         EndPoint RemoteAddress { get; }
         

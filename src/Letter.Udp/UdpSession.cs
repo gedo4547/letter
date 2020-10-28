@@ -26,7 +26,7 @@ namespace Letter.Udp
             this.Scheduler = scheduler;
             this.MemoryPool = memoryPool;
             this.filterPipeline = filterPipeline;
-            this.LoaclAddress = this.socket.BindAddress;
+            this.LocalAddress = this.socket.BindAddress;
             
             this.rcvPipeline = new DgramPipeline(this.MemoryPool, scheduler, OnRcvPipelineRead);
             this.sndPipeline = new DgramPipeline(this.MemoryPool, scheduler, OnSndPipelineRead);
@@ -49,7 +49,7 @@ namespace Letter.Udp
         
         public string Id { get; }
         public BinaryOrder Order { get; }
-        public EndPoint LoaclAddress { get; }
+        public EndPoint LocalAddress { get; }
         public EndPoint RcvAddress { get; private set; }
         public EndPoint SndAddress { get; private set; }
         public EndPoint RemoteAddress
@@ -97,7 +97,7 @@ namespace Letter.Udp
                 var memory = node.GetMomory();
                 try
                 {
-                    int transportBytes = await this.socket.ReceiveAsync(this.LoaclAddress, ref memory);
+                    int transportBytes = await this.socket.ReceiveAsync(this.LocalAddress, ref memory);
                     node.SettingPoint(this.socket.RemoteAddress);
                     node.SettingWriteLength(transportBytes);
                     this.RcvPipeWriter.Write(node);
@@ -111,7 +111,7 @@ namespace Letter.Udp
                     }
                     else
                     {
-                        this.filterPipeline.OnChannelException(this, ex);
+                        this.filterPipeline.OnTransportException(this, ex);
                     }
                     return;
                 }
@@ -128,7 +128,7 @@ namespace Letter.Udp
                 this.RcvAddress = node.Point;
                 Memory<byte> memory = node.GetReadableBuffer();
                 var w_reader = new WrappedReader(new ReadOnlySequence<byte>(memory), this.Order, this.readerFlushCallback);
-                this.filterPipeline.OnChannelRead(this, ref w_reader);
+                this.filterPipeline.OnTransportRead(this, ref w_reader);
                 node.ReleaseAsync().NoAwait();
             }
             
@@ -143,7 +143,7 @@ namespace Letter.Udp
                 var node = this.SndPipeWriter.GetDgramNode();
                 node.SettingPoint(remoteAddress);
                 var writer = new WrappedWriter(node, this.Order, this.writerFlushCallback);
-                this.filterPipeline.OnChannelWrite(this, ref writer);
+                this.filterPipeline.OnTransportWrite(this, ref writer, null);
 
                 return Task.CompletedTask;
             }
@@ -168,7 +168,7 @@ namespace Letter.Udp
                 {
                     if (!SocketErrorHelper.IsSocketDisabledError(ex) || ex is ObjectDisposedException)
                     {
-                        this.filterPipeline.OnChannelException(this, ex);
+                        this.filterPipeline.OnTransportException(this, ex);
                     }
                 }
                 finally
