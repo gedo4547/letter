@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace Letter
 {
-    public sealed class TcpPipelineReader : PipeReader
+    public sealed class StreamPipelineReader : PipeReader
     {
-        public TcpPipelineReader(PipeReader reader)
+        public StreamPipelineReader(PipeReader reader)
         {
             this.reader = reader;
         }

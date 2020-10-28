@@ -6,7 +6,7 @@ using System.IO.Pipelines;
 namespace Letter
 {
     [EditorBrowsable(EditorBrowsableState.Never)]
-    public partial class UdpPipeline : IDisposable
+    public partial class DgramPipeline : IDisposable
     {
         internal const int FALSE = 0;
         internal const int TRUE = 1;
@@ -14,7 +14,7 @@ namespace Letter
         internal const int InitialSegmentPoolSize = 16; // 65K
         internal const int MaxSegmentPoolSize = 256; // 1MB
         
-        public UdpPipeline(MemoryPool<byte> memoryPool, PipeScheduler scheduler, Action<IUdpPipelineReader> onReceived)
+        public DgramPipeline(MemoryPool<byte> memoryPool, PipeScheduler scheduler, Action<IDgramPipelineReader> onReceived)
         {
             if (memoryPool == null)
                 throw new ArgumentNullException(nameof(memoryPool));
@@ -26,7 +26,7 @@ namespace Letter
             this.memoryPool = memoryPool;
             this.scheduler = scheduler;
             this.onReceived = onReceived;
-            this.nodeStack = new UdpMessageNodeStack(InitialSegmentPoolSize);
+            this.nodeStack = new DgramNodeStack(InitialSegmentPoolSize);
             this.multiThreadedInvoke = (o) => this.onReceived(this);
         }
 
@@ -34,24 +34,24 @@ namespace Letter
 
         private MemoryPool<byte> memoryPool;
         private PipeScheduler scheduler;
-        private UdpMessageNodeStack nodeStack;
-        private Action<IUdpPipelineReader> onReceived;
+        private DgramNodeStack nodeStack;
+        private Action<IDgramPipelineReader> onReceived;
         private Action<object> multiThreadedInvoke;
 
-        private UdpMessageNode headNode;
-        private UdpMessageNode tailNode;
+        private DgramNode headNode;
+        private DgramNode tailNode;
 
         private int waiting = FALSE;
 
 
-        private UdpMessageNode CreationOrGetNode()
+        private DgramNode CreationOrGetNode()
         {
             lock (syncObj)
             {
                 if (!this.nodeStack.TryPop(out var node))
                 {
                     IMemoryOwner<byte> memoryOwner = this.memoryPool.Rent();
-                    node = new UdpMessageNode(memoryOwner, this.OnDgramNodeRelease);
+                    node = new DgramNode(memoryOwner, this.OnDgramNodeRelease);
                 }
 
                 node.next = null;
@@ -59,7 +59,7 @@ namespace Letter
             }
         }
 
-        private void OnDgramNodeRelease(UdpMessageNode node)
+        private void OnDgramNodeRelease(DgramNode node)
         {
             lock (syncObj)
             {
@@ -77,7 +77,7 @@ namespace Letter
 
         public void Dispose()
         {
-            UdpMessageNode tempNode = this.headNode;
+            DgramNode tempNode = this.headNode;
             while (tempNode != null)
             {
                 var nextNode = tempNode.next;

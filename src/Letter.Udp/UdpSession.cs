@@ -25,20 +25,20 @@ namespace Letter.Udp.Box
             this.filterGroup = filterGroup;
             this.LoaclAddress = this.socket.BindAddress;
             
-            this.rcvPipeline = new UdpPipeline(this.MemoryPool, scheduler, OnRcvPipelineRead);
-            this.sndPipeline = new UdpPipeline(this.MemoryPool, scheduler, OnSndPipelineRead);
+            this.rcvPipeline = new DgramPipeline(this.MemoryPool, scheduler, OnRcvPipelineRead);
+            this.sndPipeline = new DgramPipeline(this.MemoryPool, scheduler, OnSndPipelineRead);
 
             this.readerFlushCallback = (startPos, endPos) => { };
             this.writerFlushCallback = (writer) =>
             {
-                this.SndPipeWriter.Write((UdpMessageNode) writer);
+                this.SndPipeWriter.Write((DgramNode) writer);
             };
         }
 
         private UdpSocket socket;
         private FilterGroup filterGroup;
-        private UdpPipeline sndPipeline;
-        private UdpPipeline rcvPipeline;
+        private DgramPipeline sndPipeline;
+        private DgramPipeline rcvPipeline;
         private ReaderFlushDelegate readerFlushCallback;
         private WriterFlushDelegate writerFlushCallback;
         
@@ -56,25 +56,25 @@ namespace Letter.Udp.Box
         public MemoryPool<byte> MemoryPool { get; }
         public PipeScheduler Scheduler { get; }
 
-        public IUdpPipelineReader RcvPipeReader
+        public IDgramPipelineReader RcvPipeReader
         {
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             get { return this.rcvPipeline; }
         }
         
-        public IUdpPipelineWriter RcvPipeWriter
+        public IDgramPipelineWriter RcvPipeWriter
         {
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             get { return this.rcvPipeline; }
         }
         
-        public IUdpPipelineReader SndPipeReader
+        public IDgramPipelineReader SndPipeReader
         {
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             get { return this.sndPipeline; }
         }
 
-        public IUdpPipelineWriter SndPipeWriter
+        public IDgramPipelineWriter SndPipeWriter
         {
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             get { return this.sndPipeline; }
@@ -115,11 +115,11 @@ namespace Letter.Udp.Box
             }
         }
 
-        private void OnRcvPipelineRead(IUdpPipelineReader reader)
+        private void OnRcvPipelineRead(IDgramPipelineReader reader)
         {
             while (true)
             {
-                UdpMessageNode node = reader.Read();
+                DgramNode node = reader.Read();
                 if (node == null) break;
 
                 this.RcvAddress = node.Point;
@@ -146,7 +146,7 @@ namespace Letter.Udp.Box
             }
         }
 
-        private async void OnSndPipelineRead(IUdpPipelineReader reader)
+        private async void OnSndPipelineRead(IDgramPipelineReader reader)
         {
             while (true)
             {

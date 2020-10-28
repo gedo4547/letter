@@ -4,7 +4,7 @@ using System.Threading;
 
 namespace Letter
 {
-    public partial class UdpPipeline : IUdpPipelineReader
+    public partial class DgramPipeline : IDgramPipelineReader
     {
         public void ReceiveAsync()
         {
@@ -17,7 +17,7 @@ namespace Letter
             this.scheduler.Schedule(this.multiThreadedInvoke, null);
         }
 
-        public UdpMessageNode Read()
+        public DgramNode Read()
         {
             lock (this.syncObj)
             {
@@ -26,7 +26,7 @@ namespace Letter
                     return null;
                 }
 
-                UdpMessageNode node;
+                DgramNode node;
                 if (this.headNode == this.tailNode)
                 {
                     node = this.headNode;

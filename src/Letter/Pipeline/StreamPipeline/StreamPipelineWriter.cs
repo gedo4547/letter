@@ -7,9 +7,9 @@ using System.Threading.Tasks;
 
 namespace Letter
 {
-    public class TcpPipelineWriter : PipeWriter, IWrappedWriter
+    public class StreamPipelineWriter : PipeWriter, IWrappedWriter
     {
-        public TcpPipelineWriter(PipeWriter writer) => this.writer = writer;
+        public StreamPipelineWriter(PipeWriter writer) => this.writer = writer;
 
         private PipeWriter writer;
 

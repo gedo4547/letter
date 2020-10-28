@@ -1,20 +1,26 @@
 ﻿using System.Buffers;
 using System.IO.Pipelines;
 using System.Net;
+using System.Net.Sockets;
 using System.Threading.Tasks;
 
 namespace Letter.Tcp.Box
 {
-    public class TcpSession : ITcpInternalSession
+    class TcpSession : ATcpSession, ITcpSession
     {
+        public TcpSession(Socket socket, ATcpOptions options, PipeScheduler scheduler, MemoryPool<byte> pool) 
+            : base(socket, options, scheduler, pool)
+        {
+        }
+
         public string Id { get; }
         public BinaryOrder Order { get; }
         public EndPoint LoaclAddress { get; }
         public EndPoint RemoteAddress { get; }
         public MemoryPool<byte> MemoryPool { get; }
         public PipeScheduler Scheduler { get; }
-        
-        public Task StartAsync()
+
+        public override Task StartAsync()
         {
             throw new System.NotImplementedException();
         }
@@ -28,5 +34,8 @@ namespace Letter.Tcp.Box
         {
             throw new System.NotImplementedException();
         }
+
+
+      
     }
 }

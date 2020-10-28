@@ -5,7 +5,7 @@ using System.Net;
 namespace Letter
 {
     [EditorBrowsable(EditorBrowsableState.Never)]
-    interface IUdpMessageNode
+    interface IDgramNode
     {
         int Length { get; }
         

@@ -9,7 +9,7 @@ using FilterGroup = Letter.StreamChannelFilterGroup<Letter.Tcp.ITcpSession, Lett
 
 namespace Letter.Tcp
 {
-    class TcpSession : IInternalTcpSession
+    class TcpSession :  IInternalTcpSession
     {
         public TcpSession(ITcpClient client, IDuplexPipe transport, FilterGroup filterGroup)
         {

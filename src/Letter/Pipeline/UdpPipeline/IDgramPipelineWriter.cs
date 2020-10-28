@@ -5,14 +5,14 @@ using System.Net;
 namespace Letter
 {
     [EditorBrowsable(EditorBrowsableState.Never)]
-    public interface IUdpPipelineWriter
+    public interface IDgramPipelineWriter
     {
-        UdpMessageNode GetDgramNode();
+        DgramNode GetDgramNode();
         
         void Write(EndPoint point, byte[] bytes);
         void Write(EndPoint point, byte[] bytes, int offset, int count);
         void Write(EndPoint point, ref ReadOnlyMemory<byte> memory);
         
-        void Write(UdpMessageNode node);
+        void Write(DgramNode node);
     }
 }

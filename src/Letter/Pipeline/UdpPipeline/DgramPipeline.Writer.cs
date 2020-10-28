@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace Letter
 {
-    public partial class UdpPipeline : IUdpPipelineWriter
+    public partial class DgramPipeline : IDgramPipelineWriter
     {
-        public UdpMessageNode GetDgramNode()
+        public DgramNode GetDgramNode()
         {
             return this.CreationOrGetNode();
         }
@@ -32,7 +32,7 @@ namespace Letter
             this.Write(node);
         }
 
-        public void Write(UdpMessageNode node)
+        public void Write(DgramNode node)
         {
             lock (this.syncObj)
             {

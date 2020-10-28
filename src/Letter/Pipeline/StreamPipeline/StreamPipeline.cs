@@ -5,26 +5,26 @@ using System.Threading.Tasks;
 
 namespace Letter
 {
-    public sealed class TcpPipeline : IAsyncDisposable
+    public sealed class StreamPipeline : IAsyncDisposable
     {
-        public TcpPipeline(PipeOptions options)
+        public StreamPipeline(PipeOptions options)
         {
             this.tcpPipe = new Pipe(options);
-            this.reader = new TcpPipelineReader(this.tcpPipe.Reader);
-            this.writer = new TcpPipelineWriter(this.tcpPipe.Writer);
+            this.reader = new StreamPipelineReader(this.tcpPipe.Reader);
+            this.writer = new StreamPipelineWriter(this.tcpPipe.Writer);
         }
 
         private Pipe tcpPipe;
-        private TcpPipelineReader reader;
-        private TcpPipelineWriter writer;
+        private StreamPipelineReader reader;
+        private StreamPipelineWriter writer;
 
-        public TcpPipelineReader Reader
+        public StreamPipelineReader Reader
         {
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             get { return this.reader; }
         }
 
-        public TcpPipelineWriter Writer
+        public StreamPipelineWriter Writer
         {
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             get { return this.writer; }
