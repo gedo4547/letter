@@ -5,7 +5,6 @@ using System.Runtime.InteropServices;
 
 namespace System
 {
-    [EditorBrowsable(EditorBrowsableState.Never)]
     public static class BufferExtensions
     {
          [MethodImpl(MethodImplOptions.AggressiveInlining)]

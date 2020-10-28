@@ -1,9 +1,9 @@
 ﻿using System.Net;
 using System.Threading.Tasks;
 
-namespace Letter.Udp.Box
+namespace Letter.Udp
 {
-    public interface IUdpSession : Letter.Bootstrap.ISession
+    public interface IUdpSession : ISession
     {
         EndPoint RcvAddress { get; }
         EndPoint SndAddress { get; }

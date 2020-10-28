@@ -1,10 +1,7 @@
-﻿using System;
-using System.ComponentModel;
-using System.IO;
+﻿using System.IO;
 
-namespace Letter
+namespace System.Net.Sockets
 {
-    [EditorBrowsable(EditorBrowsableState.Never)]
     public class ConnectionResetException : IOException
     {
         public ConnectionResetException(string message) : base(message)

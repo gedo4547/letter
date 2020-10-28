@@ -1,9 +1,9 @@
 ﻿using System.Net;
 using System.Threading.Tasks;
 
-namespace Letter.Udp.Box
+namespace Letter.Udp
 {
-    public interface IUdpBootstrap : Letter.Bootstrap.IBootstrap<UdpOptions, IUdpSession, IUdpChannel, IUdpChannelFilter>
+    public interface IUdpBootstrap : IBootstrap<UdpOptions, IUdpSession, IUdpChannel, IUdpChannelFilter>
     {
         
     }

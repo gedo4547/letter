@@ -1,9 +1,5 @@
-﻿using System;
-using System.ComponentModel;
-
-namespace Letter
+﻿namespace System.Net.Sockets
 {
-    [EditorBrowsable(EditorBrowsableState.Never)]
     public class ConnectionAbortedException : OperationCanceledException
     {
         public ConnectionAbortedException() :

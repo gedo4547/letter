@@ -3,9 +3,9 @@ using System.Buffers;
 using System.Buffers.Binary;
 using System.Threading;
 
-namespace Letter.Udp.Box
+namespace Letter.Udp
 {
-    public class UdpOptions : Letter.Bootstrap.IOptions
+    public class UdpOptions : Letter.IOptions
     {
         public UdpOptions()
         {

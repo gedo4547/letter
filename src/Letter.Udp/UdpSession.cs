@@ -7,9 +7,9 @@ using System.Net.Sockets;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 
-using FilterGroup = Letter.Bootstrap.ChannelFilterGroup<Letter.Udp.Box.IUdpSession, Letter.Udp.Box.IUdpChannelFilter>;
+using FilterGroup = Letter.ChannelFilterGroup<Letter.Udp.IUdpSession, Letter.Udp.IUdpChannelFilter>;
 
-namespace Letter.Udp.Box
+namespace Letter.Udp
 {
     public class UdpSession : IUdpSession
     {

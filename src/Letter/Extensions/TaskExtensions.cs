@@ -3,7 +3,6 @@
 
 namespace System.Threading.Tasks
 {
-    [EditorBrowsable(EditorBrowsableState.Never)]
     public static class TaskExtensions
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

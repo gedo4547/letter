@@ -1,11 +1,10 @@
 ﻿using System.Threading.Tasks;
-using Letter.Bootstrap;
 
-using FilterFactory = Letter.Bootstrap.ChannelFilterGroupFactory<Letter.Udp.Box.IUdpSession, Letter.Udp.Box.IUdpChannelFilter>;
+using FilterFactory = Letter.ChannelFilterGroupFactory<Letter.Udp.IUdpSession, Letter.Udp.IUdpChannelFilter>;
 
-namespace Letter.Udp.Box
+namespace Letter.Udp
 {
-    sealed class UdpBootstrap : Letter.Bootstrap.ABootstrap<UdpOptions, IUdpSession, IUdpChannel, IUdpChannelFilter>, IUdpBootstrap
+    sealed class UdpBootstrap : ABootstrap<UdpOptions, IUdpSession, IUdpChannel, IUdpChannelFilter>, IUdpBootstrap
     {
         protected override Task<IUdpChannel> ChannelFactory(UdpOptions options, FilterFactory filterFactory)
         {

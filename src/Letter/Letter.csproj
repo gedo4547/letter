@@ -15,8 +15,4 @@
     <ItemGroup>
         <PackageReference Include="System.IO.Pipelines" Version="5.0.0-preview.8.20407.11" />
     </ItemGroup>
-
-    <ItemGroup>
-      <Folder Include="Wrapped\Box" />
-    </ItemGroup>
 </Project>

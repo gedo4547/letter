@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Buffers;
+using System.Buffers.Binary;
 using System.IO.Pipelines;
 using System.Net;
 
@@ -9,6 +10,8 @@ namespace Letter
     {
         string Id { get; }
 
+        BinaryOrder Order { get; }
+
         EndPoint LoaclAddress { get; }
         
         EndPoint RemoteAddress { get; }
@@ -16,6 +19,5 @@ namespace Letter
         MemoryPool<byte> MemoryPool { get; }
 
         PipeScheduler Scheduler { get; }
-
     }
 }

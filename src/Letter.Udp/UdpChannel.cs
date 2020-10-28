@@ -1,9 +1,10 @@
 ﻿using System.Net;
 using System.Net.Sockets;
 using System.Threading.Tasks;
-using FilterFactory = Letter.Bootstrap.ChannelFilterGroupFactory<Letter.Udp.Box.IUdpSession, Letter.Udp.Box.IUdpChannelFilter>;
 
-namespace Letter.Udp.Box
+using FilterFactory = Letter.ChannelFilterGroupFactory<Letter.Udp.IUdpSession, Letter.Udp.IUdpChannelFilter>;
+
+namespace Letter.Udp
 {
     sealed class UdpChannel : IUdpChannel
     {

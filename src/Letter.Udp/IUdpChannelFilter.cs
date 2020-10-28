@@ -1,6 +1,6 @@
-﻿namespace Letter.Udp.Box
+﻿namespace Letter.Udp
 {
-    public interface IUdpChannelFilter : Bootstrap.IChannelFilter<IUdpSession>
+    public interface IUdpChannelFilter : IChannelFilter<IUdpSession>
     {
         
     }

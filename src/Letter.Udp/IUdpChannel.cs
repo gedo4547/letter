@@ -1,9 +1,9 @@
 ﻿using System.Net;
 using System.Threading.Tasks;
 
-namespace Letter.Udp.Box
+namespace Letter.Udp
 {
-    public interface IUdpChannel : Letter.Bootstrap.IChannel
+    public interface IUdpChannel : IChannel
     {
         EndPoint BindAddress { get; }
 
