@@ -1,9 +1,6 @@
-﻿using System;
-using System.Buffers;
+﻿using System.Buffers;
 using System.Collections.Generic;
 using System.IO.Pipelines;
-using System.Net;
-using System.Net.Sockets;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 
@@ -11,7 +8,7 @@ using System.Threading.Tasks;
 using System.Runtime.InteropServices;
 #endif
 
-namespace Letter
+namespace System.Net.Sockets
 {
     public abstract class ASocket : IAsyncDisposable
     {

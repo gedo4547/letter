@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Runtime.CompilerServices;
 
-namespace Letter
+namespace System.IO.Pipelines
 {
     class ObjectStack<T>
     {

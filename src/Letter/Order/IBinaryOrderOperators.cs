@@ -1,7 +1,6 @@
-﻿using System;
-using System.Runtime.CompilerServices;
+﻿using System.Runtime.CompilerServices;
 
-namespace Letter
+namespace System.Buffers.Binary
 {
     interface IBinaryOrderOperators
     {

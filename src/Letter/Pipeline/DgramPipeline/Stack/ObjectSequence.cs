@@ -3,7 +3,7 @@ using System.Buffers;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
 
-namespace Letter
+namespace System.IO.Pipelines
 {
     class ObjectSequence<T> : ReadOnlySequenceSegment<T>
     {

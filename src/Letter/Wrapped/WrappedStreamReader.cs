@@ -1,4 +1,5 @@
 using System.Buffers;
+using System.Buffers.Binary;
 using System.ComponentModel;
 using System.IO.Pipelines;
 using System.Runtime.CompilerServices;

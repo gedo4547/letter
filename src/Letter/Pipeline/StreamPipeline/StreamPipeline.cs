@@ -3,7 +3,7 @@ using System.IO.Pipelines;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 
-namespace Letter
+namespace System.IO.Pipelines
 {
     public sealed class StreamPipeline : IAsyncDisposable
     {

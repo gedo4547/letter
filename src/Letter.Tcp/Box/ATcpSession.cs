@@ -1,34 +1,54 @@
 ﻿using System.Buffers;
+using System.Buffers.Binary;
 using System.IO.Pipelines;
+using System.Net;
 using System.Net.Sockets;
 using System.Threading.Tasks;
 using Letter.Bootstrap;
 
 namespace Letter.Tcp
 {
-    abstract class ATcpSession
+    abstract class ATcpSession : Box.ITcpSession
     {
         public ATcpSession(Socket socket, Box.ATcpOptions options, PipeScheduler scheduler, MemoryPool<byte> pool, ChannelFilterGroup<Box.ITcpSession, Box.ITcpChannelFilter> filterGroup)
         {
-            this.pool = pool;
-            this.scheduler = scheduler;
-            this.socket = new TcpSocket(socket, scheduler);
-
+            this.Id = IdGeneratorHelper.GetNextId();
+            this.Order = options.Order;
+            this.MemoryPool = pool;
+            this.Scheduler = scheduler;
+            this.MemoryPool = pool;
+            this.Scheduler = scheduler;
+            
             this.filterGroup = filterGroup;
+            this.socket = new TcpSocket(socket, scheduler);
+            this.LoaclAddress = this.socket.BindAddress;
+            this.RemoteAddress = this.socket.RemoteAddress;
+            
+            long maxReadBufferSize = options.MaxPipelineReadBufferSize == null ? 0 : options.MaxPipelineReadBufferSize.Value;
+            long maxWriteBufferSize = options.MaxPipelineWriteBufferSize == null ? 0 : options.MaxPipelineWriteBufferSize.Value;
+            var inputOptions = new PipeOptions(this.MemoryPool, PipeScheduler.ThreadPool, scheduler, maxReadBufferSize, maxReadBufferSize / 2, useSynchronizationContext: false);
+            var outputOptions = new PipeOptions(this.MemoryPool, scheduler, PipeScheduler.ThreadPool, maxWriteBufferSize, maxWriteBufferSize / 2, useSynchronizationContext: false);
+
             
             this.SettingSocket(this.socket, options);
         }
-
+        
+        public string Id { get; }
+        public BinaryOrder Order { get; }
+        public EndPoint LoaclAddress { get; }
+        public EndPoint RemoteAddress { get; }
+        public MemoryPool<byte> MemoryPool { get; }
+        public PipeScheduler Scheduler { get; }
+        
         private TcpSocket socket;
-        private MemoryPool<byte> pool;
-        private PipeScheduler scheduler;
-
+        
         protected ChannelFilterGroup<Box.ITcpSession, Box.ITcpChannelFilter> filterGroup;
         
-
+        
         public abstract Task StartAsync();
 
-
+        public abstract Task WriteAsync(object obj);
+        
         private void SettingSocket(TcpSocket socket, Box.ATcpOptions options)
         {
             this.socket.SettingKeepAlive(options.KeepAlive);
@@ -43,6 +63,22 @@ namespace Letter.Tcp
                 this.socket.SettingRcvBufferSize(options.RcvBufferSize.Value);
             if (options.SndBufferSize != null)
                 this.socket.SettingSndBufferSize(options.SndBufferSize.Value);
+        }
+
+        private void SettingPipeline()
+        {
+            
+        }
+
+
+
+
+
+
+
+        public virtual ValueTask DisposeAsync()
+        {
+            throw new System.NotImplementedException();
         }
     }
 }

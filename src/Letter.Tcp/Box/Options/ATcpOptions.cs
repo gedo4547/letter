@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Buffers;
+using System.Buffers.Binary;
 using System.Net.Sockets;
 using System.Threading;
 
@@ -32,6 +33,8 @@ namespace Letter.Tcp.Box
         public int? SndBufferSize { get; set; }
         public int? RcvTimeout { get; set; }
         public int? SndTimeout { get; set; }
+        
+        public BinaryOrder Order { get; set; } = BinaryOrder.BigEndian;
         public LingerOption LingerOption { get; set; } = new LingerOption(false, 0);
         
         public long? MaxPipelineReadBufferSize { get; set; } = 1024 * 1024;

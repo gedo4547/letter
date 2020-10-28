@@ -1,4 +1,4 @@
-﻿namespace Letter
+﻿namespace System.Buffers.Binary
 {
     static class BinaryOrderOperatorsFactory
     {

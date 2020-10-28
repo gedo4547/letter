@@ -1,8 +1,8 @@
-﻿using System;
-using System.ComponentModel;
-using System.Net.Sockets;
+﻿using System.ComponentModel;
+using System.Runtime.InteropServices;
+using Letter;
 
-namespace Letter
+namespace System.Net.Sockets
 {
     [EditorBrowsable(EditorBrowsableState.Never)]
     public static class SocketErrorHelper

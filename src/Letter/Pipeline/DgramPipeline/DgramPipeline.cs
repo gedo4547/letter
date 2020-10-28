@@ -3,7 +3,7 @@ using System.Buffers;
 using System.ComponentModel;
 using System.IO.Pipelines;
  
-namespace Letter
+namespace System.IO.Pipelines
 {
     [EditorBrowsable(EditorBrowsableState.Never)]
     public partial class DgramPipeline : IDisposable

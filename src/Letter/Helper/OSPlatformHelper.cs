@@ -1,28 +1,22 @@
 ﻿using System.ComponentModel;
 using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices;
 
-namespace Letter
+namespace System.Runtime.InteropServices
 {
     [EditorBrowsable(EditorBrowsableState.Never)]
     public static class OSPlatformHelper
     {
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool IsWindows()
-        {
-            return RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
-        }
+        private readonly static bool isWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
+        private readonly static bool isOSX = RuntimeInformation.IsOSPlatform(OSPlatform.OSX);
+        private readonly static bool isLinux = RuntimeInformation.IsOSPlatform(OSPlatform.Linux);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool IsOSX()
-        {
-            return RuntimeInformation.IsOSPlatform(OSPlatform.OSX);
-        }
+        public static bool IsWindows() => isWindows;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool IsLinux()
-        {
-            return RuntimeInformation.IsOSPlatform(OSPlatform.Linux);
-        }
+        public static bool IsOSX() => isOSX;
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool IsLinux() => isLinux;
     }
 }

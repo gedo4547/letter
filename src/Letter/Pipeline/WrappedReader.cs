@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Buffers;
+using System.Buffers.Binary;
 using System.Runtime.CompilerServices;
 
-namespace Letter.Box
+namespace System.IO.Pipelines
 {
     public delegate void ReaderFlushDelegate(SequencePosition startPos, SequencePosition endPos);
 

@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Buffers;
+using System.Buffers.Binary;
 using System.IO.Pipelines;
 using System.Net;
 using System.Net.Sockets;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
-using Letter.Box;
 
 using FilterGroup = Letter.Bootstrap.ChannelFilterGroup<Letter.Udp.Box.IUdpSession, Letter.Udp.Box.IUdpChannelFilter>;
 

@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Buffers;
+using System.Buffers.Binary;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
-namespace Letter.Box
+namespace System.IO.Pipelines
 {
     public delegate void WriterFlushDelegate(IWrappedWriter writer);
     
@@ -29,57 +30,64 @@ namespace Letter.Box
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Write(byte value)
         {
-            Span<byte> span = stackalloc byte[1];
+            int size = 1;
+            var span = this.writer.GetWritableSpan(size);
             MemoryMarshal.Write<byte>(span, ref value);
-            this.writer.Write(span);
+            this.writer.WriterAdvance(size);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Write(short value)
         {
-            Span<byte> span = stackalloc byte[2];
+            int size = 2;
+            Span<byte> span = this.writer.GetWritableSpan(size);
             this.operators.WriteInt16(span, ref value);
-            this.writer.Write(span);
+            this.writer.WriterAdvance(size);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Write(ushort value)
         {
-            Span<byte> span = stackalloc byte[2];
+            int size = 2;
+            Span<byte> span = this.writer.GetWritableSpan(size);
             this.operators.WriteUInt16(span, ref value);
-            this.writer.Write(span);
+            this.writer.WriterAdvance(size);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Write(int value)
         {
-            Span<byte> span = stackalloc byte[4];
+            int size = 4;
+            Span<byte> span = this.writer.GetWritableSpan(size);
             this.operators.WriteInt32(span, ref value);
-            this.writer.Write(span);
+            this.writer.WriterAdvance(size);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Write(uint value)
         {
-            Span<byte> span = stackalloc byte[4];
+            int size = 4;
+            Span<byte> span = this.writer.GetWritableSpan(size);
             this.operators.WriteUInt32(span, ref value);
-            this.writer.Write(span);
+            this.writer.WriterAdvance(size);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Write(long value)
         {
-            Span<byte> span = stackalloc byte[8];
+            int size = 8;
+            Span<byte> span = this.writer.GetWritableSpan(size);
             this.operators.WriteInt64(span, ref value);
-            this.writer.Write(span);
+            this.writer.WriterAdvance(size);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Write(ulong value)
         {
-            Span<byte> span = stackalloc byte[8];
+            int size = 8;
+            Span<byte> span = this.writer.GetWritableSpan(size);
             this.operators.WriteUInt64(span, ref value);
-            this.writer.Write(span);
+            this.writer.WriterAdvance(size);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -91,22 +99,19 @@ namespace Letter.Box
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Write(byte[] bytes, int offset, int count)
         {
-            Span<byte> span = new Span<byte>(bytes, offset, count);
-            this.Write(ref span);
+            this.Write(new Span<byte>(bytes, offset, count));
         }
         
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Write(ref ArraySegment<byte> segment)
         {
-            var span = segment.AsSpan();
-            this.Write(ref span);
+            this.Write(segment.AsSpan());
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Write(ref Memory<byte> memory)
         {
-            var span = memory.Span;
-            this.Write(ref span);
+            this.Write(memory.Span);
         }
 
         public void Write(ref ReadOnlyMemory<byte> memory)
@@ -127,7 +132,7 @@ namespace Letter.Box
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void Write(ref Span<byte> span)
+        public void Write(in Span<byte> span)
         {
             if (span.Length < 1)
             {

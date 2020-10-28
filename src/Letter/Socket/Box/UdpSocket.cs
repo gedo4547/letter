@@ -1,11 +1,8 @@
-﻿using System;
-using System.Buffers;
+﻿using System.Buffers;
 using System.IO.Pipelines;
-using System.Net;
-using System.Net.Sockets;
 using System.Runtime.CompilerServices;
 
-namespace Letter
+namespace System.Net.Sockets
 {
     public sealed class UdpSocket : ASocket
     {

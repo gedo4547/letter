@@ -2,7 +2,7 @@
 using System.ComponentModel;
 using System.Threading;
 
-namespace Letter
+namespace System.IO.Pipelines
 {
     public partial class DgramPipeline : IDgramPipelineReader
     {

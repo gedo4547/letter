@@ -4,7 +4,7 @@ using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Letter
+namespace System.IO.Pipelines
 {
     public sealed class StreamPipelineReader : PipeReader
     {

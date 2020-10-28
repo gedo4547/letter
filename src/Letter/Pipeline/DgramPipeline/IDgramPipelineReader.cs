@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel;
  
-namespace Letter
+namespace System.IO.Pipelines
 {
     [EditorBrowsable(EditorBrowsableState.Never)]
     public interface IDgramPipelineReader

@@ -2,7 +2,7 @@
 using System.ComponentModel;
 using System.Net;
 
-namespace Letter
+namespace System.IO.Pipelines
 {
     [EditorBrowsable(EditorBrowsableState.Never)]
     interface IDgramNode

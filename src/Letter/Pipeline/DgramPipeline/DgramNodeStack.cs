@@ -1,4 +1,4 @@
-﻿namespace Letter
+﻿namespace System.IO.Pipelines
 {
     class DgramNodeStack : ObjectStack<DgramNode>
     {

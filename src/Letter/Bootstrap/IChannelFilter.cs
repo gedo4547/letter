@@ -1,5 +1,5 @@
 ﻿using System;
-using Letter.Box;
+using System.IO.Pipelines;
 
 namespace Letter.Bootstrap
 {

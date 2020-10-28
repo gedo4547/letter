@@ -4,7 +4,7 @@ using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Letter
+namespace System.IO.Pipelines
 {
     public partial class DgramPipeline : IDgramPipelineWriter
     {
