@@ -94,7 +94,8 @@ namespace Letter.Tcp.Box
                 {
                     break;
                 }
-                
+                var session = this.createSession(acceptSocket, options, schedulerAllocator.Next(), this.memoryPool);
+                await session.StartAsync();
             }
         }
 

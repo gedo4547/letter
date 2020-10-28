@@ -3,13 +3,14 @@ using System.IO.Pipelines;
 using System.Net;
 using System.Net.Sockets;
 using System.Threading.Tasks;
+using Letter.Bootstrap;
 
 namespace Letter.Tcp.Box
 {
     class TcpSession : ATcpSession, ITcpSession
     {
-        public TcpSession(Socket socket, ATcpOptions options, PipeScheduler scheduler, MemoryPool<byte> pool) 
-            : base(socket, options, scheduler, pool)
+        public TcpSession(Socket socket, ATcpOptions options, PipeScheduler scheduler, MemoryPool<byte> pool, ChannelFilterGroup<Box.ITcpSession, Box.ITcpChannelFilter> filterGroup) 
+            : base(socket, options, scheduler, pool, filterGroup)
         {
         }
 
@@ -34,8 +35,5 @@ namespace Letter.Tcp.Box
         {
             throw new System.NotImplementedException();
         }
-
-
-      
     }
 }

@@ -2,16 +2,19 @@
 using System.IO.Pipelines;
 using System.Net.Sockets;
 using System.Threading.Tasks;
+using Letter.Bootstrap;
 
 namespace Letter.Tcp
 {
     abstract class ATcpSession
     {
-        public ATcpSession(Socket socket, Box.ATcpOptions options, PipeScheduler scheduler, MemoryPool<byte> pool)
+        public ATcpSession(Socket socket, Box.ATcpOptions options, PipeScheduler scheduler, MemoryPool<byte> pool, ChannelFilterGroup<Box.ITcpSession, Box.ITcpChannelFilter> filterGroup)
         {
             this.pool = pool;
             this.scheduler = scheduler;
             this.socket = new TcpSocket(socket, scheduler);
+
+            this.filterGroup = filterGroup;
             
             this.SettingSocket(this.socket, options);
         }
@@ -19,6 +22,9 @@ namespace Letter.Tcp
         private TcpSocket socket;
         private MemoryPool<byte> pool;
         private PipeScheduler scheduler;
+
+        protected ChannelFilterGroup<Box.ITcpSession, Box.ITcpChannelFilter> filterGroup;
+        
 
         public abstract Task StartAsync();
 
@@ -38,7 +44,5 @@ namespace Letter.Tcp
             if (options.SndBufferSize != null)
                 this.socket.SettingSndBufferSize(options.SndBufferSize.Value);
         }
-
-
     }
 }
