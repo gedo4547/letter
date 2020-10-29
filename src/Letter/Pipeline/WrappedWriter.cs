@@ -117,12 +117,11 @@ namespace System.IO.Pipelines
 
         public void Write(ref ReadOnlyMemory<byte> memory)
         {
-            var span = memory.Span;
-            this.Write(ref span);
+            this.Write(memory.Span);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void Write(ref ReadOnlySpan<byte> span)
+        public void Write(in ReadOnlySpan<byte> span)
         {
             if (span.Length < 1)
             {
