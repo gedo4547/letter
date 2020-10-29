@@ -93,11 +93,7 @@ namespace Letter.Tcp
                     break;
                 }
                 var scheduler = this.schedulerAllocator.Next();
-                var session = this.createSession(
-                    acceptSocket, 
-                    options, 
-                    scheduler, 
-                    this.memoryPool);
+                var session = this.createSession(acceptSocket, options, scheduler, this.memoryPool);
                 
                 await session.StartAsync();
             }

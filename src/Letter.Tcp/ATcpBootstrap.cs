@@ -21,12 +21,12 @@ namespace Letter.Tcp
             this.sslFeature = new SslFeature(sslOptions, sslStreamFactory);
         }
 
-        protected override Task<TChannel> ChannelFactory(TOptions options, Action<IFilterPipeline<ITcpSession>> handler)
+        protected override Task<TChannel> ChannelFactoryAsync(TOptions options, Action<IFilterPipeline<ITcpSession>> handler)
         {
-            return this.ChannelFactory(options, handler, this.sslFeature);
+            return this.ChannelFactoryAsync(options, handler, this.sslFeature);
         }
         
-        protected abstract Task<TChannel> ChannelFactory(TOptions options, Action<IFilterPipeline<ITcpSession>> handler, SslFeature sslFeature);
+        protected abstract Task<TChannel> ChannelFactoryAsync(TOptions options, Action<IFilterPipeline<ITcpSession>> handler, SslFeature sslFeature);
 
         public override ValueTask DisposeAsync()
         {

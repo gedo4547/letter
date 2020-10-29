@@ -12,10 +12,31 @@ namespace tcp_test1
     {
         private static bool isUseSsl = false;
         private static IPEndPoint address = new IPEndPoint(IPAddress.Loopback, 20001);
-        
+        private static  X509Certificate2 cert = new X509Certificate2(Path.Combine(AppContext.BaseDirectory, "dotnetty.com.pfx"), "password");
         static async Task Main(string[] args)
         {
-            // var cert = new X509Certificate2(Path.Combine(AppContext.BaseDirectory, "dotnetty.com.pfx"), "password");
+            var server_bootstrap = TcpFactory.ServerBootstrap();
+            server_bootstrap.ConfigurationOptions((options =>
+            {
+                
+            }));
+            
+            server_bootstrap.ConfigurationFilter((pipeline) =>
+            {
+                
+            });
+            
+            server_bootstrap.ConfigurationSsl(
+                new SslServerOptions(cert, false, false), stream =>
+            {
+                return null;
+            });
+
+            var channel = await server_bootstrap.BuildAsync();
+            await channel.StartAsync(address);
+
+
+            
             //
             //
             // var server_bootstrap = TcpFactory.ServerBootstrap();

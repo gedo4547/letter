@@ -38,11 +38,7 @@ namespace Letter.Tcp
             this.ConnectAddress = this.connectSocket.LocalEndPoint;
 
             var scheduler = this.schedulerAllocator.Next();
-            this.session = this.createSession(
-                this.connectSocket, 
-                this.options, 
-                scheduler, 
-                this.memoryPool);
+            this.session = this.createSession(this.connectSocket, this.options, scheduler, this.memoryPool);
             
             await this.session.StartAsync();
         }

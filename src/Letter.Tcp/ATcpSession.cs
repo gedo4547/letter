@@ -100,6 +100,7 @@ namespace Letter.Tcp
         
         private Task processingTask;
         private int minAllocBufferSize;
+        private volatile bool isDisposed = false;
         
         public abstract Task StartAsync();
 
@@ -152,7 +153,7 @@ namespace Letter.Tcp
         private async Task ProcessReceives()
         {
             var input = Input;
-            while (true)
+            while (!this.isDisposed)
             {
                 var buffer = input.GetMemory(minAllocBufferSize);
                 var bytesReceived = await this.socket.ReceiveAsync(ref buffer);
@@ -184,7 +185,7 @@ namespace Letter.Tcp
         private async Task ProcessSends()
         {
             var output = Output;
-            while (true)
+            while (!this.isDisposed)
             {
                 var result = await output.ReadAsync();
                 if (result.IsCanceled) break;

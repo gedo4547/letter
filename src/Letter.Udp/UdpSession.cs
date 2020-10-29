@@ -149,6 +149,11 @@ namespace Letter.Udp
             }
         }
 
+        public Task FlushAsync()
+        {
+            throw new NotImplementedException();
+        }
+
         private async void OnSndPipelineRead(IDgramPipelineReader reader)
         {
             while (true)

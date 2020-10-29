@@ -45,10 +45,10 @@ namespace Letter
                 this.optionsFactory(this.options);
             }
             
-            return this.ChannelFactory(this.options, this.filterPipelineHandler);
+            return this.ChannelFactoryAsync(this.options, this.filterPipelineHandler);
         }
         
-        protected abstract Task<TChannel> ChannelFactory(TOptions options, Action<IFilterPipeline<TSession>> handler);
+        protected abstract Task<TChannel> ChannelFactoryAsync(TOptions options, Action<IFilterPipeline<TSession>> handler);
         
         public virtual ValueTask DisposeAsync()
         {

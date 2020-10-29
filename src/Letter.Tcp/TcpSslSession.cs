@@ -4,7 +4,6 @@ using System.Net.Sockets;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 
-
 namespace Letter.Tcp
 {
     class TcpSslSession : TcpSession
@@ -14,13 +13,9 @@ namespace Letter.Tcp
         {
             var inputPipeOptions = StreamPipeOptionsHelper.ReaderOptionsCreator(pool);
             var outputPipeOptions = StreamPipeOptionsHelper.WriterOptionsCreator(pool);
-            var sslDuplexPipe = new SslStreamDuplexPipe(
-                base.Transport, 
-                inputPipeOptions, 
-                outputPipeOptions, 
-                sslFeature.sslStreamFactory);
-            this.sslTransport = sslDuplexPipe;
+            var sslDuplexPipe = new SslStreamDuplexPipe(base.Transport, inputPipeOptions, outputPipeOptions, sslFeature.sslStreamFactory);
             
+            this.sslTransport = sslDuplexPipe;
             this.sslOptions = sslFeature.sslOptions;
         }
         

@@ -5,7 +5,7 @@ namespace Letter.Tcp
 {
     sealed class TcpServerBootstrap : ATcpBootstrap<TcpServerOptions, ITcpServerChannel>, ITcpServerBootstrap
     {
-        protected override Task<ITcpServerChannel> ChannelFactory(TcpServerOptions options, Action<IFilterPipeline<ITcpSession>> handler, SslFeature sslFeature)
+        protected override Task<ITcpServerChannel> ChannelFactoryAsync(TcpServerOptions options, Action<IFilterPipeline<ITcpSession>> handler, SslFeature sslFeature)
         {
             return Task.FromResult((ITcpServerChannel) new TcpServerChannel(options, handler, sslFeature));
         }
