@@ -18,8 +18,8 @@ namespace tcp_test1
                 var bytes = System.Text.Encoding.UTF8.GetBytes("你好"+i);
                 session.Write(bytes);
             }
-
             await session.FlushAsync();
+            Console.WriteLine("111111111111111111");
             // await session.DisposeAsync();
         }
 
@@ -36,7 +36,7 @@ namespace tcp_test1
         public void OnTransportRead(ITcpSession session, ref WrappedReader reader, object args)
         {
             Console.WriteLine($"{nameof(TcpTestFilter_Client)}.{nameof(OnTransportRead)}");
-            List<ReadOnlySequence<byte>> buffers = (List<ReadOnlySequence<byte>>)args;
+            List<ReadOnlySequence<byte>> buffers = args as List<ReadOnlySequence<byte>>;
             for (int i = 0; i < buffers.Count; i++)
             {
                 var buffer = buffers[i];

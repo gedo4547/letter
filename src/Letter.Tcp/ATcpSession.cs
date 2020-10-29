@@ -153,9 +153,10 @@ namespace Letter.Tcp
             var input = Input;
             while (!this.isDisposed)
             {
-                var buffer = input.GetMemory(minAllocBufferSize);
+                var buffer = input.GetMemory(this.minAllocBufferSize);
+                Console.WriteLine("rcv        00000>>" + buffer.Length);
                 var bytesReceived = await this.socket.ReceiveAsync(ref buffer);
-                
+                Console.WriteLine("rcv        111111>>" + bytesReceived);
                 if (bytesReceived == 0) 
                     throw new RemoteSocketClosedException();
 
@@ -193,11 +194,13 @@ namespace Letter.Tcp
                 var result = await output.ReadAsync();
                 if (result.IsCanceled) break;
                 var buffer = result.Buffer;
+                Console.WriteLine("Send        111111>>" + buffer.Length);
                 var end = buffer.End;
                 var isCompleted = result.IsCompleted;
                 if (!buffer.IsEmpty)
                 {
                     var bytesReceived = await this.socket.SendAsync(ref buffer);
+                    Console.WriteLine("Send        2222222>>" + bytesReceived);
                     if (bytesReceived == 0)
                         throw new RemoteSocketClosedException();
                 }
