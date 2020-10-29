@@ -32,32 +32,27 @@ namespace Letter.Tcp
 
         public string Id
         {
-            [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            get;
+            [MethodImpl(MethodImplOptions.AggressiveInlining)] get;
         }
 
         public BinaryOrder Order
         {
-            [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            get;
+            [MethodImpl(MethodImplOptions.AggressiveInlining)] get;
         }
 
         public EndPoint LocalAddress
         {
-            [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            get;
+            [MethodImpl(MethodImplOptions.AggressiveInlining)] get;
         }
 
         public EndPoint RemoteAddress
         {
-            [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            get;
+            [MethodImpl(MethodImplOptions.AggressiveInlining)] get;
         }
 
         public MemoryPool<byte> MemoryPool
         {
-            [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            get;
+            [MethodImpl(MethodImplOptions.AggressiveInlining)] get;
         }
 
         public PipeScheduler Scheduler
@@ -68,18 +63,14 @@ namespace Letter.Tcp
 
         protected IWrappedDuplexPipe Transport
         {
-            [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            get;
-            [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            private set;
+            [MethodImpl(MethodImplOptions.AggressiveInlining)] get;
+            [MethodImpl(MethodImplOptions.AggressiveInlining)] private set;
         }
 
         protected IWrappedDuplexPipe Application
         {
-            [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            get;
-            [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            private set;
+            [MethodImpl(MethodImplOptions.AggressiveInlining)] get;
+            [MethodImpl(MethodImplOptions.AggressiveInlining)] private set;
         }
 
         private PipeWriter Input
@@ -91,16 +82,16 @@ namespace Letter.Tcp
         private PipeReader Output
         {
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            get { return this.Application.Input;}
+            get { return this.Application.Input; }
         }
-
-
-        private TcpSocket socket;
-        protected FilterPipeline<ITcpSession> filterPipeline;
         
+        private TcpSocket socket;
         private Task processingTask;
         private int minAllocBufferSize;
-        private volatile bool isDisposed = false;
+        
+        protected volatile bool isDisposed = false;
+        protected FilterPipeline<ITcpSession> filterPipeline;
+        
         
         public abstract Task StartAsync();
 
@@ -111,17 +102,19 @@ namespace Letter.Tcp
         protected void Run()
         {
             this.processingTask = SocketStartAsync(); 
+            
+            this.filterPipeline.OnTransportActive(this);
         }
         
         private async Task SocketStartAsync()
         {
             try
             {
-                var receiveTask = DoReceive();
-                var sendTask = DoSend();
+                var rcvTask = DoReceive();
+                var sndTask = DoSend();
 
-                await receiveTask;
-                await sendTask;
+                await rcvTask;
+                await sndTask;
 
                 await this.socket.DisposeAsync();
             }
@@ -132,14 +125,15 @@ namespace Letter.Tcp
         }
 
         private async Task DoReceive()
-        {            
+        {
             try
             {
                 await ProcessReceives();
             }
             catch (Exception ex)
             {
-                if (SocketErrorHelper.IsSocketDisabledError(ex) || ex is RemoteSocketClosedException)
+                if (SocketErrorHelper.IsSocketDisabledError(ex) || 
+                    ex is RemoteSocketClosedException)
                 {
                     await this.DisposeAsync();
                 }
@@ -147,6 +141,10 @@ namespace Letter.Tcp
                 {
                     this.filterPipeline.OnTransportException(this, ex);
                 }
+            }
+            finally
+            {
+                this.Input.Complete();
             }
         }
         
@@ -173,12 +171,17 @@ namespace Letter.Tcp
             {
                 await ProcessSends();
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
-                if (!(SocketErrorHelper.IsSocketDisabledError(ex) || ex is RemoteSocketClosedException))
+                if (!(SocketErrorHelper.IsSocketDisabledError(ex) ||
+                      ex is RemoteSocketClosedException))
                 {
                     this.filterPipeline.OnTransportException(this, ex);
                 }
+            }
+            finally
+            {
+                this.Output.Complete();
             }
         }
         
@@ -232,9 +235,16 @@ namespace Letter.Tcp
             this.Application = pair.Application;
         }
 
-        public async virtual ValueTask DisposeAsync()
+        public virtual ValueTask DisposeAsync()
         {
-            await this.socket.DisposeAsync();
+            if (!this.isDisposed)
+            {
+                this.filterPipeline.OnTransportInactive(this);
+                this.Transport.Input.Complete();
+                this.Transport.Output.Complete();
+            }
+
+            return default;
         }
     }
 }

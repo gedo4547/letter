@@ -36,7 +36,7 @@ namespace Letter.Tcp
         
         public override Task StartAsync()
         {
-            this.readTask = ReadReceiveBuffer();
+            this.readTask = this.ReadReceiveBuffer();
             
             base.Run();
             
@@ -46,7 +46,7 @@ namespace Letter.Tcp
         private async Task ReadReceiveBuffer()
         {
             StreamPipelineReader input = this.Input;
-            while (true)
+            while (!base.isDisposed)
             {
                 ReadResult result = await input.ReadAsync();
                 if (result.IsCanceled || result.IsCompleted)
@@ -74,12 +74,13 @@ namespace Letter.Tcp
         {
             lock (sync)
             {
+                if (this.isDisposed) return;
+
                 WrappedWriter writer = new WrappedWriter(this.Output, this.Order, this.writerFlushCallback);
                 this.filterPipeline.OnTransportWrite(this, ref writer, o);
             }
         }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        
         public async override Task FlushAsync()
         {
             FlushResult result = await this.Output.FlushAsync();

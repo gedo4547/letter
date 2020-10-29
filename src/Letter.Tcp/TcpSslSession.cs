@@ -58,5 +58,10 @@ namespace Letter.Tcp
 
             await base.StartAsync();
         }
+
+        public override ValueTask DisposeAsync()
+        {
+            return base.DisposeAsync();
+        }
     }
 }
