@@ -41,7 +41,7 @@ namespace System.IO.Pipelines
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public byte ReadUInt8()
         {
-            var segment = this.ReadRange(1);
+            var segment = this.ReadBuffer(1);
             var arr = segment.First.GetBinaryArray();
             return arr.Array[arr.Offset];
         }
@@ -51,7 +51,7 @@ namespace System.IO.Pipelines
         public short ReadInt16()
         {
             int length = 2;
-            var segment = this.ReadRange(length);
+            var segment = this.ReadBuffer(length);
             
             if (segment.First.Length >= length)
                 return this.operators.ReadInt16(segment.First.Span);
@@ -67,7 +67,7 @@ namespace System.IO.Pipelines
         public ushort ReadUInt16()
         {
             int length = 2;
-            var segment = this.ReadRange(length);
+            var segment = this.ReadBuffer(length);
             if (segment.First.Length >= length)
                 return this.operators.ReadUInt16(segment.First.Span);
             else
@@ -82,7 +82,7 @@ namespace System.IO.Pipelines
         public int ReadInt32()
         {
             int length = 4;
-            var segment = this.ReadRange(length);
+            var segment = this.ReadBuffer(length);
             if (segment.First.Length >= length)
                 return this.operators.ReadInt32(segment.First.Span);
             else
@@ -97,7 +97,7 @@ namespace System.IO.Pipelines
         public uint ReadUInt32()
         {
             int length = 4;
-            var segment = this.ReadRange(length);
+            var segment = this.ReadBuffer(length);
             if (segment.First.Length >= length)
                 return this.operators.ReadUInt32(segment.First.Span);
             else
@@ -112,7 +112,7 @@ namespace System.IO.Pipelines
         public unsafe long ReadInt64()
         {
             int length = 8;
-            var segment = this.ReadRange(length);
+            var segment = this.ReadBuffer(length);
             
             if (segment.First.Length >= length)
                 return this.operators.ReadInt64(segment.First.Span);
@@ -128,7 +128,7 @@ namespace System.IO.Pipelines
         public ulong ReadUInt64()
         {
             int length = 8;
-            var segment = this.ReadRange(length);
+            var segment = this.ReadBuffer(length);
             if (segment.First.Length >= length)
                 return this.operators.ReadUInt64(segment.First.Span);
             else
@@ -140,7 +140,7 @@ namespace System.IO.Pipelines
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public ReadOnlySequence<byte> ReadRange(SequencePosition endPosition)
+        public ReadOnlySequence<byte> ReadBuffer(SequencePosition endPosition)
         {
             var segment = this.buffer.Slice(buffer.Start, endPosition);
             this.buffer = this.buffer.Slice(endPosition);
@@ -148,7 +148,7 @@ namespace System.IO.Pipelines
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public ReadOnlySequence<byte> ReadRange(int length)
+        public ReadOnlySequence<byte> ReadBuffer(int length)
         {
             var endPos = this.buffer.GetPosition(length, this.buffer.Start);
             var segment = this.buffer.Slice(buffer.Start, endPos);

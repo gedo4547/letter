@@ -28,12 +28,11 @@ namespace Letter.Tcp
 
         public async Task StartAsync(EndPoint address)
         {
-            if (address is IPEndPoint)
-                throw new NotSupportedException("The SocketConnectionFactory only supports IPEndPoints for now.");
-            
-            if (connectSocket == null)
+            if (this.connectSocket == null)
+            {
                 this.connectSocket = new Socket(address.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
-
+            }
+            
             await this.connectSocket.ConnectAsync(address);
             this.ConnectAddress = this.connectSocket.LocalEndPoint;
 
