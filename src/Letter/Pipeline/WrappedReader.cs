@@ -7,8 +7,9 @@ namespace System.IO.Pipelines
 {
     public delegate void ReaderFlushDelegate(SequencePosition startPos, SequencePosition endPos);
 
-    public struct WrappedReader
+    public ref struct WrappedReader
     {
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public WrappedReader(ReadOnlySequence<byte> buffer, BinaryOrder order, ReaderFlushDelegate readerFlush)
         {
             this.buffer = buffer;

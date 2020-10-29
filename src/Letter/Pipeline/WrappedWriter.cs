@@ -10,6 +10,7 @@ namespace System.IO.Pipelines
     
     public ref struct WrappedWriter
     {
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public WrappedWriter(IWrappedWriter writer, BinaryOrder order, WriterFlushDelegate writerFlush)
         {
             this.writer = writer;

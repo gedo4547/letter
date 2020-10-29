@@ -16,13 +16,15 @@ namespace Letter.Tcp
             this.writerFlushCallback = (writer) => { };
         }
         
-        private StreamPipelineReader Input
+        protected virtual StreamPipelineReader Input
         {
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
             get { return base.Transport.WrappedInput; }
         }
 
-        private StreamPipelineWriter Output
+        protected virtual StreamPipelineWriter Output
         {
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
             get { return base.Transport.WrappedOutput; }
         }
 
@@ -51,13 +53,18 @@ namespace Letter.Tcp
                 {
                     break;
                 }
-                var buffer = result.Buffer;
-                
-                WrappedReader reader = new WrappedReader(buffer, Order, this.readerFlushCallback);
-                this.filterPipeline.OnTransportRead(this, ref reader);
+
+                this.TransportReadNotify(result.Buffer);
             }
         }
-        
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private void TransportReadNotify(ReadOnlySequence<byte> buffer)
+        {
+            var reader = new WrappedReader(buffer, this.Order, this.readerFlushCallback);
+            this.filterPipeline.OnTransportRead(this, ref reader);
+        }
+
         private void OnFilterReadFlush(SequencePosition startpos, SequencePosition endpos)
         {
             this.Input.AdvanceTo(startpos, endpos);

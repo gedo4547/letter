@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Letter.Tcp
 {
-    class TcpSslSession : ATcpSession
+    class TcpSslSession : TcpSession
     {
         public TcpSslSession(Socket socket, ATcpOptions options, PipeScheduler scheduler, MemoryPool<byte> pool, SslFeature sslFeature, FilterPipeline<ITcpSession> filterPipeline)
             : base(socket, options, scheduler, pool, filterPipeline)
@@ -19,23 +19,30 @@ namespace Letter.Tcp
                 inputPipeOptions, 
                 outputPipeOptions, 
                 sslFeature.sslStreamFactory);
-            this.SslTransport = sslDuplexPipe;
+            this.sslTransport = sslDuplexPipe;
             
             this.sslOptions = sslFeature.sslOptions;
         }
-
-        private IWrappedDuplexPipe SslTransport
+        
+        protected override StreamPipelineReader Input
         {
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            get;
+            get { return this.sslTransport.WrappedInput; }
+        }
+
+        protected override StreamPipelineWriter Output
+        {
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            get { return this.sslTransport.WrappedOutput; }
         }
 
         private SslOptions sslOptions;
+        private SslStreamDuplexPipe sslTransport;
         
         public async override Task StartAsync()
         {
             var tlsOptions = this.sslOptions;
-            var sslDuplexPipe = this.SslTransport as SslStreamDuplexPipe;
+            var sslDuplexPipe = this.sslTransport;
             switch (tlsOptions)
             {
                 case SslServerOptions serverTlsOptions:
@@ -53,16 +60,8 @@ namespace Letter.Tcp
                         clientTlsOptions.CheckCertificateRevocation);
                     break;
             }
-        }
 
-        public override void Write(object obj)
-        {
-            throw new System.NotImplementedException();
-        }
-
-        public override Task FlushAsync()
-        {
-            throw new System.NotImplementedException();
+            await base.StartAsync();
         }
     }
 }
