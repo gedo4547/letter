@@ -12,6 +12,7 @@ namespace Letter.Tcp
         public TcpSession(Socket socket, ATcpOptions options, PipeScheduler scheduler, MemoryPool<byte> pool, FilterPipeline<ITcpSession> filterPipeline) 
             : base(socket, options, scheduler, pool, filterPipeline)
         {
+            Console.WriteLine("TcpSession");
             this.readerFlushCallback = OnFilterReadFlush;
             this.writerFlushCallback = (writer) => { };
         }
@@ -32,23 +33,24 @@ namespace Letter.Tcp
         private ReaderFlushDelegate readerFlushCallback;
         private WriterFlushDelegate writerFlushCallback;
 
-        private Task readTask;
+        protected Task readTask;
         
         public override Task StartAsync()
         {
-            this.readTask = this.ReadReceiveBuffer();
-            
             base.Run();
+            this.readTask = this.ReadBufferAsync();
             
             return Task.CompletedTask;
         }
 
-        private async Task ReadReceiveBuffer()
+        protected async Task ReadBufferAsync()
         {
             StreamPipelineReader input = this.Input;
             while (!base.isDisposed)
             {
+                Console.WriteLine("Transport        000000000000");
                 ReadResult result = await input.ReadAsync();
+                Console.WriteLine("Transport        111111111");
                 if (result.IsCanceled || result.IsCompleted)
                 {
                     break;
@@ -62,6 +64,7 @@ namespace Letter.Tcp
         private void TransportReadNotify(ReadOnlySequence<byte> buffer)
         {
             var reader = new WrappedReader(buffer, this.Order, this.readerFlushCallback);
+            Console.WriteLine("Transport        拋出");
             this.filterPipeline.OnTransportRead(this, ref reader);
         }
 

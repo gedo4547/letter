@@ -28,10 +28,10 @@ namespace Letter.Tcp.DefaultFilter
         public void OnTransportInactive(ITcpSession session) { }
         public void OnTransportException(ITcpSession session, Exception ex) { }
 
-        public void OnTransportRead(ITcpSession session, ref WrappedReader reader, object args)
+        public void OnTransportRead(ITcpSession session, ref WrappedReader reader, List<Object> args)
         {
             this.buffers.Clear();
-            args = this.buffers;
+            args.Add(this.buffers);
             while (reader.TryFindPosition(this.symbol, out SequencePosition endPosition))
             {
                 var buffer = reader.ReadBuffer(endPosition);
@@ -40,9 +40,9 @@ namespace Letter.Tcp.DefaultFilter
             }
         }
 
-        public void OnTransportWrite(ITcpSession session, ref WrappedWriter writer, object args)
+        public void OnTransportWrite(ITcpSession session, ref WrappedWriter writer, List<Object> args)
         {
-            var buffer = args as byte[];
+            var buffer = args[0] as byte[];
             writer.Write(buffer);
             writer.Write(this.symbol);
         }

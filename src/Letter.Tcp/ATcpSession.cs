@@ -28,6 +28,8 @@ namespace Letter.Tcp
 
             this.SettingSocket(this.socket, options);
             this.SettingPipeline(options.MaxPipelineReadBufferSize, options.MaxPipelineWriteBufferSize);
+            
+            
         }
 
         public string Id
@@ -57,8 +59,7 @@ namespace Letter.Tcp
 
         public PipeScheduler Scheduler
         {
-            [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            get;
+            [MethodImpl(MethodImplOptions.AggressiveInlining)] get;
         }
 
         protected IWrappedDuplexPipe Transport
@@ -101,7 +102,7 @@ namespace Letter.Tcp
         
         protected void Run()
         {
-            this.processingTask = SocketStartAsync(); 
+            this.processingTask = this.SocketStartAsync(); 
             
             this.filterPipeline.OnTransportActive(this);
         }

@@ -30,10 +30,10 @@ namespace tcp_test1
 
             if (isUseSsl)
             {
-                server_bootstrap.ConfigurationSsl(
-                new SslServerOptions(cert, false, false), stream =>
+                server_bootstrap.ConfigurationSsl(new SslServerOptions(cert, false, false), 
+                    stream =>
                 {
-                    return null;
+                    return new SslStream(stream, true, (sender, certificate, chain, sslPolicyErrors) => true);
                 });
             }
             
@@ -52,10 +52,8 @@ namespace tcp_test1
 
             if (isUseSsl)
             {
-                string targetHost = cert.GetNameInfo(X509NameType.DnsName, false);
-                client_bootstrap.ConfigurationSsl(
-                    new SslClientOptions(targetHost),
-                    (stream)=>
+                client_bootstrap.ConfigurationSsl(new SslClientOptions(cert.GetNameInfo(X509NameType.DnsName, false)),
+                    stream=>
                     {
                         return new SslStream(stream, true, (sender, certificate, chain, sslPolicyErrors) => true);
                     }

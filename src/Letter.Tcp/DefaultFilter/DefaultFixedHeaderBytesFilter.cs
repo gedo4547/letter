@@ -25,17 +25,13 @@ namespace Letter.Tcp.DefaultFilter
         public void OnTransportInactive(ITcpSession session) { }
         public void OnTransportException(ITcpSession session, Exception ex) { }
 
-        public void OnTransportRead(ITcpSession session, ref WrappedReader reader, object args)
+        public void OnTransportRead(ITcpSession session, ref WrappedReader reader, List<Object> args)
         {
+            Console.WriteLine("DefaultFixedHeaderBytesFilter.OnTransportRead");
             this.buffers.Clear();
-            args = this.buffers;
-            while (true)
+            args.Add(this.buffers);
+            while (reader.IsLengthEnough(this.currentReadLength))
             {
-                if (!reader.IsLengthEnough(this.currentReadLength))
-                {
-                    break;
-                }
-                
                 if (this.currentReadPart == PackPart.Head)
                 {
                     this.currentReadLength = reader.ReadInt32();
@@ -48,15 +44,18 @@ namespace Letter.Tcp.DefaultFilter
                 else if (this.currentReadPart == PackPart.Body)
                 {
                     this.buffers.Add(reader.ReadBuffer(this.currentReadLength));
+                    Console.WriteLine("DefaultFixedHeaderBytesFilter.OnTransportRead        解包完成");
                     this.currentReadLength = PackHeaderBytesLen;
                     this.currentReadPart = PackPart.Head;
                 }
             }
+            
+            Console.WriteLine("DefaultFixedHeaderBytesFilter.OnTransportRead    完成");
         }
 
-        public void OnTransportWrite(ITcpSession session, ref WrappedWriter writer, object args)
+        public void OnTransportWrite(ITcpSession session, ref WrappedWriter writer, List<Object> args)
         {
-            var buffer = args as byte[];
+            var buffer = args[0] as byte[];
             if (buffer.Length > this.maxPackLength)
             {
                 throw new Exception("pack length error！！！" + buffer.Length);
