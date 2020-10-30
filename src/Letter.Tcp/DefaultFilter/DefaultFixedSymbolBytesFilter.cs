@@ -3,7 +3,7 @@ using System.Buffers;
 using System.Collections.Generic;
 using System.IO.Pipelines;
 
-namespace Letter.Tcp.DefaultFilter
+namespace Letter.Tcp
 {
     public sealed class DefaultFixedSymbolBytesFilter : ITcpChannelFilter
     {

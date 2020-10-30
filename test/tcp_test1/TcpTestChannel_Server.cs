@@ -26,7 +26,7 @@ namespace tcp_test1
 
         public void OnTransportRead(ITcpSession session, ref WrappedReader reader, List<Object> args)
         {
-            Console.WriteLine(">>>>>>>>>>" + (args == null));
+            // Console.WriteLine(">>>>>>>>>>" + (args == null));
             List<ReadOnlySequence<byte>> buffers = (List<ReadOnlySequence<byte>>)args[0];
             Console.WriteLine("收到包》》》》》"+buffers.Count);
             for (int i = 0; i < buffers.Count; i++)
@@ -41,7 +41,7 @@ namespace tcp_test1
 
         public void OnTransportWrite(ITcpSession session, ref WrappedWriter writer, List<Object> args)
         {
-            Console.WriteLine($"{nameof(TcpTestFilter_Server)}.{nameof(OnTransportWrite)}");
+            // Console.WriteLine($"{nameof(TcpTestFilter_Server)}.{nameof(OnTransportWrite)}");
         }
     }
 }

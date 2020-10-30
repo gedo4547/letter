@@ -6,10 +6,8 @@ namespace System.IO.Pipelines
 {
     public sealed class StreamPipelineReader : PipeReader
     {
-        public StreamPipelineReader(PipeReader reader)
-        {
-            this.reader = reader;
-        }
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public StreamPipelineReader(PipeReader reader) => this.reader = reader;
 
         private PipeReader reader;
 
@@ -25,11 +23,9 @@ namespace System.IO.Pipelines
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public override void Complete(Exception exception = null) => this.reader.Complete(exception);
-
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public override ValueTask<ReadResult> ReadAsync(CancellationToken cancellationToken = new CancellationToken())
+        public override ValueTask<ReadResult> ReadAsync(CancellationToken cancellationToken = default)
             => this.reader.ReadAsync(cancellationToken);
-        
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public override bool TryRead(out ReadResult result) => this.reader.TryRead(out result);
     }

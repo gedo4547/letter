@@ -13,14 +13,9 @@ namespace tcp_test1
     {
         public async void OnTransportActive(ITcpSession session)
         {
+            M.session = session;
             Console.WriteLine($"{nameof(TcpTestFilter_Client)}.{nameof(OnTransportActive)}" + session.Id);
-            for (int i = 0; i < 2; i++)
-            {
-                Console.WriteLine(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>111111111111111111");
-                var bytes = System.Text.Encoding.UTF8.GetBytes("你好"+i);
-                session.Write(bytes);
-                session.FlushAsync().NoAwait();
-            }
+           
             
            
             // await session.DisposeAsync();
@@ -50,7 +45,7 @@ namespace tcp_test1
 
         public void OnTransportWrite(ITcpSession session, ref WrappedWriter writer, List<Object> args)
         {
-            Console.WriteLine($"{nameof(TcpTestFilter_Client)}.{nameof(OnTransportWrite)}");
+            // Console.WriteLine($"{nameof(TcpTestFilter_Client)}.{nameof(OnTransportWrite)}");
         }
     }
 }

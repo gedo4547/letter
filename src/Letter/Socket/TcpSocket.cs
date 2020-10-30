@@ -6,6 +6,8 @@ namespace System.Net.Sockets
 {
     public sealed class TcpSocket : ASocket
     {
+        private static Memory<byte> EmptyMemory = Memory<byte>.Empty;
+        
         public TcpSocket(Socket socket, PipeScheduler scheduler) : base(socket, scheduler)
         {
         }
@@ -26,6 +28,12 @@ namespace System.Net.Sockets
         public void SettingKeepAlive(bool keepAlive)
         {
             this.socket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.KeepAlive, keepAlive);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public SocketAwaitableArgs WaitAsync()
+        {
+            return this.ReceiveAsync(ref EmptyMemory);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

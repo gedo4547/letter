@@ -149,6 +149,7 @@ namespace System.Net.Sockets
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         protected abstract bool SocketAsyncSndOperation(SocketAwaitableArgs args);
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         protected List<ArraySegment<byte>> GetBufferList(ref ReadOnlySequence<byte> buffer)
         {
             this.bufferList.Clear();

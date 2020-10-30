@@ -3,7 +3,7 @@ using System.Buffers;
 using System.Collections.Generic;
 using System.IO.Pipelines;
 
-namespace Letter.Tcp.DefaultFilter
+namespace Letter.Tcp
 {
     public sealed class DefaultFixedHeaderBytesFilter : ITcpChannelFilter
     {
@@ -27,7 +27,6 @@ namespace Letter.Tcp.DefaultFilter
 
         public void OnTransportRead(ITcpSession session, ref WrappedReader reader, List<Object> args)
         {
-            Console.WriteLine("DefaultFixedHeaderBytesFilter.OnTransportRead");
             this.buffers.Clear();
             args.Add(this.buffers);
             while (reader.IsLengthEnough(this.currentReadLength))
@@ -44,13 +43,10 @@ namespace Letter.Tcp.DefaultFilter
                 else if (this.currentReadPart == PackPart.Body)
                 {
                     this.buffers.Add(reader.ReadBuffer(this.currentReadLength));
-                    Console.WriteLine("DefaultFixedHeaderBytesFilter.OnTransportRead        解包完成");
                     this.currentReadLength = PackHeaderBytesLen;
                     this.currentReadPart = PackPart.Head;
                 }
             }
-            
-            Console.WriteLine("DefaultFixedHeaderBytesFilter.OnTransportRead    完成");
         }
 
         public void OnTransportWrite(ITcpSession session, ref WrappedWriter writer, List<Object> args)

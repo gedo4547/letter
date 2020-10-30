@@ -45,27 +45,28 @@ namespace Letter.Tcp
 
         protected async Task ReadBufferAsync()
         {
-            StreamPipelineReader input = this.Input;
-            while (!base.isDisposed)
+            PipeReader input = this.Input;
+
+            while (true)
             {
-                Console.WriteLine("Transport        000000000000");
                 ReadResult result = await input.ReadAsync();
-                Console.WriteLine("Transport        111111111");
                 if (result.IsCanceled || result.IsCompleted)
                 {
                     break;
                 }
 
+                var buffer = result.Buffer;
                 this.TransportReadNotify(result.Buffer);
             }
+             
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private void TransportReadNotify(ReadOnlySequence<byte> buffer)
         {
             var reader = new WrappedReader(buffer, this.Order, this.readerFlushCallback);
-            Console.WriteLine("Transport        拋出");
             this.filterPipeline.OnTransportRead(this, ref reader);
+            reader.Flush();
         }
 
         private void OnFilterReadFlush(SequencePosition startpos, SequencePosition endpos)
@@ -81,6 +82,7 @@ namespace Letter.Tcp
 
                 WrappedWriter writer = new WrappedWriter(this.Output, this.Order, this.writerFlushCallback);
                 this.filterPipeline.OnTransportWrite(this, ref writer, o);
+                writer.Flush();
             }
         }
         

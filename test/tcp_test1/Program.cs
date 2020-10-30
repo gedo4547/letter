@@ -5,13 +5,12 @@ using System;
 using System.IO;
 using System.Security.Cryptography.X509Certificates;
 using System.Net.Security;
-using Letter.Tcp.DefaultFilter;
 
 namespace tcp_test1
 {
     class Program
     {
-        private static bool isUseSsl = false;
+        private static bool isUseSsl = true;
         private static IPEndPoint address = new IPEndPoint(IPAddress.Loopback, 20001);
         private static  X509Certificate2 cert = new X509Certificate2(Path.Combine(AppContext.BaseDirectory, "dotnetty.com.pfx"), "password");
         static async Task Main(string[] args)
@@ -67,8 +66,15 @@ namespace tcp_test1
             await c_channel.StartAsync(address);
 
 
-
-            Console.ReadKey();
+            int num = 0;
+            while (true)
+            {
+                Console.ReadLine();
+                num++;
+                var bytes = System.Text.Encoding.UTF8.GetBytes("你好" + num);
+                M.session.Write(bytes);
+                await M.session.FlushAsync();
+            }
         }
     }
 }

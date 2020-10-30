@@ -74,7 +74,6 @@ namespace Letter
             {
                 this.readArgs.Clear();
                 int count = this.filters.Count;
-                Console.WriteLine("filters.Count>>" + count);
                 for (int i = 0; i < count; i++)
                 {
                     this.filters[i].OnTransportRead(session, ref reader, this.readArgs);

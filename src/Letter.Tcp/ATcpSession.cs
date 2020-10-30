@@ -19,6 +19,7 @@ namespace Letter.Tcp
             this.Scheduler = scheduler;
             this.MemoryPool = pool;
             this.Scheduler = scheduler;
+            this.isWaitData = options.WaitForDataBeforeAllocatingBuffer;
             this.minAllocBufferSize = this.MemoryPool.MaxBufferSize / 2;
             
             this.filterPipeline = filterPipeline;
@@ -89,7 +90,8 @@ namespace Letter.Tcp
         private TcpSocket socket;
         private Task processingTask;
         private int minAllocBufferSize;
-        
+        private bool isWaitData;
+
         protected volatile bool isDisposed = false;
         protected FilterPipeline<ITcpSession> filterPipeline;
         
@@ -152,18 +154,28 @@ namespace Letter.Tcp
         private async Task ProcessReceives()
         {
             var input = Input;
-            while (!this.isDisposed)
+            while (true)
             {
+                if (this.isWaitData)
+                {
+                    await this.socket.WaitAsync();
+                }
                 var buffer = input.GetMemory(this.minAllocBufferSize);
-                Console.WriteLine("rcv        00000>>" + buffer.Length);
-                var bytesReceived = await this.socket.ReceiveAsync(ref buffer);
-                Console.WriteLine("rcv        111111>>" + bytesReceived);
-                if (bytesReceived == 0) 
+                var bytes = await this.socket.ReceiveAsync(ref buffer);
+                
+                if (bytes == 0)
+                {
                     throw new RemoteSocketClosedException();
-
-                input.Advance(bytesReceived);
+                }
+                
+                input.Advance(bytes);
                 var result = await input.FlushAsync();
-                if (result.IsCompleted || result.IsCanceled) break;
+                //Console.WriteLine("Socket接收>" + bytes + "         result.IsCompleted>>" + result.IsCompleted + "       result.IsCanceled>>" + result.IsCanceled);
+                if (result.IsCompleted || result.IsCanceled)
+                {
+                    
+                    break;
+                }
             }
         }
         
@@ -190,24 +202,26 @@ namespace Letter.Tcp
         private async Task ProcessSends()
         {
             var output = Output;
-            while (!this.isDisposed)
+            while (true)
             {
                 var result = await output.ReadAsync();
-                if (result.IsCanceled) break;
+                if (result.IsCanceled || result.IsCompleted)
+                {
+                    break;
+                }
+
                 var buffer = result.Buffer;
-                Console.WriteLine("Send        111111>>" + buffer.Length);
                 var end = buffer.End;
-                var isCompleted = result.IsCompleted;
                 if (!buffer.IsEmpty)
                 {
-                    var bytesReceived = await this.socket.SendAsync(ref buffer);
-                    Console.WriteLine("Send        2222222>>" + bytesReceived);
-                    if (bytesReceived == 0)
+                    var bytes = await this.socket.SendAsync(ref buffer);
+                    if (bytes == 0)
+                    {
                         throw new RemoteSocketClosedException();
+                    }
                 }
 
                 output.AdvanceTo(end);
-                if (isCompleted) break;
             }
         }
 
@@ -241,6 +255,7 @@ namespace Letter.Tcp
 
         public virtual ValueTask DisposeAsync()
         {
+            Console.WriteLine("关闭");
             if (!this.isDisposed)
             {
                 this.filterPipeline.OnTransportInactive(this);

@@ -7,6 +7,7 @@ namespace System.IO.Pipelines
 {
     public sealed class StreamPipelineWriter : PipeWriter, IWrappedWriter
     {
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public StreamPipelineWriter(PipeWriter writer) => this.writer = writer;
 
         private PipeWriter writer;
@@ -30,16 +31,12 @@ namespace System.IO.Pipelines
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public override Span<byte> GetSpan(int sizeHint = 0) => this.writer.GetSpan(sizeHint);
 
-
-        
-
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public Span<byte> GetWritableSpan(int length) => this.writer.GetSpan(length);
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public Memory<byte> GetWritableMemory(int length) => this.writer.GetMemory(length);
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void WriterAdvance(int length) => this.writer.Advance(length);
-        
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Write(in ReadOnlySpan<byte> span) => this.writer.Write(span);
     }

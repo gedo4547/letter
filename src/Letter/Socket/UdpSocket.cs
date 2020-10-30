@@ -9,7 +9,7 @@ namespace System.Net.Sockets
         public UdpSocket(Socket socket, PipeScheduler scheduler) : base(socket, scheduler)
         {
         }
-        
+
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public SocketAwaitableArgs ReceiveAsync(EndPoint loaclAddress, ref Memory<byte> memory)
         {
