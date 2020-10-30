@@ -1,5 +1,6 @@
 ﻿using System.Buffers;
 using System.Buffers.Binary;
+using System.ComponentModel;
 using System.Runtime.CompilerServices;
 
 namespace System.IO.Pipelines
@@ -245,7 +246,8 @@ namespace System.IO.Pipelines
                 return true;
             }
         }
-        
+
+        [EditorBrowsable(EditorBrowsableState.Never)]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Flush()
         {

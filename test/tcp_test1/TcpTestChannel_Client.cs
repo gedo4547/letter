@@ -11,14 +11,11 @@ namespace tcp_test1
 {
     public class TcpTestFilter_Client : ITcpChannelFilter
     {
-        public async void OnTransportActive(ITcpSession session)
+        public void OnTransportActive(ITcpSession session)
         {
             M.session = session;
             Console.WriteLine($"{nameof(TcpTestFilter_Client)}.{nameof(OnTransportActive)}" + session.Id);
            
-            
-           
-            // await session.DisposeAsync();
         }
 
         public void OnTransportException(ITcpSession session, Exception ex)

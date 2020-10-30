@@ -154,7 +154,7 @@ namespace Letter.Tcp
         private async Task ProcessReceives()
         {
             var input = Input;
-            while (true)
+            while (!this.isDisposed)
             {
                 if (this.isWaitData)
                 {
@@ -202,7 +202,7 @@ namespace Letter.Tcp
         private async Task ProcessSends()
         {
             var output = Output;
-            while (true)
+            while (!this.isDisposed)
             {
                 var result = await output.ReadAsync();
                 if (result.IsCanceled || result.IsCompleted)
@@ -258,6 +258,8 @@ namespace Letter.Tcp
             Console.WriteLine("关闭");
             if (!this.isDisposed)
             {
+                this.isDisposed = true;
+
                 this.filterPipeline.OnTransportInactive(this);
                 this.Transport.Input.Complete();
                 this.Transport.Output.Complete();
