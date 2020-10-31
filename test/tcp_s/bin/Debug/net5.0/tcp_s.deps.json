@@ -1,0 +1,60 @@
+{
+  "runtimeTarget": {
+    "name": ".NETCoreApp,Version=v5.0",
+    "signature": ""
+  },
+  "compilationOptions": {},
+  "targets": {
+    ".NETCoreApp,Version=v5.0": {
+      "tcp_s/1.0.0": {
+        "dependencies": {
+          "Letter.Tcp": "1.0.0"
+        },
+        "runtime": {
+          "tcp_s.dll": {}
+        }
+      },
+      "System.IO.Pipelines/4.7.3": {},
+      "Letter/1.0.0": {
+        "dependencies": {
+          "System.IO.Pipelines": "4.7.3"
+        },
+        "runtime": {
+          "Letter.dll": {}
+        }
+      },
+      "Letter.Tcp/1.0.0": {
+        "dependencies": {
+          "Letter": "1.0.0"
+        },
+        "runtime": {
+          "Letter.Tcp.dll": {}
+        }
+      }
+    }
+  },
+  "libraries": {
+    "tcp_s/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "System.IO.Pipelines/4.7.3": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-zykThu9scJyg2Yeg27GMZCbjzniIsmjtNP5x6kQCd/8rEeKXRy20fP2NOMS7xQ+0pS/E85LZQA+K1aoQLxiUdw==",
+      "path": "system.io.pipelines/4.7.3",
+      "hashPath": "system.io.pipelines.4.7.3.nupkg.sha512"
+    },
+    "Letter/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "Letter.Tcp/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    }
+  }
+}

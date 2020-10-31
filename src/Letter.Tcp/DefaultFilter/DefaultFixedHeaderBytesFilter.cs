@@ -5,7 +5,7 @@ using System.IO.Pipelines;
 
 namespace Letter.Tcp
 {
-    public sealed class DefaultFixedHeaderBytesFilter : ITcpChannelFilter
+    public sealed class DefaultFixedHeaderBytesFilter : ITcpFilter
     {
         private const int PackHeaderBytesLen = 4;
 

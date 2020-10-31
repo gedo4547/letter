@@ -116,10 +116,12 @@ namespace Letter.Tcp
                 var rcvTask = DoReceive();
                 var sndTask = DoSend();
 
+                Console.WriteLine("111111111111111111111111111111111111");
                 await rcvTask;
+                Console.WriteLine("222222222222222222222222222222222222");
                 await sndTask;
-
-                await this.socket.DisposeAsync();
+                Console.WriteLine("333333333333333333333333333333333333");
+                //await this.socket.DisposeAsync();
             }
             catch (Exception ex)
             {
@@ -133,17 +135,15 @@ namespace Letter.Tcp
             {
                 await ProcessReceives();
             }
-            catch (Exception ex)
+            catch(Exception ex)
             {
-                if (SocketErrorHelper.IsSocketDisabledError(ex) || 
-                    ex is RemoteSocketClosedException)
-                {
-                    await this.DisposeAsync();
-                }
-                else
+                if (!(ex is RemoteSocketClosedException || SocketErrorHelper.IsSocketDisabledError(ex) || ex is ObjectDisposedException))
                 {
                     this.filterPipeline.OnTransportException(this, ex);
                 }
+                Console.WriteLine("远程socket已经被关闭");
+                await this.DisposeAsync();
+                Console.WriteLine("socket关闭成功");
             }
             finally
             {
@@ -170,10 +170,8 @@ namespace Letter.Tcp
                 
                 input.Advance(bytes);
                 var result = await input.FlushAsync();
-                //Console.WriteLine("Socket接收>" + bytes + "         result.IsCompleted>>" + result.IsCompleted + "       result.IsCanceled>>" + result.IsCanceled);
                 if (result.IsCompleted || result.IsCanceled)
                 {
-                    
                     break;
                 }
             }
@@ -187,10 +185,11 @@ namespace Letter.Tcp
             }
             catch (Exception ex)
             {
-                if (!(SocketErrorHelper.IsSocketDisabledError(ex) ||
-                      ex is RemoteSocketClosedException))
+                if (!(ex is RemoteSocketClosedException || SocketErrorHelper.IsSocketDisabledError(ex) || ex is ObjectDisposedException))
                 {
                     this.filterPipeline.OnTransportException(this, ex);
+                    Console.WriteLine("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"+ex.GetType().Name);
+                    await this.DisposeAsync();
                 }
             }
             finally
@@ -253,19 +252,22 @@ namespace Letter.Tcp
             this.Application = pair.Application;
         }
 
-        public virtual ValueTask DisposeAsync()
+        public virtual async ValueTask DisposeAsync()
         {
-            Console.WriteLine("关闭");
+            Console.WriteLine("关闭>>>"+this.isDisposed);
             if (!this.isDisposed)
             {
                 this.isDisposed = true;
 
                 this.filterPipeline.OnTransportInactive(this);
-                this.Transport.Input.Complete();
-                this.Transport.Output.Complete();
-            }
 
-            return default;
+                this.Output.CancelPendingRead();
+                await this.socket.DisposeAsync();
+
+                await this.processingTask;
+
+                Console.WriteLine("关闭成功");
+            }
         }
     }
 }

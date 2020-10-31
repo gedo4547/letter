@@ -17,7 +17,7 @@ namespace System.Net.Sockets
                        IsConnectionAbortError(socketEx.SocketErrorCode);
             }
 
-            return (ex is ObjectDisposedException);
+            return false;
         }
 
 

@@ -97,6 +97,7 @@ namespace Letter.Tcp
         
         public override ValueTask DisposeAsync()
         {
+            Logger.Error("GGGGGGGGGGGGG");
             return base.DisposeAsync();
         }
     }

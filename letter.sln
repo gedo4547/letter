@@ -1,22 +1,29 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Letter.Tcp", "src\Letter.Tcp\Letter.Tcp.csproj", "{FC059BFA-2ABD-4C0A-9AA0-34EF48DD817D}"
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30420.98
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Letter.Tcp", "src\Letter.Tcp\Letter.Tcp.csproj", "{FC059BFA-2ABD-4C0A-9AA0-34EF48DD817D}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{4BEAA32E-24C9-4833-AA2F-F0DE5C90C09F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "tcp_test1", "test\tcp_test1\tcp_test1.csproj", "{D7C640E3-4B9A-4D51-A72E-4EB5DA8A24C1}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "tcp_test1", "test\tcp_test1\tcp_test1.csproj", "{D7C640E3-4B9A-4D51-A72E-4EB5DA8A24C1}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{6D6ECC89-1C67-4B5F-AAA3-96936FA7F010}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Letter.Udp", "src\Letter.Udp\Letter.Udp.csproj", "{E4351723-B10C-4E77-BA8B-3E85B27E2ACA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Letter.Udp", "src\Letter.Udp\Letter.Udp.csproj", "{E4351723-B10C-4E77-BA8B-3E85B27E2ACA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Letter.Kcp", "src\Letter.Kcp\Letter.Kcp.csproj", "{E31366E4-C7EE-471C-930E-220C355AEBB7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Letter.Kcp", "src\Letter.Kcp\Letter.Kcp.csproj", "{E31366E4-C7EE-471C-930E-220C355AEBB7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Letter.Quic", "src\Letter.Quic\Letter.Quic.csproj", "{83D00928-7495-4B77-B3FE-3A17507001D6}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Letter.Quic", "src\Letter.Quic\Letter.Quic.csproj", "{83D00928-7495-4B77-B3FE-3A17507001D6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Letter", "src\Letter\Letter.csproj", "{0B1D4637-E89D-476F-A768-FEC4D64D1636}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Letter", "src\Letter\Letter.csproj", "{0B1D4637-E89D-476F-A768-FEC4D64D1636}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "udp_text", "test\udp_text\udp_text.csproj", "{69DED5AA-B86F-4B2F-ADA6-E21588E665C7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "udp_text", "test\udp_text\udp_text.csproj", "{69DED5AA-B86F-4B2F-ADA6-E21588E665C7}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "tcp_s", "test\tcp_s\tcp_s.csproj", "{677B9105-4BD8-41FC-BAD2-13A6EF1991CB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "tcp_c", "test\tcp_c\tcp_c.csproj", "{1ACFF401-D841-4B65-88B7-54F3F9BFFE04}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -52,6 +59,17 @@ Global
 		{69DED5AA-B86F-4B2F-ADA6-E21588E665C7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{69DED5AA-B86F-4B2F-ADA6-E21588E665C7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{69DED5AA-B86F-4B2F-ADA6-E21588E665C7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{677B9105-4BD8-41FC-BAD2-13A6EF1991CB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{677B9105-4BD8-41FC-BAD2-13A6EF1991CB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{677B9105-4BD8-41FC-BAD2-13A6EF1991CB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{677B9105-4BD8-41FC-BAD2-13A6EF1991CB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1ACFF401-D841-4B65-88B7-54F3F9BFFE04}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1ACFF401-D841-4B65-88B7-54F3F9BFFE04}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1ACFF401-D841-4B65-88B7-54F3F9BFFE04}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1ACFF401-D841-4B65-88B7-54F3F9BFFE04}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{FC059BFA-2ABD-4C0A-9AA0-34EF48DD817D} = {4BEAA32E-24C9-4833-AA2F-F0DE5C90C09F}
@@ -61,5 +79,10 @@ Global
 		{83D00928-7495-4B77-B3FE-3A17507001D6} = {4BEAA32E-24C9-4833-AA2F-F0DE5C90C09F}
 		{0B1D4637-E89D-476F-A768-FEC4D64D1636} = {4BEAA32E-24C9-4833-AA2F-F0DE5C90C09F}
 		{69DED5AA-B86F-4B2F-ADA6-E21588E665C7} = {6D6ECC89-1C67-4B5F-AAA3-96936FA7F010}
+		{677B9105-4BD8-41FC-BAD2-13A6EF1991CB} = {6D6ECC89-1C67-4B5F-AAA3-96936FA7F010}
+		{1ACFF401-D841-4B65-88B7-54F3F9BFFE04} = {6D6ECC89-1C67-4B5F-AAA3-96936FA7F010}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {88FE7350-47D0-48BE-9A66-E83D0B53A398}
 	EndGlobalSection
 EndGlobal

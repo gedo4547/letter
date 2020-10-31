@@ -5,7 +5,7 @@ using System.IO.Pipelines;
 
 namespace Letter.Tcp
 {
-    public sealed class DefaultFixedSymbolBytesFilter : ITcpChannelFilter
+    public sealed class DefaultFixedSymbolBytesFilter : ITcpFilter
     {
         public DefaultFixedSymbolBytesFilter() : this(new byte[] {(byte) '\n'})
         {

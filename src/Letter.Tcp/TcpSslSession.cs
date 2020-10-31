@@ -66,9 +66,10 @@ namespace Letter.Tcp
             this.readTask = base.ReadBufferAsync();
         }
 
-        public override ValueTask DisposeAsync()
+        public override async ValueTask DisposeAsync()
         {
-            return base.DisposeAsync();
+            await base.DisposeAsync();
+            await sslTransport.DisposeAsync();
         }
     }
 }
