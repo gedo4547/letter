@@ -19,12 +19,14 @@ namespace System.IO.Pipelines
             this.memoryOwner = memoryOwner;
             base.SetAvailableMemory(this.memoryOwner.Memory);
         }
-        
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public Span<byte> GetWritableSpan(int length)
         {
             return base.GetWritableMemory(length).Span;
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Write(in ReadOnlySpan<byte> span)
         {
             int length = span.Length;

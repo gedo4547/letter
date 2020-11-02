@@ -144,6 +144,7 @@ namespace Letter.Tcp
                 }
                 else if (!(SocketErrorHelper.IsSocketDisabledError(ex) || ex is ObjectDisposedException))
                 {
+                    this.DisposeAsync().NoAwait();
                     this.filterPipeline.OnTransportException(this, ex);
                 }
              
