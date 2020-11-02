@@ -55,7 +55,6 @@ namespace Letter.Tcp
                     break;
                 }
 
-                var buffer = result.Buffer;
                 this.TransportReadNotify(result.Buffer);
             }
              
@@ -95,10 +94,13 @@ namespace Letter.Tcp
             }
         }
         
-        public override ValueTask DisposeAsync()
+        public override async ValueTask DisposeAsync()
         {
-            Logger.Error("GGGGGGGGGGGGG");
-            return base.DisposeAsync();
+            //Logger.Error("GGGGGGGGGGGGG");
+            await base.DisposeAsync();
+            Console.WriteLine("-----------------------------");
+            await this.readTask;
+            Console.WriteLine("================");
         }
     }
 }

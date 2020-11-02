@@ -121,7 +121,7 @@ namespace Letter.Tcp
                 Console.WriteLine("222222222222222222222222222222222222");
                 await sndTask;
                 Console.WriteLine("333333333333333333333333333333333333");
-                //await this.socket.DisposeAsync();
+               
             }
             catch (Exception ex)
             {
@@ -137,16 +137,21 @@ namespace Letter.Tcp
             }
             catch(Exception ex)
             {
-                if (!(ex is RemoteSocketClosedException || SocketErrorHelper.IsSocketDisabledError(ex) || ex is ObjectDisposedException))
+                if (ex is RemoteSocketClosedException)
+                {
+                    Console.WriteLine("远程socket已经被关闭");
+                    this.DisposeAsync().NoAwait();
+                }
+                else if (!(SocketErrorHelper.IsSocketDisabledError(ex) || ex is ObjectDisposedException))
                 {
                     this.filterPipeline.OnTransportException(this, ex);
                 }
-                Console.WriteLine("远程socket已经被关闭");
-                await this.DisposeAsync();
+             
                 Console.WriteLine("socket关闭成功");
             }
             finally
             {
+                Console.WriteLine("DoReceive 结束");
                 this.Input.Complete();
             }
         }
@@ -194,6 +199,7 @@ namespace Letter.Tcp
             }
             finally
             {
+                Console.WriteLine("DoSend 结束");
                 this.Output.Complete();
             }
         }
@@ -260,13 +266,15 @@ namespace Letter.Tcp
                 this.isDisposed = true;
 
                 this.filterPipeline.OnTransportInactive(this);
-
+                Console.WriteLine("ATcpSession.DisposeAsync>>1111111");
+                this.Input.CancelPendingFlush();
                 this.Output.CancelPendingRead();
+                Console.WriteLine("ATcpSession.DisposeAsync>>2222222");
                 await this.socket.DisposeAsync();
-
+                Console.WriteLine("ATcpSession.DisposeAsync>>3333333");
                 await this.processingTask;
 
-                Console.WriteLine("关闭成功");
+                Console.WriteLine("ATcpSession.DisposeAsync>>4444444");
             }
         }
     }

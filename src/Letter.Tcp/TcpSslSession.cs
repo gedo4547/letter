@@ -68,8 +68,13 @@ namespace Letter.Tcp
 
         public override async ValueTask DisposeAsync()
         {
+            Console.WriteLine("ssl>>>DisposeAsync    >>>>11111111111111111>");
             await base.DisposeAsync();
-            await sslTransport.DisposeAsync();
+            Console.WriteLine("ssl>>>DisposeAsync    >>>>22222222222222222>");
+            await this.sslTransport.DisposeAsync();
+            Console.WriteLine("ssl>>>DisposeAsync    >>>>33333333333333333>");
+            await this.readTask;
+            Console.WriteLine("ssl>>>DisposeAsync    >>>>44444444444444444>");
         }
     }
 }
