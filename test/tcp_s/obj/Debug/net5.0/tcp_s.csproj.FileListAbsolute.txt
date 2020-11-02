@@ -20,3 +20,4 @@ F:\letter-github\test\tcp_s\obj\Debug\net5.0\tcp_s.dll
 F:\letter-github\test\tcp_s\obj\Debug\net5.0\ref\tcp_s.dll
 F:\letter-github\test\tcp_s\obj\Debug\net5.0\tcp_s.pdb
 F:\letter-github\test\tcp_s\obj\Debug\net5.0\tcp_s.genruntimeconfig.cache
+F:\letter-github\test\tcp_s\bin\Debug\net5.0\System.IO.Pipelines.dll

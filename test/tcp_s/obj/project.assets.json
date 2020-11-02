@@ -13,7 +13,7 @@
       },
       "Letter/1.0.0": {
         "type": "project",
-        "framework": "net5.0",
+        "framework": ".NETCoreApp,Version=v5.0",
         "dependencies": {
           "System.IO.Pipelines": "4.7.3"
         },
@@ -26,7 +26,7 @@
       },
       "Letter.Tcp/1.0.0": {
         "type": "project",
-        "framework": "net5.0",
+        "framework": ".NETCoreApp,Version=v5.0",
         "dependencies": {
           "Letter": "1.0.0"
         },
@@ -146,7 +146,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\5.0.100-rc.1.20452.10\\RuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\5.0.100-rc.2.20479.15\\RuntimeIdentifierGraph.json"
       }
     }
   }

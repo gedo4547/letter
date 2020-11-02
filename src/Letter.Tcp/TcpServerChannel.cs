@@ -18,7 +18,6 @@ namespace Letter.Tcp
         }
         
         private Socket listenSocket;
-        private SafeSocketHandle socketHandle;
 
         private TcpServerOptions options;
         private MemoryPool<byte> memoryPool;
@@ -47,14 +46,6 @@ namespace Letter.Tcp
             Socket listenSocket;
             switch (this.BindAddress)
             {
-                case FileHandleEndPoint fileHandle:
-                    this.socketHandle = new SafeSocketHandle((IntPtr)fileHandle.FileHandle, ownsHandle: true);
-                    listenSocket = new Socket(this.socketHandle);
-                    break;
-                case UnixDomainSocketEndPoint unix:
-                    listenSocket = new Socket(unix.AddressFamily, SocketType.Stream, ProtocolType.Unspecified);
-                    BindSocket();
-                    break;
                 case IPEndPoint ip:
                     listenSocket = new Socket(ip.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
                     if (ip.Address == IPAddress.IPv6Any) listenSocket.DualMode = true;
@@ -124,10 +115,10 @@ namespace Letter.Tcp
         
         public async ValueTask DisposeAsync()
         {
-            if (this.socketHandle != null)
-            {
-                this.socketHandle.Dispose();
-            }
+            //if (this.socketHandle != null)
+            //{
+            //    this.socketHandle.Dispose();
+            //}
 
             if (this.listenSocket != null)
             {

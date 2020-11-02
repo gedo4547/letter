@@ -160,7 +160,7 @@ namespace Letter.Tcp
         private async Task ProcessReceives()
         {
             var input = Input;
-            while (!this.isDisposed)
+            while (true)
             {
                 if (this.isWaitData)
                 {
@@ -208,7 +208,7 @@ namespace Letter.Tcp
         private async Task ProcessSends()
         {
             var output = Output;
-            while (!this.isDisposed)
+            while (true)
             {
                 var result = await output.ReadAsync();
                 if (result.IsCanceled || result.IsCompleted)

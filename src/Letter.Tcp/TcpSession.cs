@@ -47,7 +47,7 @@ namespace Letter.Tcp
         {
             PipeReader input = this.Input;
 
-            while (!this.isDisposed)
+            while (true)
             {
                 ReadResult result = await input.ReadAsync();
                 if (result.IsCanceled || result.IsCompleted)

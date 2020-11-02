@@ -14,7 +14,14 @@
           "tcp_s.dll": {}
         }
       },
-      "System.IO.Pipelines/4.7.3": {},
+      "System.IO.Pipelines/4.7.3": {
+        "runtime": {
+          "lib/netcoreapp3.0/System.IO.Pipelines.dll": {
+            "assemblyVersion": "4.0.2.2",
+            "fileVersion": "4.700.20.47203"
+          }
+        }
+      },
       "Letter/1.0.0": {
         "dependencies": {
           "System.IO.Pipelines": "4.7.3"

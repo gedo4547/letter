@@ -6,6 +6,14 @@ namespace System.IO.Pipelines
 {
     public abstract class ASegment : ReadOnlySequenceSegment<byte>, IDisposable
     {
+        public object Token
+        {
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            get;
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            set; 
+        }
+
         public int Length
         {
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
