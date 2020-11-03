@@ -28,10 +28,10 @@ namespace tcp_test1
             Console.WriteLine($"{nameof(TcpTestFilter_Client)}.{nameof(OnTransportInactive)}");
         }
 
-        public void OnTransportRead(ITcpSession session, ref WrappedReader reader, List<Object> args)
+        public void OnTransportRead(ITcpSession session, ref WrappedReader reader, Letter.EventArgs args)
         {
             Console.WriteLine($"{nameof(TcpTestFilter_Client)}.{nameof(OnTransportRead)}");
-            List<ReadOnlySequence<byte>> buffers = (List<ReadOnlySequence<byte>>)args[0];
+            List<ReadOnlySequence<byte>> buffers = (List<ReadOnlySequence<byte>>)args.Value;
             for (int i = 0; i < buffers.Count; i++)
             {
                 var buffer = buffers[i];
@@ -40,7 +40,7 @@ namespace tcp_test1
             }
         }
 
-        public void OnTransportWrite(ITcpSession session, ref WrappedWriter writer, List<Object> args)
+        public void OnTransportWrite(ITcpSession session, ref WrappedWriter writer, Letter.EventArgs args)
         {
             // Console.WriteLine($"{nameof(TcpTestFilter_Client)}.{nameof(OnTransportWrite)}");
         }

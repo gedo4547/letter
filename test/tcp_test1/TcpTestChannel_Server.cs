@@ -23,10 +23,10 @@ namespace tcp_test1
             Console.WriteLine($"{nameof(TcpTestFilter_Server)}.{nameof(OnTransportInactive)}");
         }
 
-        public void OnTransportRead(ITcpSession session, ref WrappedReader reader, List<Object> args)
+        public void OnTransportRead(ITcpSession session, ref WrappedReader reader, Letter.EventArgs args)
         {
             // Console.WriteLine(">>>>>>>>>>" + (args == null));
-            List<ReadOnlySequence<byte>> buffers = (List<ReadOnlySequence<byte>>)args[0];
+            List<ReadOnlySequence<byte>> buffers = (List<ReadOnlySequence<byte>>)args.Value;
             Console.WriteLine("收到包》》》》》"+buffers.Count);
             for (int i = 0; i < buffers.Count; i++)
             {
@@ -38,7 +38,7 @@ namespace tcp_test1
             Console.WriteLine($"{nameof(TcpTestFilter_Server)}.{nameof(OnTransportRead)}");
         }
 
-        public void OnTransportWrite(ITcpSession session, ref WrappedWriter writer, List<Object> args)
+        public void OnTransportWrite(ITcpSession session, ref WrappedWriter writer, Letter.EventArgs args)
         {
             // Console.WriteLine($"{nameof(TcpTestFilter_Server)}.{nameof(OnTransportWrite)}");
         }

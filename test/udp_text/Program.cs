@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO.Pipelines;
 using System.Net;
 using System.Threading.Tasks;
 using Letter.Udp;
@@ -12,6 +13,13 @@ namespace udp_text
         
         static async Task Main(string[] args)
         {
+            SegmentSequence sequence = new SegmentSequence();
+            foreach (var item in sequence)
+            {
+                
+            }
+            
+            
             // IUdpBootstrap bootstrap = UdpFactory.Bootstrap();
             // bootstrap.ConfigurationOptions(options =>
             // {

@@ -96,9 +96,7 @@ namespace System.IO.Pipelines
         {
             this.writeLength += length;
         }
-
-
-
+        
         public ReadOnlyMemory<byte> Read()
         {
             var memory = this.memoryOwner.Memory.Slice(0, this.writeLength);

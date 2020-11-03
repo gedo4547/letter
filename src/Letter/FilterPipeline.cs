@@ -84,7 +84,7 @@ namespace Letter
             }
         }
         
-        public void OnTransportWrite(TSession session, ref WrappedWriter writer, Object o)
+        public void OnTransportWrite(TSession session, ref WrappedWriter writer, object o)
         {
             try
             {

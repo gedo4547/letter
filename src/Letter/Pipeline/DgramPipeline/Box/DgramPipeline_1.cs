@@ -8,13 +8,22 @@ namespace System.IO.Pipelines
         private const int INIT_SEGMENT_POOL_SIZE = 8;
         //private const int MAX_SEGMENT_POOL_SIZE = 256;
 
-        public DgramPipeline_1(BinaryOrder order, MemoryPool<byte> memoryPool)
+        public DgramPipeline_1(BinaryOrder order, MemoryPool<byte> memoryPool, Action rcvCallback)
         {
             this.memoryPool = memoryPool;
             this.memoryBlockSize = this.memoryPool.MaxBufferSize;
             this.operators = BinaryOrderOperatorsFactory.GetOperators(order);
             this.entityBufferSegmentStack = new BufferStack<MemorySegment>(INIT_SEGMENT_POOL_SIZE);
+            
+            this.rcvCallback = rcvCallback;
+            this.Reader = new DgramPipeline_1Reader(this);
+            this.Writer = new DgramPipeline_1Writer(this);
         }
+
+        public DgramPipeline_1Reader Reader { get; private set; }
+        public DgramPipeline_1Writer Writer { get; private set; }
+
+        private Action rcvCallback;
         
         private MemoryPool<byte> memoryPool;
         private IBinaryOrderOperators operators;
@@ -25,6 +34,8 @@ namespace System.IO.Pipelines
         private ASegment tailBufferSegment = null;
         
         private object sync = new object();
+        
+        private int awaitRcv = 0;
 
         public MemorySegment GetSegment()
         {
@@ -59,15 +70,35 @@ namespace System.IO.Pipelines
 
         public void Advance()
         {
-            if (this.headBufferSegment == this.tailBufferSegment)
+            lock (this.sync)
             {
-                this.headBufferSegment = null;
-                this.tailBufferSegment = null;
-            }
-            else
-            {
-                this.tailBufferSegment = this.tailBufferSegment.ChildSegment;
+                if (this.headBufferSegment == this.tailBufferSegment)
+                {
+                    this.headBufferSegment = null;
+                    this.tailBufferSegment = null;
+                }
+                else
+                {
+                    this.tailBufferSegment = this.tailBufferSegment.ChildSegment;
+                }
             }
         }
+        
+        public ReadDgramResult Read()
+        {
+            throw new NotImplementedException();
+        }
+        
+        public void ReceiveAsync()
+        {
+            
+        }
+
+        public void FlushAsync()
+        {
+            
+        }
+
+        
     }
 }

@@ -225,12 +225,21 @@ namespace Letter
             }, tcs, cancellationToken);
             return tcs.Task;
         }
-
+        
+#if NET5_0
         public override ValueTask DisposeAsync()
+#elif NETSTANDARD2_0
+        public virtual ValueTask DisposeAsync()
+#endif
         {
             this._input.Complete();
             this._output.Complete();
+#if NET5_0
             return base.DisposeAsync();
+#elif NETSTANDARD2_0
+            base.Dispose();
+            return default;
+#endif
         }
     }
 }
