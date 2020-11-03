@@ -2,7 +2,12 @@
 {
     public ref struct ReadDgramResult
     {
-        public bool Completed 
+        public ReadDgramResult(ASegment headBufferSegment, ASegment tailBufferSegment)
+        {
+            
+        }
+
+        public bool IsCompleted 
         {
             get
             {

@@ -1,10 +1,10 @@
 {
   "version": 2,
-  "dgSpecHash": "LevwS8fSFcots1JB4dgqVKk15rrd/mYcJ2bd9l2+weqMFbmWrBnQ8OH70Ain2pT9IaT3uN9tKU2XlVCXQ4N0/g==",
+  "dgSpecHash": "BYJEr9aQ6gGfGFl6oCLEPyQ+Z6DApk0il+Moeoh+DzuGrdauSH81mWir2QG4abh6gFOIoJIhcskRdurxfIZ6og==",
   "success": true,
-  "projectFilePath": "F:\\letter-github\\test\\tcp_s\\tcp_s.csproj",
+  "projectFilePath": "/Users/guanyedong/Projects/letter-github/test/tcp_s/tcp_s.csproj",
   "expectedPackageFiles": [
-    "C:\\Users\\pc\\.nuget\\packages\\system.io.pipelines\\4.7.3\\system.io.pipelines.4.7.3.nupkg.sha512"
+    "/Users/guanyedong/.nuget/packages/system.io.pipelines/4.7.3/system.io.pipelines.4.7.3.nupkg.sha512"
   ],
   "logs": []
 }

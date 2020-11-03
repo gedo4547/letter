@@ -1,11 +1,12 @@
 ﻿namespace System.IO.Pipelines
 {
-    public struct SegmentSequence
+    public ref struct SegmentSequence
     {
         public struct Enumerator
         {
             public Enumerator(ASegment headBufferSegment, ASegment tailBufferSegment)
             {
+                this.isLastSegment = false;
                 this.current = null;
                 this.headBufferSegment = headBufferSegment;
                 this.tailBufferSegment = tailBufferSegment;
@@ -14,6 +15,8 @@
             private ASegment current;
             private ASegment headBufferSegment;
             private ASegment tailBufferSegment;
+
+            private bool isLastSegment;
             
             public ASegment Current
             {
@@ -28,20 +31,35 @@
             {
                 //这里先走
                 Console.WriteLine("2222222222222222222222222");
-                if (this.current == null)
+                if (!this.isLastSegment)
                 {
                     this.current = this.headBufferSegment;
-                    return true;
+                    if (this.current == this.tailBufferSegment)
+                    {
+                        isLastSegment = true;
+                    }
+                    else
+                    {
+                        this.headBufferSegment = this.headBufferSegment.ChildSegment;
+                    }
                 }
 
                 return false;
             }
         }
 
+        public SegmentSequence(ASegment headBufferSegment, ASegment tailBufferSegment)
+        {
+            this.headBufferSegment = headBufferSegment;
+            this.tailBufferSegment = tailBufferSegment;
+        }
 
+        private ASegment headBufferSegment;
+        private ASegment tailBufferSegment;
+        
         public Enumerator GetEnumerator()
         {
-            return new Enumerator();
+            return new Enumerator(this.headBufferSegment, this.tailBufferSegment);
         }
     }
 }
