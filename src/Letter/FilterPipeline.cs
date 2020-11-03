@@ -1,16 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO.Pipelines;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace Letter
 {
     public sealed class FilterPipeline<TSession> : IFilterPipeline<TSession>, IAsyncDisposable where TSession : ISession
     {
-        private List<Object> readArgs = new List<object>();
-        private List<Object> writeArgs = new List<object>();
-        
+        private EventArgs readArgs = new EventArgs();
+        private EventArgs writeArgs = new EventArgs();
         private List<IFilter<TSession>> filters = new List<IFilter<TSession>>();
         
         public void Add(IFilter<TSession> filter)
@@ -72,7 +70,7 @@ namespace Letter
         {
             try
             {
-                this.readArgs.Clear();
+                this.readArgs.Value = null;
                 int count = this.filters.Count;
                 for (int i = 0; i < count; i++)
                 {
@@ -90,9 +88,7 @@ namespace Letter
         {
             try
             {
-                this.writeArgs.Clear();
-                this.writeArgs.Add(o);
-                
+                this.writeArgs.Value = o;
                 int count = this.filters.Count;
                 for (int i = 0; i < count; i++)
                 {

@@ -46,7 +46,7 @@ namespace Letter.Tcp
         protected async Task ReadBufferAsync()
         {
             PipeReader input = this.Input;
-
+            
             while (true)
             {
                 ReadResult result = await input.ReadAsync();

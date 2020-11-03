@@ -12,8 +12,8 @@ namespace Letter
         
         void OnTransportException(TSession session, Exception ex);
         
-        void OnTransportRead(TSession session, ref WrappedReader reader, List<Object> args);
+        void OnTransportRead(TSession session, ref WrappedReader reader, EventArgs args);
         
-        void OnTransportWrite(TSession session, ref WrappedWriter writer, List<Object> args);
+        void OnTransportWrite(TSession session, ref WrappedWriter writer, EventArgs args);
     }
 }

@@ -25,10 +25,10 @@ namespace Letter.Tcp
         public void OnTransportInactive(ITcpSession session) { }
         public void OnTransportException(ITcpSession session, Exception ex) { }
 
-        public void OnTransportRead(ITcpSession session, ref WrappedReader reader, List<Object> args)
+        public void OnTransportRead(ITcpSession session, ref WrappedReader reader, EventArgs args)
         {
             this.buffers.Clear();
-            args.Add(this.buffers);
+            args.Value = this.buffers;
             while (reader.IsLengthEnough(this.currentReadLength))
             {
                 if (this.currentReadPart == PackPart.Head)
@@ -49,9 +49,9 @@ namespace Letter.Tcp
             }
         }
 
-        public void OnTransportWrite(ITcpSession session, ref WrappedWriter writer, List<Object> args)
+        public void OnTransportWrite(ITcpSession session, ref WrappedWriter writer, EventArgs args)
         {
-            var buffer = args[0] as byte[];
+            var buffer = args.Value as byte[];
             if (buffer.Length > this.maxPackLength)
             {
                 throw new Exception("pack length error！！！" + buffer.Length);
