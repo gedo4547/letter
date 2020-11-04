@@ -14,6 +14,9 @@ namespace System.IO.Pipelines
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public MemorySegment GetSegment() => this.pipeline.GetSegment();
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void WriterAdvance(ASegment segment) => this.pipeline.WriterAdvance(segment);
+        
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void FlushAsync() => this.pipeline.FlushAsync();
     }
 }

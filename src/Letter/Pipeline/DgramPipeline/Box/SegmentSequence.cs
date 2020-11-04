@@ -22,26 +22,29 @@
             {
                 get
                 {
-                    Console.WriteLine("11111111111111111");
                     return this.current;
                 }
             }
 
             public bool MoveNext()
             {
-                //这里先走
-                Console.WriteLine("2222222222222222222222222");
                 if (!this.isLastSegment)
                 {
-                    this.current = this.headBufferSegment;
+                    if (this.current == null)
+                    {
+                        this.current = this.headBufferSegment;
+                    }
+                    else
+                    {
+                        this.current = this.current.ChildSegment;
+                    }
+                    
                     if (this.current == this.tailBufferSegment)
                     {
                         isLastSegment = true;
                     }
-                    else
-                    {
-                        this.headBufferSegment = this.headBufferSegment.ChildSegment;
-                    }
+
+                    return true;
                 }
 
                 return false;
@@ -59,6 +62,11 @@
         
         public Enumerator GetEnumerator()
         {
+            if (headBufferSegment == null)
+            {
+                throw new Exception("buffers are empty");
+            }
+
             return new Enumerator(this.headBufferSegment, this.tailBufferSegment);
         }
     }

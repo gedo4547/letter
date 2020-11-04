@@ -111,12 +111,7 @@ namespace System.Net.Sockets
 #elif NET5_0
             this.sndArgs.SetBuffer(MemoryMarshal.AsMemory(buffer));
 #endif
-            if (!this.SocketAsyncSndOperation(this.sndArgs))
-            {
-                this.sndArgs.Complete();
-            }
-
-            return this.sndArgs;
+            return this.SocketSndAsync();
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -135,6 +130,13 @@ namespace System.Net.Sockets
 #endif
             
             this.sndArgs.BufferList = this.GetBufferList(ref buffers);
+            
+            return this.SocketSndAsync();
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private SocketAwaitableArgs SocketSndAsync()
+        {
             if (!this.SocketAsyncSndOperation(this.sndArgs))
             {
                 this.sndArgs.Complete();

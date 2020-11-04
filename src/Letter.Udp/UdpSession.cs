@@ -97,9 +97,9 @@ namespace Letter.Udp
                 var memory = node.GetMomory();
                 try
                 {
-                    int transportBytes = await this.socket.ReceiveAsync(this.LocalAddress, ref memory);
+                    SocketResult socketResult = await this.socket.ReceiveAsync(this.LocalAddress, ref memory);
                     node.SettingPoint(this.socket.RemoteAddress);
-                    node.SettingWriteLength(transportBytes);
+                    node.SettingWriteLength(socketResult.bytesTransferred);
                     this.RcvPipeWriter.Write(node);
                 }
                 catch(Exception ex)

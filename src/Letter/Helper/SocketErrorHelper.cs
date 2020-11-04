@@ -20,7 +20,11 @@ namespace System.Net.Sockets
             return false;
         }
 
-
+        public static bool IsSocketDisabledError(SocketError error)
+        {
+            return IsConnectionResetError(error) ||
+                   IsConnectionAbortError(error);
+        }
 
         public static bool IsConnectionResetError(SocketError errorCode)
         {

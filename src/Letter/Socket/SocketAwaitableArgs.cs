@@ -26,16 +26,11 @@ namespace System.Net.Sockets
         public SocketAwaitableArgs GetAwaiter() => this;
         public bool IsCompleted => ReferenceEquals(_callback, _callbackCompleted);
 
-        public int GetResult()
+        public SocketResult GetResult()
         {
             _callback = null;
-
-            if (SocketError != SocketError.Success)
-            {
-                throw new SocketException((int)SocketError);
-            }
             
-            return this.BytesTransferred;
+            return new SocketResult(this.BytesTransferred, this.SocketError);
         }
 
         public void OnCompleted(Action continuation)

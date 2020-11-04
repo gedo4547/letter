@@ -1,5 +1,5 @@
-﻿﻿using System.Buffers;
- using System.IO.Pipelines;
+﻿using System.Buffers;
+using System.IO.Pipelines;
 
 namespace Letter
 {

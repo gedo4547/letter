@@ -135,20 +135,8 @@ namespace Letter.Tcp
             {
                 await ProcessReceives();
             }
-            catch(Exception ex)
+            catch(ObjectDisposedException)
             {
-                if (ex is RemoteSocketClosedException)
-                {
-                    Console.WriteLine("远程socket已经被关闭");
-                    this.DisposeAsync().NoAwait();
-                }
-                else if (!(SocketErrorHelper.IsSocketDisabledError(ex) || ex is ObjectDisposedException))
-                {
-                    this.DisposeAsync().NoAwait();
-                    this.filterPipeline.OnTransportException(this, ex);
-                }
-             
-                Console.WriteLine("socket关闭成功");
             }
             finally
             {
@@ -162,19 +150,17 @@ namespace Letter.Tcp
             var input = Input;
             while (true)
             {
-                if (this.isWaitData)
-                {
-                    await this.socket.WaitAsync();
-                }
                 var buffer = input.GetMemory(this.minAllocBufferSize);
-                var bytes = await this.socket.ReceiveAsync(ref buffer);
-                
-                if (bytes == 0)
+                var socketResult = await this.socket.ReceiveAsync(ref buffer);
+
+                if (!this.SocketErrorNotify(socketResult.error)) break;
+                if (socketResult.bytesTransferred == 0)
                 {
-                    throw new RemoteSocketClosedException();
+                    this.DisposeAsync().NoAwait();
+                    break;
                 }
                 
-                input.Advance(bytes);
+                input.Advance(socketResult.bytesTransferred);
                 var result = await input.FlushAsync();
                 if (result.IsCompleted || result.IsCanceled)
                 {
@@ -189,14 +175,8 @@ namespace Letter.Tcp
             {
                 await ProcessSends();
             }
-            catch (Exception ex)
+            catch (ObjectDisposedException)
             {
-                if (!(ex is RemoteSocketClosedException || SocketErrorHelper.IsSocketDisabledError(ex) || ex is ObjectDisposedException))
-                {
-                    this.filterPipeline.OnTransportException(this, ex);
-                    Console.WriteLine("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"+ex.GetType().Name);
-                    await this.DisposeAsync();
-                }
             }
             finally
             {
@@ -220,17 +200,33 @@ namespace Letter.Tcp
                 var end = buffer.End;
                 if (!buffer.IsEmpty)
                 {
-                    var bytes = await this.socket.SendAsync(ref buffer);
-                    if (bytes == 0)
-                    {
-                        throw new RemoteSocketClosedException();
-                    }
+                    var socketResult = await this.socket.SendAsync(ref buffer);
+                    
+                    if (!this.SocketErrorNotify(socketResult.error)) break;
+                    if (socketResult.bytesTransferred == 0) break;
                 }
 
                 output.AdvanceTo(end);
             }
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private bool SocketErrorNotify(SocketError error)
+        {
+            if (error != SocketError.Success)
+            {
+                if (!SocketErrorHelper.IsSocketDisabledError(error))
+                {
+                    this.DisposeAsync().NoAwait();
+                    this.filterPipeline.OnTransportException(this, new SocketException((int)error));
+                }
+
+                return false;
+            }
+
+            return true;
+        }
+        
         private void SettingSocket(TcpSocket socket, ATcpOptions options)
         {
             this.socket.SettingKeepAlive(options.KeepAlive);
