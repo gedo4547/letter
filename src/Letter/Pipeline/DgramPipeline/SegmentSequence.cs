@@ -1,6 +1,6 @@
 ﻿namespace System.IO.Pipelines
 {
-    public ref struct SegmentSequence
+    public struct SegmentSequence
     {
         public struct Enumerator
         {

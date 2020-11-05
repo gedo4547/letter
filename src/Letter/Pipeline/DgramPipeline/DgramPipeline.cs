@@ -1,113 +1,116 @@
-﻿using System;
-using System.Buffers;
-using System.ComponentModel;
-using System.IO.Pipelines;
- 
+﻿using System.Buffers;
+using System.Threading;
+
 namespace System.IO.Pipelines
 {
-    [EditorBrowsable(EditorBrowsableState.Never)]
-    public partial class DgramPipeline : IDisposable
+    public class DgramPipeline
     {
-        internal const int FALSE = 0;
-        internal const int TRUE = 1;
-
-        internal const int InitialSegmentPoolSize = 16; // 65K
-        internal const int MaxSegmentPoolSize = 256; // 1MB
+        private const int FALSE = 0;
+        private const int TRUE = 1;
         
-        public DgramPipeline(MemoryPool<byte> memoryPool, PipeScheduler scheduler, Action<IDgramPipelineReader> onReceived)
-        {
-            if (memoryPool == null)
-                throw new ArgumentNullException(nameof(memoryPool));
-            if (scheduler == null)
-                throw new ArgumentNullException(nameof(scheduler));
-            if (onReceived == null)
-                throw new ArgumentNullException(nameof(onReceived));
+        private const int INIT_SEGMENT_POOL_SIZE = 8;
+        //private const int MAX_SEGMENT_POOL_SIZE = 256;
 
-            this.memoryPool = memoryPool;
+        public DgramPipeline(MemoryPool<byte> memoryPool, PipeScheduler scheduler, Action rcvCallback)
+        {
             this.scheduler = scheduler;
-            this.onReceived = onReceived;
-            this.nodeStack = new DgramNodeStack(InitialSegmentPoolSize);
-            this.multiThreadedInvoke = (o) => this.onReceived(this);
+            this.memoryPool = memoryPool;
+            this.memoryBlockSize = this.memoryPool.MaxBufferSize;
+            this.entityBufferSegmentStack = new BufferStack<MemorySegment>(INIT_SEGMENT_POOL_SIZE);
+
+            this.rcvCallback = (o) => { rcvCallback(); };
+            this.Reader = new DgramPipelineReader(this);
+            this.Writer = new DgramPipelineWriter(this);
         }
 
-        private object syncObj = new object();
-
-        private MemoryPool<byte> memoryPool;
+        public DgramPipelineReader Reader { get; private set; }
+        public DgramPipelineWriter Writer { get; private set; }
+        
         private PipeScheduler scheduler;
-        private DgramNodeStack nodeStack;
-        private Action<IDgramPipelineReader> onReceived;
-        private Action<object> multiThreadedInvoke;
+        private MemoryPool<byte> memoryPool;
+        private BufferStack<MemorySegment> entityBufferSegmentStack;
+        
+        private Action<object> rcvCallback;
+        
+        private int memoryBlockSize;
+        private ASegment headBufferSegment = null;
+        private ASegment tailBufferSegment = null;
+        
+        private object sync = new object();
+        
+        private int awaitRcv = FALSE;
 
-        private DgramNode headNode;
-        private DgramNode tailNode;
-
-        private int waiting = FALSE;
-
-
-        private DgramNode CreationOrGetNode()
+        public MemorySegment GetSegment()
         {
-            lock (syncObj)
+            lock (this.sync)
             {
-                if (!this.nodeStack.TryPop(out var node))
+                MemorySegment segment;
+                if (!this.entityBufferSegmentStack.TryPop(out segment))
                 {
-                    IMemoryOwner<byte> memoryOwner = this.memoryPool.Rent();
-                    node = new DgramNode(memoryOwner, this.OnDgramNodeRelease);
+                    segment = new MemorySegment(this.entityBufferSegmentStack);
+                    segment.SetMemoryBlock(this.memoryPool.Rent());
                 }
-
-                node.next = null;
-                return node;
+                
+                return segment;
+            }
+        }
+        
+        public void WriterAdvance(ASegment segment)
+        {
+            if (segment == null)
+            {
+                throw new ArgumentNullException(nameof(segment));
+            }
+            
+            if (this.headBufferSegment == null && this.tailBufferSegment == null)
+            {
+                this.headBufferSegment = segment;
+                this.tailBufferSegment = segment;
+            }
+            else
+            {
+                this.tailBufferSegment.SetNext(segment);
+                this.tailBufferSegment = segment;
             }
         }
 
-        private void OnDgramNodeRelease(DgramNode node)
+        public void ReaderAdvance()
         {
-            lock (syncObj)
+            lock (this.sync)
             {
-                if (this.nodeStack.Count < MaxSegmentPoolSize)
+                if (this.headBufferSegment == this.tailBufferSegment)
                 {
-                    this.nodeStack.Push(node);
+                    this.headBufferSegment = null;
+                    this.tailBufferSegment = null;
                 }
                 else
                 {
-                    node.Dispose();
+                    this.tailBufferSegment = this.tailBufferSegment.ChildSegment;
                 }
             }
         }
         
-
-        public void Dispose()
+        public ReadDgramResult Read()
         {
-            DgramNode tempNode = this.headNode;
-            while (tempNode != null)
+            return new ReadDgramResult(this.headBufferSegment, this.tailBufferSegment);
+        }
+        
+        public void ReceiveAsync()
+        {
+            Interlocked.Exchange(ref this.awaitRcv, TRUE);
+            if (this.headBufferSegment != null)
             {
-                var nextNode = tempNode.next;
-                tempNode.Dispose();
-                tempNode = nextNode;
+                this.PipelineNotify();
             }
-            
-            if (this.headNode != null)
-            {
-                this.headNode = null;
-            }
+        }
 
-            if (this.tailNode != null)
-            {
-                this.tailNode = null;
-            }
-            
-            if (this.nodeStack != null)
-            {
-                while (this.nodeStack.TryPop(out var node))
-                {
-                    node.Dispose();
-                }
+        public void FlushAsync() => this.PipelineNotify();
 
-                this.nodeStack = null;
-            }
-            
-            if (this.memoryPool != null)
+        private void PipelineNotify()
+        {
+            if (Interlocked.CompareExchange(ref this.awaitRcv, FALSE, TRUE) == TRUE)
             {
-                this.memoryPool = null;
+                this.scheduler.Schedule(this.rcvCallback, null);
             }
         }
     }

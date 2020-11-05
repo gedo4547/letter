@@ -49,6 +49,14 @@ namespace Letter.Udp
             this.BindAddress = this.socket.LocalEndPoint;
         }
 
+        private void Run()
+        {
+            var memoryPool = this.options.MemoryPoolFactory();
+            var scheduler = this.options.SchedulerAllocator.Next();
+            UdpSession session = new UdpSession(this.socket, options, memoryPool, scheduler, filterPipeline);
+            session.Start();
+        }
+
         public ValueTask DisposeAsync()
         {
             throw new System.NotImplementedException();

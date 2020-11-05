@@ -153,7 +153,7 @@ namespace Letter.Tcp
                 var buffer = input.GetMemory(this.minAllocBufferSize);
                 var socketResult = await this.socket.ReceiveAsync(ref buffer);
 
-                if (!this.SocketErrorNotify(socketResult.error)) break;
+                if (this.SocketErrorNotify(socketResult.error)) break;
                 if (socketResult.bytesTransferred == 0)
                 {
                     this.DisposeAsync().NoAwait();
@@ -202,7 +202,7 @@ namespace Letter.Tcp
                 {
                     var socketResult = await this.socket.SendAsync(ref buffer);
                     
-                    if (!this.SocketErrorNotify(socketResult.error)) break;
+                    if (this.SocketErrorNotify(socketResult.error)) break;
                     if (socketResult.bytesTransferred == 0) break;
                 }
 
@@ -221,10 +221,10 @@ namespace Letter.Tcp
                     this.filterPipeline.OnTransportException(this, new SocketException((int)error));
                 }
 
-                return false;
+                return true;
             }
 
-            return true;
+            return false;
         }
         
         private void SettingSocket(TcpSocket socket, ATcpOptions options)

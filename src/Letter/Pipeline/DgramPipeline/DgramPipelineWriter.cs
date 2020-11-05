@@ -2,14 +2,14 @@
 
 namespace System.IO.Pipelines
 {
-    public sealed class DgramPipeline_1Writer
+    public sealed class DgramPipelineWriter
     {
-        public DgramPipeline_1Writer(DgramPipeline_1 pipeline)
+        public DgramPipelineWriter(DgramPipeline pipeline)
         {
             this.pipeline = pipeline;
         }
 
-        private DgramPipeline_1 pipeline;
+        private DgramPipeline pipeline;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public MemorySegment GetSegment() => this.pipeline.GetSegment();

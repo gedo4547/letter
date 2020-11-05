@@ -14,8 +14,6 @@ namespace Letter
 
         EndPoint LocalAddress { get; }
         
-        EndPoint RemoteAddress { get; }
-        
         MemoryPool<byte> MemoryPool { get; }
 
         PipeScheduler Scheduler { get; }

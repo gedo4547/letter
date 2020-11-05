@@ -11,12 +11,7 @@ namespace Letter.Udp
 {
     public class UdpSession : IUdpSession
     {
-        public UdpSession(
-            Socket socket, 
-            UdpOptions options, 
-            MemoryPool<byte> memoryPool, 
-            PipeScheduler scheduler, 
-            FilterPipeline<IUdpSession> filterPipeline)
+        public UdpSession(Socket socket, UdpOptions options, MemoryPool<byte> memoryPool, PipeScheduler scheduler, FilterPipeline<IUdpSession> filterPipeline)
         {
             this.Id = IdGeneratorHelper.GetNextId();
             this.socket = new UdpSocket(socket, scheduler);
@@ -27,6 +22,7 @@ namespace Letter.Udp
             this.MemoryPool = memoryPool;
             this.filterPipeline = filterPipeline;
             this.LocalAddress = this.socket.BindAddress;
+            this.memoryBlockSize = this.MemoryPool.MaxBufferSize;
             
             this.rcvPipeline = new DgramPipeline(this.MemoryPool, scheduler, OnRcvPipelineRead);
             this.sndPipeline = new DgramPipeline(this.MemoryPool, scheduler, OnSndPipelineRead);
@@ -34,104 +30,104 @@ namespace Letter.Udp
             this.readerFlushCallback = (startPos, endPos) => { };
             this.writerFlushCallback = (writer) =>
             {
-                this.SndPipeWriter.Write((DgramNode) writer);
+                // this.SndPipeWriter.Write((DgramNode) writer);
             };
         }
-
-        private UdpSocket socket;
-        private FilterPipeline<IUdpSession> filterPipeline;
-        private DgramPipeline sndPipeline;
-        private DgramPipeline rcvPipeline;
-        private ReaderFlushDelegate readerFlushCallback;
-        private WriterFlushDelegate writerFlushCallback;
-        
-        private object sync = new object();
         
         public string Id { get; }
         public BinaryOrder Order { get; }
         public EndPoint LocalAddress { get; }
         public EndPoint RcvAddress { get; private set; }
         public EndPoint SndAddress { get; private set; }
-        public EndPoint RemoteAddress
-        {
-            get { throw new Exception("please use IUdpSession.RcvAddress or IUdpSession.SndAddress"); }
-        }
         public MemoryPool<byte> MemoryPool { get; }
         public PipeScheduler Scheduler { get; }
 
-        public IDgramPipelineReader RcvPipeReader
+        private UdpSocket socket;
+        private DgramPipeline sndPipeline;
+        private DgramPipeline rcvPipeline;
+        private ReaderFlushDelegate readerFlushCallback;
+        private WriterFlushDelegate writerFlushCallback;
+        private FilterPipeline<IUdpSession> filterPipeline;
+
+        private int memoryBlockSize;
+        private object sync = new object();
+        private Task readTask;
+
+        public DgramPipelineReader RcvPipeReader
         {
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            get { return this.rcvPipeline; }
+            get { return this.rcvPipeline.Reader; }
         }
         
-        public IDgramPipelineWriter RcvPipeWriter
+        public DgramPipelineWriter RcvPipeWriter
         {
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            get { return this.rcvPipeline; }
+            get { return this.rcvPipeline.Writer; }
         }
         
-        public IDgramPipelineReader SndPipeReader
+        public DgramPipelineReader SndPipeReader
         {
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            get { return this.sndPipeline; }
+            get { return this.sndPipeline.Reader; }
         }
 
-        public IDgramPipelineWriter SndPipeWriter
+        public DgramPipelineWriter SndPipeWriter
         {
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            get { return this.sndPipeline; }
+            get { return this.sndPipeline.Writer; }
         }
         
         public void Start()
         {
             this.sndPipeline.ReceiveAsync();
             this.rcvPipeline.ReceiveAsync();
+
+            this.readTask = this.SocketReceiveAsync();
         }
         
         private async Task SocketReceiveAsync()
         {
             while (true)
             {
-                var node = this.RcvPipeWriter.GetDgramNode();
-                var memory = node.GetMomory();
+                var node = this.RcvPipeWriter.GetSegment();
+                var memory = node.GetWritableMemory(this.memoryBlockSize);
                 try
                 {
-                    SocketResult socketResult = await this.socket.ReceiveAsync(this.LocalAddress, ref memory);
-                    node.SettingPoint(this.socket.RemoteAddress);
-                    node.SettingWriteLength(socketResult.bytesTransferred);
-                    this.RcvPipeWriter.Write(node);
+                    var socketResult = await this.socket.ReceiveAsync(this.LocalAddress, ref memory);
+                    if (this.SocketErrorNotify(socketResult.error))
+                    {
+                        break;
+                    }
+                    
+                    node.Token = this.socket.RemoteAddress;
+                    node.WriterAdvance(socketResult.bytesTransferred);
+                    this.RcvPipeWriter.WriterAdvance(node);
                 }
-                catch(Exception ex)
+                catch(ObjectDisposedException)
                 {
-                    await node.ReleaseAsync();
-                    if (SocketErrorHelper.IsSocketDisabledError(ex) || ex is ObjectDisposedException)
-                    {
-                        await this.DisposeAsync();
-                    }
-                    else
-                    {
-                        this.filterPipeline.OnTransportException(this, ex);
-                    }
-                    return;
+                    
                 }
             }
         }
 
-        private void OnRcvPipelineRead(IDgramPipelineReader reader)
+        private void OnRcvPipelineRead()
         {
-            while (true)
+            ReadDgramResult readDgramResult = RcvPipeReader.Read();
+            if (readDgramResult.IsEmpty)
             {
-                DgramNode node = reader.Read();
-                if (node == null) break;
+                return;
+            }
 
-                this.RcvAddress = node.Point;
-                Memory<byte> memory = node.GetReadableBuffer();
+            var buffer = readDgramResult.GetBuffer();
+            foreach (var segment in buffer)
+            {
+                this.RcvAddress = (EndPoint) segment.Token;
+                var memory = segment.GetReadableMemory();
                 var w_reader = new WrappedReader(new ReadOnlySequence<byte>(memory), this.Order, this.readerFlushCallback);
                 this.filterPipeline.OnTransportRead(this, ref w_reader);
-                node.ReleaseAsync().NoAwait();
+                RcvPipeReader.ReaderAdvance();
             }
-            
+
             this.RcvPipeReader.ReceiveAsync();
         }
         
@@ -140,9 +136,9 @@ namespace Letter.Udp
             lock (sync)
             {
                 this.SndAddress = remoteAddress;
-                var node = this.SndPipeWriter.GetDgramNode();
-                node.SettingPoint(remoteAddress);
-                var writer = new WrappedWriter(node, this.Order, this.writerFlushCallback);
+                var segment = this.SndPipeWriter.GetSegment();
+                segment.Token = remoteAddress;
+                var writer = new WrappedWriter(segment, this.Order, this.writerFlushCallback);
                 this.filterPipeline.OnTransportWrite(this, ref writer, null);
 
                 return Task.CompletedTask;
@@ -151,38 +147,48 @@ namespace Letter.Udp
 
         public Task FlushAsync()
         {
-            throw new NotImplementedException();
+            this.SndPipeWriter.FlushAsync();
+            return Task.CompletedTask;
         }
 
-        private async void OnSndPipelineRead(IDgramPipelineReader reader)
+        private async void OnSndPipelineRead()
         {
-            while (true)
-            {
-                var node = reader.Read();
-                if (node == null) break;
+            var reader = this.SndPipeReader;
+            ReadDgramResult readDgramResult = reader.Read();
+            if (readDgramResult.IsEmpty) return;
 
-                var memory = node.GetReadableBuffer();
-                var buffer = new ReadOnlySequence<byte>(memory);
-                var address = node.Point;
-                
-                try
+            var buffer = readDgramResult.GetBuffer();
+            
+            foreach (var segment in buffer)
+            {
+                var memory = segment.GetReadableMemory();
+                var sequence = new ReadOnlySequence<byte>(memory);
+                var socketResult = await this.socket.SendAsync((EndPoint)segment.Token, ref sequence);
+                this.SndPipeReader.ReaderAdvance();
+                if (this.SocketErrorNotify(socketResult.error))
                 {
-                    await this.socket.SendAsync(address, ref buffer);
-                }
-                catch (Exception ex)
-                {
-                    if (!SocketErrorHelper.IsSocketDisabledError(ex) || ex is ObjectDisposedException)
-                    {
-                        this.filterPipeline.OnTransportException(this, ex);
-                    }
-                }
-                finally
-                {
-                    await node.ReleaseAsync();
+                    break;
                 }
             }
-            
+
             this.SndPipeReader.ReceiveAsync();
+        }
+        
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private bool SocketErrorNotify(SocketError error)
+        {
+            if (error != SocketError.Success)
+            {
+                if (!SocketErrorHelper.IsSocketDisabledError(error))
+                {
+                    this.DisposeAsync().NoAwait();
+                    this.filterPipeline.OnTransportException(this, new SocketException((int)error));
+                }
+
+                return true;
+            }
+
+            return false;
         }
         
         private void SettingSocket(UdpSocket socket, UdpOptions options)

@@ -1,6 +1,6 @@
 ﻿namespace System.IO.Pipelines
 {
-    public ref struct ReadDgramResult
+    public struct ReadDgramResult
     {
         public ReadDgramResult(ASegment headBufferSegment, ASegment tailBufferSegment)
         {

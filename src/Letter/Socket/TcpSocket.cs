@@ -31,12 +31,6 @@ namespace System.Net.Sockets
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public SocketAwaitableArgs WaitAsync()
-        {
-            return this.ReceiveAsync(ref EmptyMemory);
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public SocketAwaitableArgs ReceiveAsync(ref Memory<byte> memory)
         {
             return base.InternalReceiveAsync(ref memory);
