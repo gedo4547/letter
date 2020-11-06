@@ -25,7 +25,7 @@ namespace Letter.Tcp
         public void OnTransportInactive(ITcpSession session) { }
         public void OnTransportException(ITcpSession session, Exception ex) { }
 
-        public void OnTransportRead(ITcpSession session, ref WrappedReader reader, EventArgs args)
+        public void OnTransportRead(ITcpSession session, ref WrappedReader reader, WrappedArgs args)
         {
             this.buffers.Clear();
             args.Value = this.buffers;
@@ -49,7 +49,7 @@ namespace Letter.Tcp
             }
         }
 
-        public void OnTransportWrite(ITcpSession session, ref WrappedWriter writer, EventArgs args)
+        public void OnTransportWrite(ITcpSession session, ref WrappedWriter writer, WrappedArgs args)
         {
             var buffer = args.Value as byte[];
             if (buffer.Length > this.maxPackLength)

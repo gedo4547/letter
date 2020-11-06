@@ -7,8 +7,8 @@ namespace Letter
 {
     public sealed class FilterPipeline<TSession> : IFilterPipeline<TSession>, IAsyncDisposable where TSession : ISession
     {
-        private EventArgs readArgs = new EventArgs();
-        private EventArgs writeArgs = new EventArgs();
+        private WrappedArgs readArgs = new WrappedArgs();
+        private WrappedArgs writeArgs = new WrappedArgs();
         private List<IFilter<TSession>> filters = new List<IFilter<TSession>>();
         
         public void Add(IFilter<TSession> filter)

@@ -1,14 +1,13 @@
-using System;
 using System.Runtime.CompilerServices;
 
 namespace Letter
 {
-    public sealed class EventArgs
+    public sealed class WrappedArgs
     {
         public object Value
         {
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            get; 
+            get;
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             set;
         }

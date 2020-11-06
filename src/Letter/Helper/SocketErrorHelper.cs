@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
-using Letter;
 
 namespace System.Net.Sockets
 {
@@ -20,12 +20,14 @@ namespace System.Net.Sockets
             return false;
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool IsSocketDisabledError(SocketError error)
         {
             return IsConnectionResetError(error) ||
                    IsConnectionAbortError(error);
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool IsConnectionResetError(SocketError errorCode)
         {
             // A connection reset can be reported as SocketError.ConnectionAborted on Windows.
@@ -35,6 +37,7 @@ namespace System.Net.Sockets
                    (errorCode == SocketError.ConnectionAborted && IsWindows);
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool IsConnectionAbortError(SocketError errorCode)
         {
             // Calling Dispose after ReceiveAsync can cause an "InvalidArgument" error on *nix.

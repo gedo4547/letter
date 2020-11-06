@@ -5,7 +5,7 @@ using System.Threading;
 
 namespace Letter.Udp
 {
-    public class UdpOptions : Letter.IOptions
+    public class UdpOptions : IOptions
     {
         public UdpOptions()
         {

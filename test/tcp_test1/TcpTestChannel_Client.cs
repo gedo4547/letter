@@ -4,7 +4,6 @@ using Letter.Tcp;
 using System.Buffers;
 using System.Collections.Generic;
 using System.IO.Pipelines;
-using System.Threading.Tasks;
 
 
 namespace tcp_test1
@@ -15,7 +14,6 @@ namespace tcp_test1
         {
             M.session = session;
             Console.WriteLine($"{nameof(TcpTestFilter_Client)}.{nameof(OnTransportActive)}" + session.Id);
-           
         }
 
         public void OnTransportException(ITcpSession session, Exception ex)
@@ -28,7 +26,7 @@ namespace tcp_test1
             Console.WriteLine($"{nameof(TcpTestFilter_Client)}.{nameof(OnTransportInactive)}");
         }
 
-        public void OnTransportRead(ITcpSession session, ref WrappedReader reader, Letter.EventArgs args)
+        public void OnTransportRead(ITcpSession session, ref WrappedReader reader, WrappedArgs args)
         {
             Console.WriteLine($"{nameof(TcpTestFilter_Client)}.{nameof(OnTransportRead)}");
             List<ReadOnlySequence<byte>> buffers = (List<ReadOnlySequence<byte>>)args.Value;
@@ -40,7 +38,7 @@ namespace tcp_test1
             }
         }
 
-        public void OnTransportWrite(ITcpSession session, ref WrappedWriter writer, Letter.EventArgs args)
+        public void OnTransportWrite(ITcpSession session, ref WrappedWriter writer, WrappedArgs args)
         {
             // Console.WriteLine($"{nameof(TcpTestFilter_Client)}.{nameof(OnTransportWrite)}");
         }

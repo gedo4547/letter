@@ -131,17 +131,15 @@ namespace Letter.Udp
             this.RcvPipeReader.ReceiveAsync();
         }
         
-        public Task WriteAsync(EndPoint remoteAddress, object obj)
+        public void Write(EndPoint remoteAddress, object obj)
         {
-            lock (sync)
+            lock (this.sync)
             {
                 this.SndAddress = remoteAddress;
                 var segment = this.SndPipeWriter.GetSegment();
                 segment.Token = remoteAddress;
                 var writer = new WrappedWriter(segment, this.Order, this.writerFlushCallback);
                 this.filterPipeline.OnTransportWrite(this, ref writer, null);
-
-                return Task.CompletedTask;
             }
         }
 

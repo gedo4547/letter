@@ -8,7 +8,7 @@ namespace Letter.Udp
         EndPoint RcvAddress { get; }
         EndPoint SndAddress { get; }
         
-        Task WriteAsync(EndPoint remoteAddress, object obj);
+        void Write(EndPoint remoteAddress, object obj);
         
         Task FlushAsync();
     }
