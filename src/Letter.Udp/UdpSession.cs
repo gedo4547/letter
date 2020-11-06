@@ -31,7 +31,7 @@ namespace Letter.Udp
             this.readerFlushCallback = (startPos, endPos) => { };
             this.writerFlushCallback = (writer) =>
             {
-                // this.SndPipeWriter.Write((DgramNode) writer);
+                this.SndPipeWriter.WriterAdvance((ASegment) writer);
             };
         }
         
@@ -52,6 +52,8 @@ namespace Letter.Udp
 
         private int memoryBlockSize;
         private object sync = new object();
+        protected volatile bool isDisposed = false;
+        
         private Task readTask;
 
         public DgramPipelineReader RcvPipeReader
@@ -84,25 +86,29 @@ namespace Letter.Udp
             this.rcvPipeline.ReceiveAsync();
 
             this.readTask = this.SocketReceiveAsync();
+            
+            this.filterPipeline.OnTransportActive(this);
         }
         
         private async Task SocketReceiveAsync()
         {
+            var address = this.LocalAddress;
             while (true)
             {
-                var node = this.RcvPipeWriter.GetSegment();
-                var memory = node.GetWritableMemory(this.memoryBlockSize);
+                var segment = this.RcvPipeWriter.GetSegment();
+                var memory = segment.GetWritableMemory(this.memoryBlockSize);
                 try
                 {
-                    var socketResult = await this.socket.ReceiveAsync(this.LocalAddress, ref memory);
+                    var socketResult = await this.socket.ReceiveAsync(address, ref memory);
                     if (this.SocketErrorNotify(socketResult.error))
                     {
                         break;
                     }
                     
-                    node.Token = this.socket.RemoteAddress;
-                    node.WriterAdvance(socketResult.bytesTransferred);
-                    this.RcvPipeWriter.WriterAdvance(node);
+                    segment.Token = this.socket.RemoteAddress;
+                    segment.WriterAdvance(socketResult.bytesTransferred);
+                    this.RcvPipeWriter.WriterAdvance(segment);
+                    this.RcvPipeWriter.FlushAsync();
                 }
                 catch(ObjectDisposedException)
                 {
@@ -122,17 +128,18 @@ namespace Letter.Udp
             var buffer = readDgramResult.GetBuffer();
             foreach (var segment in buffer)
             {
+                Console.WriteLine(">>>>>>>>>buffer>>>>>>>>>>>>>>>>>>");
                 this.RcvAddress = (EndPoint) segment.Token;
                 var memory = segment.GetReadableMemory();
                 var w_reader = new WrappedReader(new ReadOnlySequence<byte>(memory), this.Order, this.readerFlushCallback);
                 this.filterPipeline.OnTransportRead(this, ref w_reader);
-                RcvPipeReader.ReaderAdvance();
+                this.RcvPipeReader.ReaderAdvance();
             }
 
             this.RcvPipeReader.ReceiveAsync();
         }
         
-        public void Write(EndPoint remoteAddress, object obj)
+        public void Write(EndPoint remoteAddress, object o)
         {
             lock (this.sync)
             {
@@ -140,7 +147,8 @@ namespace Letter.Udp
                 var segment = this.SndPipeWriter.GetSegment();
                 segment.Token = remoteAddress;
                 var writer = new WrappedWriter(segment, this.Order, this.writerFlushCallback);
-                this.filterPipeline.OnTransportWrite(this, ref writer, null);
+                this.filterPipeline.OnTransportWrite(this, ref writer, o);
+                writer.Flush();
             }
         }
 
@@ -152,6 +160,7 @@ namespace Letter.Udp
 
         private async void OnSndPipelineRead()
         {
+            // Console.WriteLine(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
             var reader = this.SndPipeReader;
             ReadDgramResult readDgramResult = reader.Read();
             if (readDgramResult.IsEmpty) return;
@@ -160,9 +169,13 @@ namespace Letter.Udp
             
             foreach (var segment in buffer)
             {
+                // Console.WriteLine("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
                 var memory = segment.GetReadableMemory();
                 var sequence = new ReadOnlySequence<byte>(memory);
-                var socketResult = await this.socket.SendAsync((EndPoint)segment.Token, ref sequence);
+                // Console.WriteLine("ssssssssssssssssssssssssssssss");
+                var address = (EndPoint) segment.Token;
+                var socketResult = await this.socket.SendAsync(address, ref sequence);
+                // Console.WriteLine("dddddddddddddddddddddddddddddd");
                 this.SndPipeReader.ReaderAdvance();
                 if (this.SocketErrorNotify(socketResult.error))
                 {
@@ -203,9 +216,15 @@ namespace Letter.Udp
                 socket.SettingSndBufferSize(options.SndBufferSize.Value);
         }
 
-        public ValueTask DisposeAsync()
+        public async ValueTask DisposeAsync()
         {
-            throw new System.NotImplementedException();
+            if (this.isDisposed)
+            {
+                return;
+            }
+
+            this.filterPipeline.OnTransportInactive(this);
+            await this.socket.DisposeAsync();
         }
     }
 }

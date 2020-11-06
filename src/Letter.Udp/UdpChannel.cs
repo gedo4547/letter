@@ -16,6 +16,7 @@ namespace Letter.Udp
         }
 
         private Socket socket;
+        private UdpSession session;
         private UdpOptions options;
         private FilterPipeline<IUdpSession> filterPipeline;
         
@@ -25,6 +26,8 @@ namespace Letter.Udp
         {
             this.Bind(bindAddress);
             
+            this.Run();
+            
             return Task.CompletedTask;
         }
         
@@ -33,6 +36,8 @@ namespace Letter.Udp
             this.Bind(bindAddress);
 
             await this.socket.ConnectAsync(connectAddress);
+
+            this.Run();
         }
         
         private void Bind(EndPoint bindAddress)
@@ -54,13 +59,13 @@ namespace Letter.Udp
         {
             var memoryPool = this.options.MemoryPoolFactory();
             var scheduler = this.options.SchedulerAllocator.Next();
-            UdpSession session = new UdpSession(this.socket, options, memoryPool, scheduler, filterPipeline);
+            this.session = new UdpSession(this.socket, options, memoryPool, scheduler, filterPipeline);
             session.Start();
         }
 
-        public ValueTask DisposeAsync()
+        public async ValueTask DisposeAsync()
         {
-            throw new System.NotImplementedException();
+            await this.session.DisposeAsync();
         }
     }
 }
