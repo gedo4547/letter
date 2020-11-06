@@ -2,6 +2,7 @@
 using System.IO;
 using System.Net.Security;
 using System.Threading.Tasks;
+using Letter.IO;
 
 namespace Letter.Tcp
 {

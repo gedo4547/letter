@@ -3,6 +3,7 @@ using System.Buffers;
 using System.Buffers.Binary;
 using System.Net.Sockets;
 using System.Threading;
+using Letter.IO;
 
 namespace Letter.Tcp
 {

@@ -22,17 +22,17 @@
           }
         }
       },
-      "Letter/1.0.0": {
+      "Letter.IO/1.0.0": {
         "dependencies": {
           "System.IO.Pipelines": "4.7.3"
         },
         "runtime": {
-          "Letter.dll": {}
+          "Letter.IO.dll": {}
         }
       },
       "Letter.Tcp/1.0.0": {
         "dependencies": {
-          "Letter": "1.0.0"
+          "Letter.IO": "1.0.0"
         },
         "runtime": {
           "Letter.Tcp.dll": {}
@@ -53,7 +53,7 @@
       "path": "system.io.pipelines/4.7.3",
       "hashPath": "system.io.pipelines.4.7.3.nupkg.sha512"
     },
-    "Letter/1.0.0": {
+    "Letter.IO/1.0.0": {
       "type": "project",
       "serviceable": false,
       "sha512": ""

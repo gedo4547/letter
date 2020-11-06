@@ -1,6 +1,6 @@
 using System.Runtime.CompilerServices;
 
-namespace Letter
+namespace Letter.IO
 {
     public sealed class WrappedArgs
     {

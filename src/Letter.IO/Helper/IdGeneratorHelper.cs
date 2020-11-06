@@ -5,7 +5,7 @@ using System;
 using System.ComponentModel;
 using System.Threading;
 
-namespace Letter
+namespace Letter.IO
 {
     [EditorBrowsable(EditorBrowsableState.Never)]
     public static class IdGeneratorHelper

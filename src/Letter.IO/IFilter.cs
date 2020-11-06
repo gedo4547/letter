@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IO.Pipelines;
 
-namespace Letter
+namespace Letter.IO
 {
     public interface IFilter<TSession> where TSession : ISession
     {

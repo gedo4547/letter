@@ -15,7 +15,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Letter.Udp", "src\Letter.Ud
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Letter.Kcp", "src\Letter.Kcp\Letter.Kcp.csproj", "{E31366E4-C7EE-471C-930E-220C355AEBB7}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Letter", "src\Letter\Letter.csproj", "{0B1D4637-E89D-476F-A768-FEC4D64D1636}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Letter.IO", "src\Letter.IO\Letter.IO.csproj", "{0B1D4637-E89D-476F-A768-FEC4D64D1636}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "udp_text", "test\udp_text\udp_text.csproj", "{69DED5AA-B86F-4B2F-ADA6-E21588E665C7}"
 EndProject

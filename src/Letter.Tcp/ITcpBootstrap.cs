@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Net.Security;
+using Letter.IO;
 
 namespace Letter.Tcp
 {

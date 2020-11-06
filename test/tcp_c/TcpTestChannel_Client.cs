@@ -5,6 +5,7 @@ using System.Buffers;
 using System.Collections.Generic;
 using System.IO.Pipelines;
 using System.Threading.Tasks;
+using Letter.IO;
 
 
 namespace tcp_test1
@@ -28,7 +29,7 @@ namespace tcp_test1
             Console.WriteLine($"{nameof(TcpTestFilter_Client)}.{nameof(OnTransportInactive)}");
         }
 
-        public void OnTransportRead(ITcpSession session, ref WrappedReader reader, Letter.WrappedArgs args)
+        public void OnTransportRead(ITcpSession session, ref WrappedReader reader, WrappedArgs args)
         {
             Console.WriteLine($"{nameof(TcpTestFilter_Client)}.{nameof(OnTransportRead)}");
             List<ReadOnlySequence<byte>> buffers = (List<ReadOnlySequence<byte>>)args.Value;
@@ -40,7 +41,7 @@ namespace tcp_test1
             }
         }
 
-        public void OnTransportWrite(ITcpSession session, ref WrappedWriter writer, Letter.WrappedArgs args)
+        public void OnTransportWrite(ITcpSession session, ref WrappedWriter writer, WrappedArgs args)
         {
             // Console.WriteLine($"{nameof(TcpTestFilter_Client)}.{nameof(OnTransportWrite)}");
         }

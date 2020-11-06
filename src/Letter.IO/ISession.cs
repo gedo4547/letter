@@ -4,7 +4,7 @@ using System.Buffers.Binary;
 using System.IO.Pipelines;
 using System.Net;
 
-namespace Letter
+namespace Letter.IO
 {
     public interface ISession : IAsyncDisposable
     {

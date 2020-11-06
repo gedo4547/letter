@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Letter
+namespace Letter.IO
 {
     public interface IChannel : IAsyncDisposable
     {

@@ -1,7 +1,7 @@
 ﻿// using System;
 // using System.Buffers;
-// using Letter;
-// using Letter.Udp;
+// using Letter.IO;
+// using Letter.IO.Udp;
 //
 // namespace udp_text
 // {

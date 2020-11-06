@@ -11,24 +11,24 @@
           "lib/netcoreapp3.0/System.IO.Pipelines.dll": {}
         }
       },
-      "Letter/1.0.0": {
+      "Letter.IO/1.0.0": {
         "type": "project",
         "framework": ".NETCoreApp,Version=v5.0",
         "dependencies": {
           "System.IO.Pipelines": "4.7.3"
         },
         "compile": {
-          "bin/placeholder/Letter.dll": {}
+          "bin/placeholder/Letter.IO.dll": {}
         },
         "runtime": {
-          "bin/placeholder/Letter.dll": {}
+          "bin/placeholder/Letter.IO.dll": {}
         }
       },
       "Letter.Tcp/1.0.0": {
         "type": "project",
         "framework": ".NETCoreApp,Version=v5.0",
         "dependencies": {
-          "Letter": "1.0.0"
+          "Letter.IO": "1.0.0"
         },
         "compile": {
           "bin/placeholder/Letter.Tcp.dll": {}
@@ -68,10 +68,10 @@
         "version.txt"
       ]
     },
-    "Letter/1.0.0": {
+    "Letter.IO/1.0.0": {
       "type": "project",
-      "path": "../../src/Letter/Letter.csproj",
-      "msbuildProject": "../../src/Letter/Letter.csproj"
+      "path": "../../src/Letter.IO/Letter.IO.csproj",
+      "msbuildProject": "../../src/Letter.IO/Letter.IO.csproj"
     },
     "Letter.Tcp/1.0.0": {
       "type": "project",

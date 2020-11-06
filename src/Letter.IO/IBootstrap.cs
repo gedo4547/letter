@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 
-namespace Letter
+namespace Letter.IO
 {
     public interface IBootstrap<TOptions, TSession, TChannel> : IAsyncDisposable
         where TOptions : class, IOptions, new()

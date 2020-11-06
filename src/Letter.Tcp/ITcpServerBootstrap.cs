@@ -1,4 +1,5 @@
-﻿namespace Letter.Tcp
+﻿
+namespace Letter.Tcp
 {
     public interface ITcpServerBootstrap : ITcpBootstrap<TcpServerOptions, ITcpServerChannel>
     {
