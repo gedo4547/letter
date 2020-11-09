@@ -1,12 +1,10 @@
 ﻿using System;
-using Letter;
-using Letter.Tcp;
 using System.Buffers;
 using System.Collections.Generic;
 using System.IO.Pipelines;
-using System.Threading.Tasks;
-using Letter.IO;
 
+using Letter.IO;
+using Letter.Tcp;
 
 namespace tcp_test1
 {

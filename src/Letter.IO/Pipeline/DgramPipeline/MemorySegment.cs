@@ -5,13 +5,13 @@ namespace System.IO.Pipelines
 {
     public sealed class MemorySegment : ASegment, IWrappedWriter
     {
-        public MemorySegment(BufferStack<MemorySegment> stack)
+        public MemorySegment(ConcurrentBufferStack<MemorySegment> stack)
         {
             this.stack = stack;
         }
 
         private IMemoryOwner<byte> memoryOwner;
-        private BufferStack<MemorySegment> stack;
+        private ConcurrentBufferStack<MemorySegment> stack;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void SetMemoryBlock(IMemoryOwner<byte> memoryOwner)

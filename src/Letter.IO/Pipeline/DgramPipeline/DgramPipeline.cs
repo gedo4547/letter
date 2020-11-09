@@ -16,7 +16,7 @@ namespace System.IO.Pipelines
             this.scheduler = scheduler;
             this.memoryPool = memoryPool;
             this.memoryBlockSize = this.memoryPool.MaxBufferSize;
-            this.entityBufferSegmentStack = new BufferStack<MemorySegment>(INIT_SEGMENT_POOL_SIZE);
+            this.entityBufferSegmentStack = new ConcurrentBufferStack<MemorySegment>(INIT_SEGMENT_POOL_SIZE);
 
             this.rcvCallback = (o) => { rcvCallback(); };
             this.Reader = new DgramPipelineReader(this);
@@ -28,7 +28,7 @@ namespace System.IO.Pipelines
         
         private PipeScheduler scheduler;
         private MemoryPool<byte> memoryPool;
-        private BufferStack<MemorySegment> entityBufferSegmentStack;
+        private ConcurrentBufferStack<MemorySegment> entityBufferSegmentStack;
         
         private Action<object> rcvCallback;
         
@@ -62,37 +62,31 @@ namespace System.IO.Pipelines
                 throw new ArgumentNullException(nameof(segment));
             }
             
-            if (this.headBufferSegment == null && this.tailBufferSegment == null)
-            {
-                this.headBufferSegment = segment;
-                this.tailBufferSegment = segment;
-            }
-            else
-            {
-                this.tailBufferSegment.SetNext(segment);
-                this.tailBufferSegment = segment;
-            }
-        }
-
-        public void ReaderAdvance()
-        {
             lock (this.sync)
             {
-                if (this.headBufferSegment == this.tailBufferSegment)
+                if (this.headBufferSegment == null && 
+                    this.tailBufferSegment == null)
                 {
-                    this.headBufferSegment = null;
-                    this.tailBufferSegment = null;
+                    this.headBufferSegment = segment;
+                    this.tailBufferSegment = segment;
                 }
                 else
                 {
-                    this.tailBufferSegment = this.tailBufferSegment.ChildSegment;
+                    this.tailBufferSegment.SetNext(segment);
+                    this.tailBufferSegment = segment;
                 }
             }
         }
-        
+
         public ReadDgramResult Read()
         {
-            return new ReadDgramResult(this.headBufferSegment, this.tailBufferSegment);
+            lock (this.sync)
+            {
+                var result = new ReadDgramResult(this.headBufferSegment, this.tailBufferSegment);
+                this.headBufferSegment = null;
+                this.tailBufferSegment = null;
+                return result;
+            }
         }
         
         public void ReceiveAsync()

@@ -15,7 +15,5 @@ namespace System.IO.Pipelines
         public void ReceiveAsync() => this.pipeline.ReceiveAsync();
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public ReadDgramResult Read() => this.pipeline.Read();
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void ReaderAdvance() => this.pipeline.ReaderAdvance();
     }
 }

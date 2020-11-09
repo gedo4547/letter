@@ -5,27 +5,17 @@
         public ReadDgramResult(ASegment headBufferSegment, ASegment tailBufferSegment)
         {
             this.IsEmpty = (headBufferSegment == null);
-            this.headBufferSegment = headBufferSegment;
-            this.tailBufferSegment = tailBufferSegment;
+            this.Head = headBufferSegment;
+            this.Tail = tailBufferSegment;
         }
 
-        private ASegment headBufferSegment;
-        private ASegment tailBufferSegment;
+        public ASegment Head { get; }
+        public ASegment Tail { get; }
 
         public bool IsEmpty
         {
             get;
             private set;
-        }
-
-        public SegmentSequence GetBuffer()
-        {
-            if (!this.IsEmpty)
-            {
-                return new SegmentSequence(this.headBufferSegment, this.tailBufferSegment);
-            }
-            
-            return default;
         }
     }
 }

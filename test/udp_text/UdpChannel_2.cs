@@ -17,7 +17,7 @@ namespace udp_text
                 string str = "nihao";
                 
                 Console.WriteLine("发送");
-                for (int i = 0; i < 2; i++)
+                for (int i = 0; i < 20; i++)
                 {
                     string tempStr = str + "__" + i.ToString();
                     var arr = System.Text.Encoding.UTF8.GetBytes(tempStr);

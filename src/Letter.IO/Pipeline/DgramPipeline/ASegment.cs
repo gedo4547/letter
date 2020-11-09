@@ -108,12 +108,11 @@ namespace System.IO.Pipelines
             this.writedLength = 0;
             this.readedLength = 0;
             this.availableMemory = default;
-
-            base.Next = null;
+            
             base.Memory = default;
             base.RunningIndex = 0;
             
-            this.childSegment = null;
+            this.ChildSegment = null;
         }
         
         
