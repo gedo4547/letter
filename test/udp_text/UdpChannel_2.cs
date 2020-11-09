@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Buffers;
 using System.IO.Pipelines;
+using System.Threading.Tasks;
 using Letter.IO;
 using Letter.Udp;
 
@@ -17,13 +18,17 @@ namespace udp_text
                 string str = "nihao";
                 
                 Console.WriteLine("发送");
-                for (int i = 0; i < 20; i++)
-                {
-                    string tempStr = str + "__" + i.ToString();
-                    var arr = System.Text.Encoding.UTF8.GetBytes(tempStr);
-                    session.Write(Program.s_p, arr);
-                    await session.FlushAsync();
-                }
+                Task.Run(async ()=>{
+                    for (int i = 0; i < 20; i++)
+                    {
+                        string tempStr = str + "__" + i.ToString();
+                        var arr = System.Text.Encoding.UTF8.GetBytes(tempStr);
+                        session.Write(Program.s_p, arr);
+                        await session.FlushAsync();
+
+                        await Task.Delay(1000);
+                    }
+                }).NoAwait();
             }
         }
 
