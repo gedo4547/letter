@@ -35,13 +35,19 @@ namespace System.IO.Pipelines
             base.WriterAdvance(length);
         }
 
+        public override void Release()
+        {
+            base.Release();
+            
+            this.stack.Push(this);
+        }
+
         public override void Dispose()
         {
             base.Dispose();
             
             this.memoryOwner.Dispose();
             this.memoryOwner = null;
-            this.stack.Push(this);
         }
     }
 }

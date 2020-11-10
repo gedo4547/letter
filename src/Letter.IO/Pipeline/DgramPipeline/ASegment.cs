@@ -10,7 +10,7 @@ namespace System.IO.Pipelines
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             get;
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            set; 
+            set;
         }
 
         public int Length
@@ -100,6 +100,15 @@ namespace System.IO.Pipelines
                 
                 segment = segment.ChildSegment;
             }
+        }
+
+
+        public virtual void Release()
+        {
+            this.writedLength = 0;
+            this.readedLength = 0;
+            base.RunningIndex = 0;
+            this.ChildSegment = null;
         }
 
         public virtual void Dispose()

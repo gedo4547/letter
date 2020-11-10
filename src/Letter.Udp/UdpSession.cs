@@ -93,12 +93,12 @@ namespace Letter.Udp
         private async Task SocketReceiveAsync()
         {
             var address = this.LocalAddress;
-            while (true)
+            try
             {
-                var segment = this.RcvPipeWriter.GetSegment();
-                var memory = segment.GetWritableMemory(this.memoryBlockSize);
-                try
+                while (true)
                 {
+                    var segment = this.RcvPipeWriter.GetSegment();
+                    var memory = segment.GetWritableMemory(this.memoryBlockSize);
                     var socketResult = await this.socket.ReceiveAsync(address, ref memory);
                     if (this.SocketErrorNotify(socketResult.error))
                     {
@@ -110,10 +110,10 @@ namespace Letter.Udp
                     this.RcvPipeWriter.WriterAdvance(segment);
                     this.RcvPipeWriter.FlushAsync();
                 }
-                catch(ObjectDisposedException)
-                {
+            }
+            catch(ObjectDisposedException)
+            {
                     
-                }
             }
         }
 
@@ -136,10 +136,9 @@ namespace Letter.Udp
                 var w_reader = new WrappedReader(new ReadOnlySequence<byte>(memory), this.Order, this.readerFlushCallback);
                 this.filterPipeline.OnTransportRead(this, ref w_reader);
                 
-                
                 segment = head;
                 head = head.ChildSegment;
-                segment.Dispose();
+                segment.Release();
             }
             
             this.RcvPipeReader.ReceiveAsync();
@@ -182,7 +181,7 @@ namespace Letter.Udp
                 SocketResult socketResult = await this.socket.SendAsync(address, ref sequence);
                 segment = head;
                 head = head.ChildSegment;
-                segment.Dispose();
+                segment.Release();
             }
 
             this.SndPipeReader.ReceiveAsync();
