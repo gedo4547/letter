@@ -3,20 +3,19 @@ using System.Threading;
 
 namespace System.IO.Pipelines
 {
-    public class DgramPipeline
+    public class DgramPipeline : IDisposable
     {
         private const int FALSE = 0;
         private const int TRUE = 1;
         
         private const int INIT_SEGMENT_POOL_SIZE = 8;
-        //private const int MAX_SEGMENT_POOL_SIZE = 256;
 
         public DgramPipeline(MemoryPool<byte> memoryPool, PipeScheduler scheduler, Action rcvCallback)
         {
             this.scheduler = scheduler;
             this.memoryPool = memoryPool;
             this.memoryBlockSize = this.memoryPool.MaxBufferSize;
-            this.entityBufferSegmentStack = new ConcurrentBufferStack<MemorySegment>(INIT_SEGMENT_POOL_SIZE);
+            this.segmentStack = new ConcurrentBufferStack<MemorySegment>(INIT_SEGMENT_POOL_SIZE);
 
             this.rcvCallback = (o) => { rcvCallback(); };
             this.Reader = new DgramPipelineReader(this);
@@ -28,7 +27,7 @@ namespace System.IO.Pipelines
         
         private PipeScheduler scheduler;
         private MemoryPool<byte> memoryPool;
-        private ConcurrentBufferStack<MemorySegment> entityBufferSegmentStack;
+        private ConcurrentBufferStack<MemorySegment> segmentStack;
         
         private Action<object> rcvCallback;
         
@@ -45,9 +44,9 @@ namespace System.IO.Pipelines
             lock (this.sync)
             {
                 MemorySegment segment;
-                if (!this.entityBufferSegmentStack.TryPop(out segment))
+                if (!this.segmentStack.TryPop(out segment))
                 {
-                    segment = new MemorySegment(this.entityBufferSegmentStack);
+                    segment = new MemorySegment(this.segmentStack);
                     segment.SetMemoryBlock(this.memoryPool.Rent());
                 }
                 
@@ -83,6 +82,7 @@ namespace System.IO.Pipelines
             lock (this.sync)
             {
                 var result = new ReadDgramResult(this.headBufferSegment, this.tailBufferSegment);
+                
                 this.headBufferSegment = null;
                 this.tailBufferSegment = null;
                 return result;
@@ -105,6 +105,28 @@ namespace System.IO.Pipelines
             if (Interlocked.CompareExchange(ref this.awaitRcv, FALSE, TRUE) == TRUE)
             {
                 this.scheduler.Schedule(this.rcvCallback, null);
+            }
+        }
+
+        public void Dispose()
+        {
+            if (this.headBufferSegment != null)
+            {
+                this.headBufferSegment.Dispose();
+                this.headBufferSegment = null;
+            }
+
+            if (this.tailBufferSegment != null)
+            {
+                this.tailBufferSegment.Dispose();
+                this.tailBufferSegment = null;
+            }
+            
+            this.memoryPool = null;
+
+            while (this.segmentStack.TryPop(out var item))
+            {
+                item.Dispose();
             }
         }
     }

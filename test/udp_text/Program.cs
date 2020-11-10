@@ -35,7 +35,7 @@ namespace udp_text
                 string str = Console.ReadLine();
                 if (str == "send")
                 {
-                    for (int i = 0; i < 20; i++)
+                    for (int i = 0; i < 100; i++)
                     {
                         num++;
                         var bytes = System.Text.Encoding.UTF8.GetBytes("你好" + num);

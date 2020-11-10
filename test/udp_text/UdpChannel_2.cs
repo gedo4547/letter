@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Buffers;
 using System.IO.Pipelines;
-using System.Threading.Tasks;
 using Letter.IO;
 using Letter.Udp;
 
@@ -16,34 +14,6 @@ namespace udp_text
             if (session.LocalAddress.ToString() == Program.c_p.ToString())
             {
                 M.session = session;
-                
-                // string str = "nihao";
-                //
-                // Console.WriteLine("发送");
-                // for (int i = 0; i < 20; i++)
-                // {
-                //     string tempStr = str + "__" + i.ToString();
-                //     var arr = System.Text.Encoding.UTF8.GetBytes(tempStr);
-                //     session.Write(Program.s_p, arr);
-                //     await session.FlushAsync();
-                //     
-                //     System.Threading.Thread.Sleep(1000);
-                //     
-                // }
-                
-                
-                
-                // Task.Run(async ()=>{
-                //     for (int i = 0; i < 20; i++)
-                //     {
-                //         string tempStr = str + "__" + i.ToString();
-                //         var arr = System.Text.Encoding.UTF8.GetBytes(tempStr);
-                //         session.Write(Program.s_p, arr);
-                //         await session.FlushAsync();
-                //
-                //         await Task.Delay(1000);
-                //     }
-                // }).NoAwait();
             }
         }
 
@@ -70,9 +40,6 @@ namespace udp_text
         {
             Console.WriteLine($"{nameof(UdpFilter_2)}.{nameof(OnTransportWrite)}");
             var buffer = args.Value as byte[];
-            
-            Console.WriteLine(">>>>>>>"+(buffer.Length));
-            
             writer.Write(buffer);
         }
     }

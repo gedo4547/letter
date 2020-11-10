@@ -179,6 +179,11 @@ namespace Letter.Udp
                 ReadOnlySequence<byte> sequence = new ReadOnlySequence<byte>(memory);
                 EndPoint address = (EndPoint) head.Token;
                 SocketResult socketResult = await this.socket.SendAsync(address, ref sequence);
+                if (this.SocketErrorNotify(socketResult.error))
+                {
+                    break;
+                }
+                
                 segment = head;
                 head = head.ChildSegment;
                 segment.Release();
@@ -226,6 +231,9 @@ namespace Letter.Udp
 
             this.filterPipeline.OnTransportInactive(this);
             await this.socket.DisposeAsync();
+            await this.readTask;
+            this.rcvPipeline.Dispose();
+            this.sndPipeline.Dispose();
         }
     }
 }
