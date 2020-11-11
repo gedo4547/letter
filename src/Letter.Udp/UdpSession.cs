@@ -173,23 +173,33 @@ namespace Letter.Udp
             ASegment tail = readDgramResult.Tail;
             ASegment segment = null;
 
-            while (head != null)
+            try
             {
-                ReadOnlyMemory<byte> memory = head.GetReadableMemory();
-                ReadOnlySequence<byte> sequence = new ReadOnlySequence<byte>(memory);
-                EndPoint address = (EndPoint) head.Token;
-                SocketResult socketResult = await this.socket.SendAsync(address, ref sequence);
-                if (this.SocketErrorNotify(socketResult.error))
+                while (head != null)
                 {
-                    break;
+                    ReadOnlyMemory<byte> memory = head.GetReadableMemory();
+                    if (memory.Length > 0)
+                    {
+                        EndPoint address = (EndPoint) head.Token;
+                        ReadOnlySequence<byte> sequence = new ReadOnlySequence<byte>(memory);
+                        SocketResult socketResult = await this.socket.SendAsync(address, ref sequence);
+                        if (this.SocketErrorNotify(socketResult.error))
+                        {
+                            break;
+                        }
+                    }
+                    segment = head;
+                    head = head.ChildSegment;
+                    segment.Release();
                 }
-                
-                segment = head;
-                head = head.ChildSegment;
-                segment.Release();
-            }
 
-            this.SndPipeReader.ReceiveAsync();
+                this.SndPipeReader.ReceiveAsync();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                throw;
+            }
         }
         
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -231,7 +241,9 @@ namespace Letter.Udp
 
             this.filterPipeline.OnTransportInactive(this);
             await this.socket.DisposeAsync();
+            
             await this.readTask;
+            
             this.rcvPipeline.Dispose();
             this.sndPipeline.Dispose();
         }
