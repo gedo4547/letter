@@ -58,7 +58,6 @@ namespace Letter.Tcp
 
                 this.TransportReadNotify(result.Buffer);
             }
-             
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

@@ -114,8 +114,8 @@ namespace Letter.Tcp
         {
             try
             {
-                var rcvTask = DoReceive();
-                var sndTask = DoSend();
+                var rcvTask = this.DoRcvAsync();
+                var sndTask = this.DoSndAsync();
 
                 Console.WriteLine("111111111111111111111111111111111111");
                 await rcvTask;
@@ -126,15 +126,16 @@ namespace Letter.Tcp
             }
             catch (Exception ex)
             {
+                this.DisposeAsync().NoAwait();
                 this.filterPipeline.OnTransportException(this, ex);
             }
         }
 
-        private async Task DoReceive()
+        private async Task DoRcvAsync()
         {
             try
             {
-                await ProcessReceives();
+                await this.ProcessRcvAsync();
             }
             catch(ObjectDisposedException)
             {
@@ -146,7 +147,7 @@ namespace Letter.Tcp
             }
         }
         
-        private async Task ProcessReceives()
+        private async Task ProcessRcvAsync()
         {
             var input = Input;
             while (true)
@@ -170,11 +171,11 @@ namespace Letter.Tcp
             }
         }
         
-        private async Task DoSend()
+        private async Task DoSndAsync()
         {
             try
             {
-                await ProcessSends();
+                await this.ProcessSndAsync();
             }
             catch (ObjectDisposedException)
             {
@@ -186,7 +187,7 @@ namespace Letter.Tcp
             }
         }
         
-        private async Task ProcessSends()
+        private async Task ProcessSndAsync()
         {
             var output = Output;
             while (true)

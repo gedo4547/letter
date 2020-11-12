@@ -91,11 +91,11 @@
                  sb.Append($"{tempParameterInfo.ParameterType} {tempParameterInfo.Name}");
                  if (i < parameters.Length - 1)
                  {
-                     sb.Append(",");
+                     sb.Append(',');
                  }
              }
 
-             sb.Append(")");
+             sb.Append(')');
              sb.Append($" at ({item.GetFileName()}:{item.GetFileLineNumber()})");
              if (tempIndex != sfs.Length) sb.AppendLine();
              //if (isInfo)
