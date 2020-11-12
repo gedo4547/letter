@@ -18,18 +18,10 @@ namespace Letter.IO
         
         public void OnTransportActive(TSession session)
         {
-            try
+            int count = this.filters.Count;
+            for (int i = 0; i < count; i++)
             {
-                int count = this.filters.Count;
-                for (int i = 0; i < count; i++)
-                {
-                    this.filters[i].OnTransportActive(session);
-                }
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e);
-                throw;
+                this.filters[i].OnTransportActive(session);
             }
         }
 
@@ -43,10 +35,9 @@ namespace Letter.IO
                     this.filters[i].OnTransportInactive(session);
                 }
             }
-            catch (Exception e)
+            catch
             {
-                Console.WriteLine(e);
-                throw;
+                
             }
         }
 
@@ -62,43 +53,27 @@ namespace Letter.IO
             }
             catch
             {
-                session.DisposeAsync().NoAwait();
+                
             }
         }
 
         public void OnTransportRead(TSession session, ref WrappedReader reader)
         {
-            try
+            this.readArgs.Value = null;
+            int count = this.filters.Count;
+            for (int i = 0; i < count; i++)
             {
-                this.readArgs.Value = null;
-                int count = this.filters.Count;
-                for (int i = 0; i < count; i++)
-                {
-                    this.filters[i].OnTransportRead(session, ref reader, this.readArgs);
-                }
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e);
-                throw;
+                this.filters[i].OnTransportRead(session, ref reader, this.readArgs);
             }
         }
         
         public void OnTransportWrite(TSession session, ref WrappedWriter writer, object o)
         {
-            try
+            this.writeArgs.Value = o;
+            int count = this.filters.Count;
+            for (int i = 0; i < count; i++)
             {
-                this.writeArgs.Value = o;
-                int count = this.filters.Count;
-                for (int i = 0; i < count; i++)
-                {
-                    this.filters[i].OnTransportWrite(session, ref writer, this.writeArgs);
-                }
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e);
-                throw;
+                this.filters[i].OnTransportWrite(session, ref writer, this.writeArgs);
             }
         }
 

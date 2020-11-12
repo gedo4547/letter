@@ -64,8 +64,19 @@ namespace Letter.Tcp
         private void TransportReadNotify(ReadOnlySequence<byte> buffer)
         {
             var reader = new WrappedReader(buffer, this.Order, this.readerFlushCallback);
-            this.filterPipeline.OnTransportRead(this, ref reader);
-            reader.Flush();
+            try
+            {
+                this.filterPipeline.OnTransportRead(this, ref reader);
+            }
+            catch (Exception ex)
+            {
+                this.filterPipeline.OnTransportException(this, ex);
+                this.DisposeAsync().NoAwait();
+            }
+            finally
+            {
+                reader.Flush();    
+            }
         }
 
         private void OnFilterReadFlush(SequencePosition startpos, SequencePosition endpos)
@@ -80,8 +91,19 @@ namespace Letter.Tcp
                 if (this.isDisposed) return;
 
                 WrappedWriter writer = new WrappedWriter(this.Output, this.Order, this.writerFlushCallback);
-                this.filterPipeline.OnTransportWrite(this, ref writer, o);
-                writer.Flush();
+                try
+                {
+                    this.filterPipeline.OnTransportWrite(this, ref writer, o);
+                }
+                catch (Exception e)
+                {
+                    this.filterPipeline.OnTransportException(this, e);
+                    this.DisposeAsync().NoAwait();
+                }
+                finally
+                {
+                    writer.Flush();    
+                }
             }
         }
         

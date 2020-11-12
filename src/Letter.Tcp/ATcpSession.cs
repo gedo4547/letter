@@ -105,9 +105,17 @@ namespace Letter.Tcp
         
         protected void Run()
         {
-            this.processingTask = this.SocketStartAsync(); 
-            
-            this.filterPipeline.OnTransportActive(this);
+            this.processingTask = this.SocketStartAsync();
+
+            try
+            {
+                this.filterPipeline.OnTransportActive(this);
+            }
+            catch (Exception e)
+            {
+                this.filterPipeline.OnTransportException(this, e);
+                this.DisposeAsync().NoAwait();
+            }
         }
         
         private async Task SocketStartAsync()
@@ -219,8 +227,8 @@ namespace Letter.Tcp
             {
                 if (!SocketErrorHelper.IsSocketDisabledError(error))
                 {
-                    this.DisposeAsync().NoAwait();
                     this.filterPipeline.OnTransportException(this, new SocketException((int)error));
+                    this.DisposeAsync().NoAwait();
                 }
 
                 return true;
