@@ -23,6 +23,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "tcp_s", "test\tcp_s\tcp_s.c
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "tcp_c", "test\tcp_c\tcp_c.csproj", "{1ACFF401-D841-4B65-88B7-54F3F9BFFE04}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "test", "test\test\test.csproj", "{86CF2C7D-12E8-4761-A164-BC82066AC65E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -61,6 +63,10 @@ Global
 		{1ACFF401-D841-4B65-88B7-54F3F9BFFE04}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1ACFF401-D841-4B65-88B7-54F3F9BFFE04}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1ACFF401-D841-4B65-88B7-54F3F9BFFE04}.Release|Any CPU.Build.0 = Release|Any CPU
+		{86CF2C7D-12E8-4761-A164-BC82066AC65E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{86CF2C7D-12E8-4761-A164-BC82066AC65E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{86CF2C7D-12E8-4761-A164-BC82066AC65E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{86CF2C7D-12E8-4761-A164-BC82066AC65E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -74,6 +80,7 @@ Global
 		{69DED5AA-B86F-4B2F-ADA6-E21588E665C7} = {6D6ECC89-1C67-4B5F-AAA3-96936FA7F010}
 		{677B9105-4BD8-41FC-BAD2-13A6EF1991CB} = {6D6ECC89-1C67-4B5F-AAA3-96936FA7F010}
 		{1ACFF401-D841-4B65-88B7-54F3F9BFFE04} = {6D6ECC89-1C67-4B5F-AAA3-96936FA7F010}
+		{86CF2C7D-12E8-4761-A164-BC82066AC65E} = {6D6ECC89-1C67-4B5F-AAA3-96936FA7F010}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {88FE7350-47D0-48BE-9A66-E83D0B53A398}
