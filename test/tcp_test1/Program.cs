@@ -10,7 +10,7 @@ namespace tcp_test1
 {
     class Program
     {
-        private static bool isUseSsl = false;
+        private static bool isUseSsl = true;
         private static IPEndPoint address = new IPEndPoint(IPAddress.Loopback, 20001);
         private static  X509Certificate2 cert = new X509Certificate2(Path.Combine(AppContext.BaseDirectory, "dotnetty.com.pfx"), "password");
         static async Task Main(string[] args)
