@@ -111,7 +111,7 @@ namespace Letter.Udp
                     var socketResult = await this.socket.ReceiveAsync(address, ref memory);
                     if (this.SocketErrorNotify(socketResult.error))
                     {
-                        segment.Release();
+                        // segment.Release();
                         break;
                     }
 

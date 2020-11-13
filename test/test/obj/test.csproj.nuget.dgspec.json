@@ -1,32 +1,29 @@
 {
   "format": 1,
   "restore": {
-    "F:\\letter-github\\test\\test\\test.csproj": {}
+    "/Users/guanyedong/Projects/letter-github/test/test/test.csproj": {}
   },
   "projects": {
-    "F:\\letter-github\\test\\test\\test.csproj": {
+    "/Users/guanyedong/Projects/letter-github/test/test/test.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "F:\\letter-github\\test\\test\\test.csproj",
+        "projectUniqueName": "/Users/guanyedong/Projects/letter-github/test/test/test.csproj",
         "projectName": "test",
-        "projectPath": "F:\\letter-github\\test\\test\\test.csproj",
-        "packagesPath": "C:\\Users\\pc\\.nuget\\packages\\",
-        "outputPath": "F:\\letter-github\\test\\test\\obj\\",
+        "projectPath": "/Users/guanyedong/Projects/letter-github/test/test/test.csproj",
+        "packagesPath": "/Users/guanyedong/.nuget/packages/",
+        "outputPath": "/Users/guanyedong/Projects/letter-github/test/test/obj/",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
-          "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
+          "/usr/local/share/dotnet/sdk/NuGetFallbackFolder"
         ],
         "configFilePaths": [
-          "C:\\Users\\pc\\AppData\\Roaming\\NuGet\\NuGet.Config",
-          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+          "/Users/guanyedong/.config/NuGet/NuGet.Config"
         ],
         "originalTargetFrameworks": [
           "net48"
         ],
         "sources": {
-          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
-          "https://api.nuget.org/v3/index.json": {},
-          "https://nuget.cdn.azure.cn/v3/index.json": {}
+          "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
           "net48": {
@@ -43,12 +40,7 @@
       "frameworks": {
         "net48": {
           "targetAlias": "net48",
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\5.0.100\\RuntimeIdentifierGraph.json"
-        }
-      },
-      "runtimes": {
-        "win7-x86": {
-          "#import": []
+          "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/5.0.100/RuntimeIdentifierGraph.json"
         }
       }
     }

@@ -130,13 +130,12 @@ namespace System.IO.Pipelines
         
             
             this.memoryPool = null;
-            Logger.Error("FFFFFFFFFF>>" + segmentStack1.Count);
+            Console.WriteLine("AAAAAAAAAAAAAAAAAA>>" + segmentStack1.Count);
             try
             {
                 while (this.segmentStack1.TryPop(out var item))
                 {
                     Console.WriteLine("FFFFFFFFFF>>" + segmentStack1.Count);
-                    Console.WriteLine("XXXXXXXXXXXXXXX>>");
                     item.Dispose();
                 }
             }
