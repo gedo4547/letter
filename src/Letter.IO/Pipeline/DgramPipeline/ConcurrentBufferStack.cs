@@ -4,6 +4,9 @@
     {
         public ConcurrentBufferStack(int size)
         {
+        
+
+
             this.stack = new BufferStack<T>(size);
         }
 

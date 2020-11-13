@@ -134,8 +134,8 @@ namespace Letter.Tcp
             }
             catch (Exception ex)
             {
-                this.DisposeAsync().NoAwait();
                 this.filterPipeline.OnTransportException(this, ex);
+                this.DisposeAsync().NoAwait();
             }
         }
 
@@ -160,6 +160,10 @@ namespace Letter.Tcp
             var input = Input;
             while (true)
             {
+                if(this.isWaitData)
+                {
+                    await this.socket.Wait();
+                }
                 var buffer = input.GetMemory(this.minAllocBufferSize);
                 var socketResult = await this.socket.ReceiveAsync(ref buffer);
 

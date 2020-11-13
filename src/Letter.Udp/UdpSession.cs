@@ -197,7 +197,7 @@ namespace Letter.Udp
                 }
                 finally
                 {
-                    writer.Flush();    
+                    writer.Flush();
                 }
             }
         }
@@ -289,6 +289,8 @@ namespace Letter.Udp
             {
                 return;
             }
+            Console.WriteLine(">>>>>>>>>>>>>>>>>>>>>>>>>");
+            this.isDisposed = true;
 
             this.filterPipeline.OnTransportInactive(this);
             await this.socket.DisposeAsync();

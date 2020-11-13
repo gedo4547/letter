@@ -1,4 +1,5 @@
 ﻿using System.Buffers;
+using System.Collections.Concurrent;
 using System.Threading;
 
 namespace System.IO.Pipelines
@@ -15,7 +16,8 @@ namespace System.IO.Pipelines
             this.scheduler = scheduler;
             this.memoryPool = memoryPool;
             this.memoryBlockSize = this.memoryPool.MaxBufferSize;
-            this.segmentStack = new ConcurrentBufferStack<MemorySegment>(INIT_SEGMENT_POOL_SIZE);
+            //this.segmentStack = new ConcurrentBufferStack<MemorySegment>(INIT_SEGMENT_POOL_SIZE);
+            this.segmentStack1 = new ConcurrentStack<MemorySegment>();
 
             this.rcvCallback = (o) => { rcvCallback(); };
             this.Reader = new DgramPipelineReader(this);
@@ -28,7 +30,10 @@ namespace System.IO.Pipelines
         private PipeScheduler scheduler;
         private MemoryPool<byte> memoryPool;
         private ConcurrentBufferStack<MemorySegment> segmentStack;
-        
+
+        private ConcurrentStack<MemorySegment> segmentStack1;
+
+
         private Action<object> rcvCallback;
         
         private int memoryBlockSize;
@@ -41,17 +46,14 @@ namespace System.IO.Pipelines
 
         public MemorySegment GetSegment()
         {
-            lock (this.sync)
+            MemorySegment segment;
+            if (!this.segmentStack1.TryPop(out segment))
             {
-                MemorySegment segment;
-                if (!this.segmentStack.TryPop(out segment))
-                {
-                    segment = new MemorySegment(this.segmentStack);
-                    segment.SetMemoryBlock(this.memoryPool.Rent());
-                }
-                
-                return segment;
+                segment = new MemorySegment(this.segmentStack1);
+                segment.SetMemoryBlock(this.memoryPool.Rent());
             }
+
+            return segment;
         }
         
         public void WriterAdvance(ASegment segment)
@@ -110,24 +112,41 @@ namespace System.IO.Pipelines
 
         public void Dispose()
         {
-            if (this.headBufferSegment != null)
+            Console.WriteLine("DgramPipeline.Dispose");
+            lock (this.sync)
             {
-                this.headBufferSegment.Dispose();
-                this.headBufferSegment = null;
-            }
+                if (this.headBufferSegment != null)
+                {
+                    this.headBufferSegment.Dispose();
+                    this.headBufferSegment = null;
+                }
 
-            if (this.tailBufferSegment != null)
-            {
-                this.tailBufferSegment.Dispose();
-                this.tailBufferSegment = null;
+                if (this.tailBufferSegment != null)
+                {
+                    this.tailBufferSegment.Dispose();
+                    this.tailBufferSegment = null;
+                }
             }
+        
             
             this.memoryPool = null;
-
-            while (this.segmentStack.TryPop(out var item))
+            Logger.Error("FFFFFFFFFF>>" + segmentStack1.Count);
+            try
             {
-                item.Dispose();
+                while (this.segmentStack1.TryPop(out var item))
+                {
+                    Console.WriteLine("FFFFFFFFFF>>" + segmentStack1.Count);
+                    Console.WriteLine("XXXXXXXXXXXXXXX>>");
+                    item.Dispose();
+                }
             }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+            }
+           
+
+            this.segmentStack1.Clear();
         }
     }
 }

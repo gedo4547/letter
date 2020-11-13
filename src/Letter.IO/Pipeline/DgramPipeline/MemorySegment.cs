@@ -1,21 +1,23 @@
 ﻿using System.Buffers;
+using System.Collections.Concurrent;
 using System.Runtime.CompilerServices;
 
 namespace System.IO.Pipelines
 {
     public sealed class MemorySegment : ASegment, IWrappedWriter
     {
-        public MemorySegment(ConcurrentBufferStack<MemorySegment> stack)
+        public MemorySegment(ConcurrentStack<MemorySegment> stack)
         {
             this.stack = stack;
         }
 
         private IMemoryOwner<byte> memoryOwner;
-        private ConcurrentBufferStack<MemorySegment> stack;
+        private ConcurrentStack<MemorySegment> stack;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void SetMemoryBlock(IMemoryOwner<byte> memoryOwner)
         {
+            Console.WriteLine("分配内存》》》》》》》》");
             this.memoryOwner = memoryOwner;
             base.SetAvailableMemory(this.memoryOwner.Memory);
         }
@@ -44,10 +46,9 @@ namespace System.IO.Pipelines
 
         public override void Dispose()
         {
+            Console.WriteLine("GGGGGGGGGGGGGGGGGGGGGGGGGGGGGG");
             base.Dispose();
-            
             this.memoryOwner.Dispose();
-            this.memoryOwner = null;
         }
     }
 }

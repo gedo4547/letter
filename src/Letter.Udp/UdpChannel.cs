@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Net;
 using System.Net.Sockets;
+using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using Letter.IO;
 
@@ -43,6 +44,14 @@ namespace Letter.Udp
         private void Bind(EndPoint bindAddress)
         {
             this.socket = new Socket(bindAddress.AddressFamily, SocketType.Dgram, ProtocolType.Udp);
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                uint IOC_IN = 0x80000000;
+                uint IOC_VENDOR = 0x18000000;
+                uint SIO_UDP_CONNRESET = IOC_IN | IOC_VENDOR | 12;
+                this.socket.IOControl((int)SIO_UDP_CONNRESET, new byte[] { Convert.ToByte(false) }, null);
+            }
+
             try
             {
                 this.socket.Bind(bindAddress);
