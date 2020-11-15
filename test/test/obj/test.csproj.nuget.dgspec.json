@@ -17,7 +17,7 @@
           "/usr/local/share/dotnet/sdk/NuGetFallbackFolder"
         ],
         "configFilePaths": [
-          "/Users/guanyedong/.config/NuGet/NuGet.Config"
+          "/Users/guanyedong/.nuget/NuGet/NuGet.Config"
         ],
         "originalTargetFrameworks": [
           "net48"
@@ -40,6 +40,14 @@
       "frameworks": {
         "net48": {
           "targetAlias": "net48",
+          "dependencies": {
+            "Microsoft.NETFramework.ReferenceAssemblies": {
+              "suppressParent": "All",
+              "target": "Package",
+              "version": "[1.0.0, )",
+              "autoReferenced": true
+            }
+          },
           "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/5.0.100/RuntimeIdentifierGraph.json"
         }
       }

@@ -17,7 +17,6 @@ namespace System.IO.Pipelines
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void SetMemoryBlock(IMemoryOwner<byte> memoryOwner)
         {
-            Console.WriteLine("分配内存》》》》》》》》");
             this.memoryOwner = memoryOwner;
             base.SetAvailableMemory(this.memoryOwner.Memory);
         }
@@ -37,16 +36,15 @@ namespace System.IO.Pipelines
             base.WriterAdvance(length);
         }
 
-        public override void Release()
+        public override void Reset()
         {
-            base.Release();
+            base.Reset();
             
             this.stack.Push(this);
         }
 
         public override void Dispose()
         {
-            Console.WriteLine("GGGGGGGGGGGGGGGGGGGGGGGGGGGGGG");
             base.Dispose();
             this.memoryOwner.Dispose();
         }

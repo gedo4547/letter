@@ -103,7 +103,7 @@ namespace System.IO.Pipelines
         }
 
 
-        public virtual void Release()
+        public virtual void Reset()
         {
             this.writedLength = 0;
             this.readedLength = 0;

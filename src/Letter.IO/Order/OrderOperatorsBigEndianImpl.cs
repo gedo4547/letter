@@ -19,16 +19,16 @@ namespace System.Buffers.Binary
         
         
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void WriteInt16(in Span<byte> destination, ref short value) => BinaryPrimitives.WriteInt16BigEndian(destination, value);
+        public void WriteInt16(in Span<byte> destination, short value) => BinaryPrimitives.WriteInt16BigEndian(destination, value);
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void WriteUInt16(in Span<byte> destination, ref ushort value) => BinaryPrimitives.WriteUInt16BigEndian(destination, value);
+        public void WriteUInt16(in Span<byte> destination, ushort value) => BinaryPrimitives.WriteUInt16BigEndian(destination, value);
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void WriteInt32(in Span<byte> destination, ref int value) => BinaryPrimitives.WriteInt32BigEndian(destination, value);
+        public void WriteInt32(in Span<byte> destination, int value) => BinaryPrimitives.WriteInt32BigEndian(destination, value);
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void WriteUInt32(in Span<byte> destination, ref uint value) => BinaryPrimitives.WriteUInt32BigEndian(destination, value);
+        public void WriteUInt32(in Span<byte> destination, uint value) => BinaryPrimitives.WriteUInt32BigEndian(destination, value);
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void WriteInt64(in Span<byte> destination, ref long value) => BinaryPrimitives.WriteInt64BigEndian(destination, value);
+        public void WriteInt64(in Span<byte> destination, long value) => BinaryPrimitives.WriteInt64BigEndian(destination, value);
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void WriteUInt64(in Span<byte> destination, ref ulong value) => BinaryPrimitives.WriteUInt64BigEndian(destination, value);
+        public void WriteUInt64(in Span<byte> destination, ulong value) => BinaryPrimitives.WriteUInt64BigEndian(destination, value);
     }
 }

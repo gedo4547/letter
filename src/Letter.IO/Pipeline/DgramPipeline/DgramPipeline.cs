@@ -29,7 +29,7 @@ namespace System.IO.Pipelines
         
         private PipeScheduler scheduler;
         private MemoryPool<byte> memoryPool;
-        private ConcurrentBufferStack<MemorySegment> segmentStack;
+        // private ConcurrentBufferStack<MemorySegment> segmentStack;
 
         private ConcurrentStack<MemorySegment> segmentStack1;
 
@@ -52,7 +52,6 @@ namespace System.IO.Pipelines
                 segment = new MemorySegment(this.segmentStack1);
                 segment.SetMemoryBlock(this.memoryPool.Rent());
             }
-
             return segment;
         }
         
@@ -112,7 +111,6 @@ namespace System.IO.Pipelines
 
         public void Dispose()
         {
-            Console.WriteLine("DgramPipeline.Dispose");
             lock (this.sync)
             {
                 if (this.headBufferSegment != null)
@@ -130,19 +128,12 @@ namespace System.IO.Pipelines
         
             
             this.memoryPool = null;
-            Console.WriteLine("AAAAAAAAAAAAAAAAAA>>" + segmentStack1.Count);
-            try
+            
+            while (this.segmentStack1.TryPop(out var item))
             {
-                while (this.segmentStack1.TryPop(out var item))
-                {
-                    Console.WriteLine("FFFFFFFFFF>>" + segmentStack1.Count);
-                    item.Dispose();
-                }
+                item.Dispose();
             }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.ToString());
-            }
+            
            
 
             this.segmentStack1.Clear();

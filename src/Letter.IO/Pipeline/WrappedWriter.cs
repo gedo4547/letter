@@ -42,7 +42,7 @@ namespace System.IO.Pipelines
         {
             int size = 2;
             Span<byte> span = this.writer.GetWritableSpan(size);
-            this.operators.WriteInt16(span, ref value);
+            this.operators.WriteInt16(span, value);
             this.writer.WriterAdvance(size);
         }
 
@@ -51,7 +51,7 @@ namespace System.IO.Pipelines
         {
             int size = 2;
             Span<byte> span = this.writer.GetWritableSpan(size);
-            this.operators.WriteUInt16(span, ref value);
+            this.operators.WriteUInt16(span, value);
             this.writer.WriterAdvance(size);
         }
 
@@ -60,7 +60,7 @@ namespace System.IO.Pipelines
         {
             int size = 4;
             Span<byte> span = this.writer.GetWritableSpan(size);
-            this.operators.WriteInt32(span, ref value);
+            this.operators.WriteInt32(span, value);
             this.writer.WriterAdvance(size);
         }
 
@@ -69,7 +69,7 @@ namespace System.IO.Pipelines
         {
             int size = 4;
             Span<byte> span = this.writer.GetWritableSpan(size);
-            this.operators.WriteUInt32(span, ref value);
+            this.operators.WriteUInt32(span, value);
             this.writer.WriterAdvance(size);
         }
 
@@ -78,7 +78,7 @@ namespace System.IO.Pipelines
         {
             int size = 8;
             Span<byte> span = this.writer.GetWritableSpan(size);
-            this.operators.WriteInt64(span, ref value);
+            this.operators.WriteInt64(span, value);
             this.writer.WriterAdvance(size);
         }
 
@@ -87,7 +87,7 @@ namespace System.IO.Pipelines
         {
             int size = 8;
             Span<byte> span = this.writer.GetWritableSpan(size);
-            this.operators.WriteUInt64(span, ref value);
+            this.operators.WriteUInt64(span, value);
             this.writer.WriterAdvance(size);
         }
 

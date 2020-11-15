@@ -111,7 +111,6 @@ namespace Letter.Udp
                     var socketResult = await this.socket.ReceiveAsync(address, ref memory);
                     if (this.SocketErrorNotify(socketResult.error))
                     {
-                        // segment.Release();
                         break;
                     }
 
@@ -133,7 +132,7 @@ namespace Letter.Udp
             }
             finally
             {
-                if (segment != null) segment.Release();
+                if (segment != null) segment.Reset();
             }
         }
 
@@ -172,7 +171,7 @@ namespace Letter.Udp
 
                 segment = head;
                 head = head.ChildSegment;
-                segment.Release();
+                segment.Reset();
             }
             
             this.RcvPipeReader.ReceiveAsync();
@@ -247,7 +246,7 @@ namespace Letter.Udp
                    
                 segment = head;
                 head = head.ChildSegment;
-                segment.Release();
+                segment.Reset();
             }
 
             this.SndPipeReader.ReceiveAsync();
@@ -289,7 +288,7 @@ namespace Letter.Udp
             {
                 return;
             }
-            Console.WriteLine(">>>>>>>>>>>>>>>>>>>>>>>>>");
+            Console.WriteLine("session 关闭");
             this.isDisposed = true;
 
             this.filterPipeline.OnTransportInactive(this);

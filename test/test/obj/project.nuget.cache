@@ -1,8 +1,11 @@
 {
   "version": 2,
-  "dgSpecHash": "pYPsZX0mz+O1agWEklac1/b3iC6RJUTXj30Er3n122938k4vRzyRxHm6eVmxtV+NDaHYlHMheJCILWccOhB5kA==",
+  "dgSpecHash": "jjBaQh6YO2JGAjI73GWY7l9ZIHf3PIL3xJyu3FxIq6XMrNjIrBnRJTf55yRQ7n7I/WP5Oy2KoizeaoL6h3lc1Q==",
   "success": true,
   "projectFilePath": "/Users/guanyedong/Projects/letter-github/test/test/test.csproj",
-  "expectedPackageFiles": [],
+  "expectedPackageFiles": [
+    "/Users/guanyedong/.nuget/packages/microsoft.netframework.referenceassemblies/1.0.0/microsoft.netframework.referenceassemblies.1.0.0.nupkg.sha512",
+    "/Users/guanyedong/.nuget/packages/microsoft.netframework.referenceassemblies.net48/1.0.0/microsoft.netframework.referenceassemblies.net48.1.0.0.nupkg.sha512"
+  ],
   "logs": []
 }

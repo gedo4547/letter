@@ -20,16 +20,16 @@ namespace System.Buffers.Binary
         
         
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        void WriteInt16(in Span<byte> destination, ref short value);
+        void WriteInt16(in Span<byte> destination, short value);
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        void WriteUInt16(in Span<byte> destination, ref ushort value);
+        void WriteUInt16(in Span<byte> destination, ushort value);
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        void WriteInt32(in Span<byte> destination, ref int value);
+        void WriteInt32(in Span<byte> destination, int value);
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        void WriteUInt32(in Span<byte> destination, ref uint value);
+        void WriteUInt32(in Span<byte> destination, uint value);
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        void WriteInt64(in Span<byte> destination, ref long value);
+        void WriteInt64(in Span<byte> destination, long value);
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        void WriteUInt64(in Span<byte> destination, ref ulong value);
+        void WriteUInt64(in Span<byte> destination, ulong value);
     }
 }

@@ -23,8 +23,8 @@ namespace udp_text
                 pipeline.Add(new UdpFilter_2());
             });
             
-            // IUdpChannel s_channel = await bootstrap.BuildAsync();
-            // await s_channel.StartAsync(s_p);
+            IUdpChannel s_channel = await bootstrap.BuildAsync();
+            await s_channel.StartAsync(s_p);
             
             IUdpChannel c_channel = await bootstrap.BuildAsync();
             await c_channel.StartAsync(c_p);

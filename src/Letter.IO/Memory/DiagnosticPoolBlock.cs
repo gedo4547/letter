@@ -87,7 +87,7 @@ namespace System.Buffers
                     _pool.Return(this);
 
                     _isDisposed = true;
-                    Logger.Error("buffer被释放");
+                    
                 }
             }
             catch (Exception exception)
