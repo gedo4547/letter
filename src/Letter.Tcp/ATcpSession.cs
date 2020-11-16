@@ -165,7 +165,7 @@ namespace Letter.Tcp
                     await this.socket.Wait();
                 }
                 var buffer = input.GetMemory(this.minAllocBufferSize);
-                var socketResult = await this.socket.ReceiveAsync(ref buffer);
+                var socketResult = await this.socket.ReceiveAsync(buffer);
 
                 if (this.SocketErrorNotify(socketResult.error)) break;
                 if (socketResult.bytesTransferred == 0)
@@ -214,7 +214,7 @@ namespace Letter.Tcp
                 var end = buffer.End;
                 if (!buffer.IsEmpty)
                 {
-                    var socketResult = await this.socket.SendAsync(ref buffer);
+                    var socketResult = await this.socket.SendAsync(buffer);
                     
                     if (this.SocketErrorNotify(socketResult.error)) break;
                     if (socketResult.bytesTransferred == 0) break;

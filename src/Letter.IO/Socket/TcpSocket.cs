@@ -33,29 +33,29 @@ namespace System.Net.Sockets
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public SocketAwaitableArgs Wait()
         {
-            return base.InternalReceiveAsync(ref EmptyMemory);
+            return base.InternalReceiveAsync(EmptyMemory);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public SocketAwaitableArgs ReceiveAsync(ref Memory<byte> memory)
+        public SocketAwaitableArgs ReceiveAsync(Memory<byte> memory)
         {
-            return base.InternalReceiveAsync(ref memory);
+            return base.InternalReceiveAsync(memory);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public SocketAwaitableArgs SendAsync(ref ReadOnlySequence<byte> buffers)
+        public SocketAwaitableArgs SendAsync(ReadOnlySequence<byte> buffers)
         {
-            return base.InternalSendAsync(ref buffers);
+            return base.InternalSendAsync(buffers);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        protected override bool SocketAsyncRcvOperation(SocketAwaitableArgs args)
+        protected override bool SocketRcvOperationAsync(SocketAwaitableArgs args)
         {
             return this.socket.ReceiveAsync(args);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        protected override bool SocketAsyncSndOperation(SocketAwaitableArgs args)
+        protected override bool SocketSndOperationAsync(SocketAwaitableArgs args)
         {
             return this.socket.SendAsync(args);
         }

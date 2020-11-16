@@ -14,7 +14,7 @@ namespace Letter.Tcp
             : base(socket, options, scheduler, pool, filterPipeline)
         {
             Console.WriteLine("TcpSession");
-            this.readerFlushCallback = OnFilterReadFlush;
+            this.readerFlushCallback = this.OnFilterReadFlush;
             this.writerFlushCallback = (writer) => { };
         }
         

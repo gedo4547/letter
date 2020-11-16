@@ -38,8 +38,7 @@ namespace System.Threading
         {
             get { return this.schedulers.Length; }
         }
-
-
+        
         public PipeScheduler Next()
         {
             var scheduler = this.schedulers[this.schedulerIndex];

@@ -31,7 +31,7 @@ namespace Letter.Udp
             this.readerFlushCallback = (startPos, endPos) => { };
             this.writerFlushCallback = (writer) =>
             {
-                this.SndPipeWriter.WriterAdvance((ASegment) writer);
+                this.SndPipeWriter.WriterAdvance();
             };
         }
         
@@ -108,7 +108,7 @@ namespace Letter.Udp
                 {
                     segment = this.RcvPipeWriter.GetSegment();
                     var memory = segment.GetWritableMemory(this.memoryBlockSize);
-                    var socketResult = await this.socket.ReceiveAsync(address, ref memory);
+                    var socketResult = await this.socket.ReceiveAsync(address, memory);
                     if (this.SocketErrorNotify(socketResult.error))
                     {
                         break;
@@ -116,14 +116,14 @@ namespace Letter.Udp
 
                     segment.Token = this.socket.RemoteAddress;
                     segment.WriterAdvance(socketResult.bytesTransferred);
-                    this.RcvPipeWriter.WriterAdvance(segment);
+                    
+                    this.RcvPipeWriter.WriterAdvance();
                     this.RcvPipeWriter.FlushAsync();
                     segment = null;
                 }
             }
             catch (ObjectDisposedException)
             {
-                
             }
             catch (Exception ex)
             {
@@ -132,7 +132,7 @@ namespace Letter.Udp
             }
             finally
             {
-                if (segment != null) segment.Reset();
+                this.RcvPipeWriter.Complete();
             }
         }
 
@@ -144,37 +144,40 @@ namespace Letter.Udp
                 return;
             }
 
-            bool isError = false;
+            int count = 0;
+            bool isReadComplete = false;
             ASegment head = readDgramResult.Head;
             ASegment tail = readDgramResult.Tail;
-            ASegment segment = null;
+            ASegment segment = head;
 
-            while (head != null)
+            try
             {
-                //这里发生异常后，将关闭socket，停止向filter传递数据，将现有的segment回收
-                if (!isError)
+                while (!isReadComplete)
                 {
-                    this.RcvAddress = (EndPoint) head.Token;
-                    var memory = head.GetReadableMemory();
-                    var w_reader = new WrappedReader(new ReadOnlySequence<byte>(memory), this.Order, this.readerFlushCallback);
-                    try
-                    {
-                        this.filterPipeline.OnTransportRead(this, ref w_reader);
-                    }
-                    catch (Exception ex)
-                    {
-                        isError = true;
-                        this.filterPipeline.OnTransportException(this, ex);
-                        this.DisposeAsync().NoAwait();
-                    }
+                    this.RcvAddress = (EndPoint) segment.Token;
+                    var memory = segment.GetReadableMemory();
+                    
+                    var reader = new WrappedReader(new ReadOnlySequence<byte>(memory), this.Order, this.readerFlushCallback);
+                    this.filterPipeline.OnTransportRead(this, ref reader);
+                    reader.Flush();
+                    
+                    count++;
+                    if (segment == tail)
+                        isReadComplete = true;
+                    else
+                        segment = segment.ChildSegment;
                 }
 
-                segment = head;
-                head = head.ChildSegment;
-                segment.Reset();
+                this.RcvPipeReader.ReaderAdvance(count);
+                this.RcvPipeReader.ReceiveAsync();
             }
-            
-            this.RcvPipeReader.ReceiveAsync();
+            catch (Exception e)
+            {
+                this.filterPipeline.OnTransportException(this, e);
+                this.DisposeAsync().NoAwait();
+                
+                this.RcvPipeReader.Complete();
+            }
         }
         
         public void Write(EndPoint remoteAddress, object o)
@@ -184,19 +187,18 @@ namespace Letter.Udp
                 this.SndAddress = remoteAddress;
                 var segment = this.SndPipeWriter.GetSegment();
                 segment.Token = remoteAddress;
-                var writer = new WrappedWriter(segment, this.Order, this.writerFlushCallback);
                 try
                 {
+                    var writer = new WrappedWriter(segment, this.Order, this.writerFlushCallback);
                     this.filterPipeline.OnTransportWrite(this, ref writer, o);
+                    writer.Flush();
                 }
                 catch (Exception e)
                 {
                     this.filterPipeline.OnTransportException(this, e);
                     this.DisposeAsync().NoAwait();
-                }
-                finally
-                {
-                    writer.Flush();
+                    
+                    this.SndPipeWriter.Complete();
                 }
             }
         }
@@ -209,47 +211,50 @@ namespace Letter.Udp
 
         private async void OnSndPipelineRead()
         {
-            var reader = this.SndPipeReader;
-            ReadDgramResult readDgramResult = reader.Read();
-            if (readDgramResult.IsEmpty) return;
-
-            bool isError = false;
-            ASegment head = readDgramResult.Head;
-            ASegment tail = readDgramResult.Tail;
-            ASegment segment = null;
-
-            while (head != null)
+            ReadDgramResult readDgramResult = this.SndPipeReader.Read();
+            if (readDgramResult.IsEmpty)
             {
-                if (!isError)
-                {
-                    ReadOnlyMemory<byte> memory = head.GetReadableMemory();
-                    if (memory.Length > 0)
-                    {
-                        EndPoint address = (EndPoint) head.Token;
-                        ReadOnlySequence<byte> sequence = new ReadOnlySequence<byte>(memory);
-                        try
-                        {
-                            SocketResult socketResult = await this.socket.SendAsync(address, ref sequence);
-                            if (this.SocketErrorNotify(socketResult.error))
-                            {
-                                break;
-                            }
-                        }
-                        catch (Exception e)
-                        {
-                            isError = true;
-                            this.filterPipeline.OnTransportException(this, e);
-                            this.DisposeAsync().NoAwait();
-                        }
-                    }
-                }
-                   
-                segment = head;
-                head = head.ChildSegment;
-                segment.Reset();
+                return;
             }
 
-            this.SndPipeReader.ReceiveAsync();
+            int count = 0;
+            bool isReadComplete = false;
+            ASegment head = readDgramResult.Head;
+            ASegment tail = readDgramResult.Tail;
+            ASegment segment = head;
+            try
+            {
+                while (!isReadComplete)
+                {
+                    ReadOnlyMemory<byte> memory = segment.GetReadableMemory();
+                    if (memory.Length > 0)
+                    {
+                        EndPoint address = (EndPoint) segment.Token;
+                        ReadOnlySequence<byte> sequence = new ReadOnlySequence<byte>(memory);
+                        SocketResult socketResult = await this.socket.SendAsync(address, sequence);
+                        if (this.SocketErrorNotify(socketResult.error))
+                        {
+                            this.SndPipeReader.Complete();
+                            break;
+                        }
+                    }
+                    count++;
+                    if (segment == tail)
+                        isReadComplete = true;
+                    else
+                        segment = segment.ChildSegment;
+                }
+
+                this.SndPipeReader.ReaderAdvance(count);
+                this.SndPipeReader.ReceiveAsync();
+            }
+            catch (Exception e)
+            {
+                this.filterPipeline.OnTransportException(this, e);
+                this.DisposeAsync().NoAwait();
+                
+                this.SndPipeReader.Complete();
+            }
         }
         
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -288,7 +293,6 @@ namespace Letter.Udp
             {
                 return;
             }
-            Console.WriteLine("session 关闭");
             this.isDisposed = true;
 
             this.filterPipeline.OnTransportInactive(this);
@@ -296,8 +300,10 @@ namespace Letter.Udp
             
             await this.readTask;
             
-            this.rcvPipeline.Dispose();
-            this.sndPipeline.Dispose();
+            this.sndPipeline.Complete();
+            
+            
+            Console.WriteLine("session 关闭");
         }
     }
 }

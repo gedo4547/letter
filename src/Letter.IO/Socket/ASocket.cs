@@ -23,6 +23,7 @@ namespace System.Net.Sockets
         protected Socket socket;
         protected SocketAwaitableArgs rcvArgs;
         protected SocketAwaitableArgs sndArgs;
+        
         private List<ArraySegment<byte>> bufferList;
         
         public EndPoint BindAddress
@@ -68,7 +69,7 @@ namespace System.Net.Sockets
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        protected SocketAwaitableArgs InternalReceiveAsync(ref Memory<byte> memory)
+        protected SocketAwaitableArgs InternalReceiveAsync(Memory<byte> memory)
         {
 #if NETSTANDARD2_0
             ArraySegment<byte> segment = memory.GetBinaryArray();
@@ -76,7 +77,7 @@ namespace System.Net.Sockets
 #elif NET5_0
             this.rcvArgs.SetBuffer(memory);
 #endif
-            if (!this.SocketAsyncRcvOperation(this.rcvArgs))
+            if (!this.SocketRcvOperationAsync(this.rcvArgs))
             {
                 this.rcvArgs.Complete();
             }
@@ -85,21 +86,21 @@ namespace System.Net.Sockets
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        protected SocketAwaitableArgs InternalSendAsync(ref ReadOnlySequence<byte> buffers)
+        protected SocketAwaitableArgs InternalSendAsync(ReadOnlySequence<byte> buffers)
         {
             if (buffers.IsSingleSegment)
             {
                 var memory = buffers.First;
-                return this.SendSingleMessageAsync(ref memory);
+                return this.SendSingleMessageAsync(memory);
             }
             else
             {
-                return this.SendMultipleMessageAsync(ref buffers);
+                return this.SendMultipleMessageAsync(buffers);
             }
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private SocketAwaitableArgs SendSingleMessageAsync(ref ReadOnlyMemory<byte> buffer)
+        private SocketAwaitableArgs SendSingleMessageAsync(ReadOnlyMemory<byte> buffer)
         {
             if (this.sndArgs.BufferList != null)
             {
@@ -115,7 +116,7 @@ namespace System.Net.Sockets
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private SocketAwaitableArgs SendMultipleMessageAsync(ref ReadOnlySequence<byte> buffers)
+        private SocketAwaitableArgs SendMultipleMessageAsync(ReadOnlySequence<byte> buffers)
         {
 #if NETSTANDARD2_0
             if (!Array.Empty<byte>().Equals(this.sndArgs.Buffer))
@@ -129,7 +130,7 @@ namespace System.Net.Sockets
             }
 #endif
             
-            this.sndArgs.BufferList = this.GetBufferList(ref buffers);
+            this.sndArgs.BufferList = this.GetBufferList(buffers);
             
             return this.SocketSndAsync();
         }
@@ -137,7 +138,7 @@ namespace System.Net.Sockets
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private SocketAwaitableArgs SocketSndAsync()
         {
-            if (!this.SocketAsyncSndOperation(this.sndArgs))
+            if (!this.SocketSndOperationAsync(this.sndArgs))
             {
                 this.sndArgs.Complete();
             }
@@ -146,13 +147,13 @@ namespace System.Net.Sockets
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        protected abstract bool SocketAsyncRcvOperation(SocketAwaitableArgs args);
+        protected abstract bool SocketRcvOperationAsync(SocketAwaitableArgs args);
         
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        protected abstract bool SocketAsyncSndOperation(SocketAwaitableArgs args);
+        protected abstract bool SocketSndOperationAsync(SocketAwaitableArgs args);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        protected List<ArraySegment<byte>> GetBufferList(ref ReadOnlySequence<byte> buffer)
+        protected List<ArraySegment<byte>> GetBufferList(ReadOnlySequence<byte> buffer)
         {
             this.bufferList.Clear();
             foreach (var b in buffer)

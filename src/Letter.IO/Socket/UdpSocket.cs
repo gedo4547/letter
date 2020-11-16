@@ -11,27 +11,27 @@ namespace System.Net.Sockets
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public SocketAwaitableArgs ReceiveAsync(EndPoint loaclAddress, ref Memory<byte> memory)
+        public SocketAwaitableArgs ReceiveAsync(EndPoint loaclAddress, Memory<byte> memory)
         {
             this.rcvArgs.RemoteEndPoint = loaclAddress;
-            return base.InternalReceiveAsync(ref memory);
+            return base.InternalReceiveAsync(memory);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public SocketAwaitableArgs SendAsync(EndPoint remoteAddress, ref ReadOnlySequence<byte> buffers)
+        public SocketAwaitableArgs SendAsync(EndPoint remoteAddress, ReadOnlySequence<byte> buffers)
         {
             this.sndArgs.RemoteEndPoint = remoteAddress;
-            return base.InternalSendAsync(ref buffers);
+            return base.InternalSendAsync(buffers);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        protected override bool SocketAsyncRcvOperation(SocketAwaitableArgs args)
+        protected override bool SocketRcvOperationAsync(SocketAwaitableArgs args)
         {
             return this.socket.ReceiveFromAsync(args);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        protected override bool SocketAsyncSndOperation(SocketAwaitableArgs args)
+        protected override bool SocketSndOperationAsync(SocketAwaitableArgs args)
         {
             return this.socket.SendToAsync(args);
         }

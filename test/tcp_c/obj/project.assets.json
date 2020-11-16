@@ -83,36 +83,39 @@
     ]
   },
   "packageFolders": {
-    "/Users/guanyedong/.nuget/packages/": {},
-    "/usr/local/share/dotnet/sdk/NuGetFallbackFolder": {}
+    "C:\\Users\\pc\\.nuget\\packages\\": {},
+    "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "/Users/guanyedong/Projects/letter-github/test/tcp_c/tcp_c.csproj",
+      "projectUniqueName": "F:\\letter-github\\test\\tcp_c\\tcp_c.csproj",
       "projectName": "tcp_c",
-      "projectPath": "/Users/guanyedong/Projects/letter-github/test/tcp_c/tcp_c.csproj",
-      "packagesPath": "/Users/guanyedong/.nuget/packages/",
-      "outputPath": "/Users/guanyedong/Projects/letter-github/test/tcp_c/obj/",
+      "projectPath": "F:\\letter-github\\test\\tcp_c\\tcp_c.csproj",
+      "packagesPath": "C:\\Users\\pc\\.nuget\\packages\\",
+      "outputPath": "F:\\letter-github\\test\\tcp_c\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
-        "/usr/local/share/dotnet/sdk/NuGetFallbackFolder"
+        "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
       ],
       "configFilePaths": [
-        "/Users/guanyedong/.config/NuGet/NuGet.Config"
+        "C:\\Users\\pc\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "originalTargetFrameworks": [
         "net5.0"
       ],
       "sources": {
-        "https://api.nuget.org/v3/index.json": {}
+        "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+        "https://api.nuget.org/v3/index.json": {},
+        "https://nuget.cdn.azure.cn/v3/index.json": {}
       },
       "frameworks": {
         "net5.0": {
           "targetAlias": "net5.0",
           "projectReferences": {
-            "/Users/guanyedong/Projects/letter-github/src/Letter.Tcp/Letter.Tcp.csproj": {
-              "projectPath": "/Users/guanyedong/Projects/letter-github/src/Letter.Tcp/Letter.Tcp.csproj"
+            "F:\\letter-github\\src\\Letter.Tcp\\Letter.Tcp.csproj": {
+              "projectPath": "F:\\letter-github\\src\\Letter.Tcp\\Letter.Tcp.csproj"
             }
           }
         }
@@ -141,7 +144,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/5.0.100/RuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\5.0.100\\RuntimeIdentifierGraph.json"
       }
     }
   }

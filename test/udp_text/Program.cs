@@ -35,11 +35,16 @@ namespace udp_text
                 string str = Console.ReadLine();
                 if (str == "send")
                 {
-                    for (int i = 0; i < 100; i++)
+                    for (int i = 0; i < 10; i++)
                     {
                         num++;
-                        var bytes = System.Text.Encoding.UTF8.GetBytes("你好" + num);
-                        M.session.Write(Program.s_p, bytes);
+                        for (int j = 1; j <= 5; j++)
+                        {
+                            string com = $"你好:{num}_temp:{j}";
+                            var bytes = System.Text.Encoding.UTF8.GetBytes(com);
+                            M.session.Write(Program.s_p, bytes);
+                        }
+
                         await M.session.FlushAsync();
                     }
                 }

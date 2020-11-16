@@ -4,7 +4,7 @@ using System.Threading;
 
 namespace System.IO.Pipelines
 {
-    public class DgramPipeline : IDisposable
+    public sealed class DgramPipeline
     {
         private const int FALSE = 0;
         private const int TRUE = 1;
@@ -37,13 +37,16 @@ namespace System.IO.Pipelines
         private Action<object> rcvCallback;
         
         private int memoryBlockSize;
+        private ASegment awaitWriteSegment = null;
+        
         private ASegment headBufferSegment = null;
         private ASegment tailBufferSegment = null;
         
         private object sync = new object();
-        
+        private volatile bool isDispose = false;
         private int awaitRcv = FALSE;
-
+        
+        
         public MemorySegment GetSegment()
         {
             MemorySegment segment;
@@ -52,18 +55,23 @@ namespace System.IO.Pipelines
                 segment = new MemorySegment(this.segmentStack1);
                 segment.SetMemoryBlock(this.memoryPool.Rent());
             }
+
+            this.awaitWriteSegment = segment;
             return segment;
         }
         
-        public void WriterAdvance(ASegment segment)
+        public void WriterAdvance()
         {
-            if (segment == null)
+            if (awaitWriteSegment == null)
             {
-                throw new ArgumentNullException(nameof(segment));
+                throw new NullReferenceException(nameof(awaitWriteSegment));
             }
             
             lock (this.sync)
             {
+                var segment = this.awaitWriteSegment;
+                this.awaitWriteSegment = null;
+                
                 if (this.headBufferSegment == null && 
                     this.tailBufferSegment == null)
                 {
@@ -82,14 +90,35 @@ namespace System.IO.Pipelines
         {
             lock (this.sync)
             {
-                var result = new ReadDgramResult(this.headBufferSegment, this.tailBufferSegment);
-                
-                this.headBufferSegment = null;
-                this.tailBufferSegment = null;
-                return result;
+                return new ReadDgramResult(this.headBufferSegment, this.tailBufferSegment);
             }
         }
-        
+
+        public void ReaderAdvance(int count)
+        {
+            lock (this.sync)
+            {
+                while (count > 0)
+                {
+                    if (this.headBufferSegment == null)
+                    {
+                        throw new ArgumentOutOfRangeException("The Segment is not enough");
+                    }
+
+                    var segment = this.headBufferSegment.ChildSegment;
+                    this.headBufferSegment.Reset();
+                    this.headBufferSegment = segment;
+                    count--;
+
+                    if (this.headBufferSegment == null)
+                    {
+                        this.headBufferSegment = null;
+                        this.tailBufferSegment = null;
+                    }
+                }
+            }
+        }
+
         public void ReceiveAsync()
         {
             Interlocked.Exchange(ref this.awaitRcv, TRUE);
@@ -109,23 +138,31 @@ namespace System.IO.Pipelines
             }
         }
 
-        public void Dispose()
+        public void Complete()
         {
+            if (this.isDispose)
+            {
+                return;
+            }
+
+            this.isDispose = true;
+            
             lock (this.sync)
             {
-                if (this.headBufferSegment != null)
+                if (this.awaitWriteSegment != null)
                 {
-                    this.headBufferSegment.Dispose();
-                    this.headBufferSegment = null;
+                    this.awaitWriteSegment.Dispose();
                 }
-
-                if (this.tailBufferSegment != null)
+                
+                ASegment segment = this.headBufferSegment;
+                while (segment != null)
                 {
-                    this.tailBufferSegment.Dispose();
-                    this.tailBufferSegment = null;
+                    ASegment returnSegment = segment;
+                    segment = segment.ChildSegment;
+
+                    returnSegment.Dispose();
                 }
             }
-        
             
             this.memoryPool = null;
             
@@ -134,8 +171,6 @@ namespace System.IO.Pipelines
                 item.Dispose();
             }
             
-           
-
             this.segmentStack1.Clear();
         }
     }

@@ -1,19 +1,21 @@
 ﻿{
   "version": "1.0.0",
   "restore": {
-    "projectUniqueName": "/Users/guanyedong/Projects/letter-github/test/test/test.csproj",
+    "projectUniqueName": "F:\\letter-github\\test\\test\\test.csproj",
     "projectName": "test",
-    "projectPath": "/Users/guanyedong/Projects/letter-github/test/test/test.csproj",
-    "outputPath": "/Users/guanyedong/Projects/letter-github/test/test/obj/",
+    "projectPath": "F:\\letter-github\\test\\test\\test.csproj",
+    "outputPath": "F:\\letter-github\\test\\test\\obj\\",
     "projectStyle": "PackageReference",
     "fallbackFolders": [
-      "/usr/local/share/dotnet/sdk/NuGetFallbackFolder"
+      "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
     ],
     "originalTargetFrameworks": [
       "net48"
     ],
     "sources": {
-      "https://api.nuget.org/v3/index.json": {}
+      "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+      "https://api.nuget.org/v3/index.json": {},
+      "https://nuget.cdn.azure.cn/v3/index.json": {}
     },
     "frameworks": {
       "net48": {
@@ -28,7 +30,12 @@
   },
   "frameworks": {
     "net48": {
-      "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/5.0.100-preview.7.20366.6/RuntimeIdentifierGraph.json"
+      "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\5.0.100\\RuntimeIdentifierGraph.json"
+    }
+  },
+  "runtimes": {
+    "win7-x86": {
+      "#import": []
     }
   }
 }

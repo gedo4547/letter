@@ -93,7 +93,7 @@ namespace System.IO.Pipelines
             this.ChildSegment = segment;
 
             segment = this;
-
+            
             while (segment.Next != null)
             {
                 segment.ChildSegment.RunningIndex = segment.RunningIndex + segment.writedLength;
@@ -103,7 +103,7 @@ namespace System.IO.Pipelines
         }
 
 
-        public virtual void Reset()
+        internal virtual void Reset()
         {
             this.writedLength = 0;
             this.readedLength = 0;

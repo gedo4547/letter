@@ -13,10 +13,14 @@ namespace System.IO.Pipelines
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public MemorySegment GetSegment() => this.pipeline.GetSegment();
+        
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void WriterAdvance(ASegment segment) => this.pipeline.WriterAdvance(segment);
+        public void WriterAdvance() => this.pipeline.WriterAdvance();
         
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void FlushAsync() => this.pipeline.FlushAsync();
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void Complete() => this.pipeline.Complete();
     }
 }

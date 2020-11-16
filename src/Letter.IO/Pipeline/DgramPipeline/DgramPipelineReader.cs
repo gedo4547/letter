@@ -13,7 +13,14 @@ namespace System.IO.Pipelines
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void ReceiveAsync() => this.pipeline.ReceiveAsync();
+        
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public ReadDgramResult Read() => this.pipeline.Read();
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void ReaderAdvance(int count) => this.pipeline.ReaderAdvance(count);
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void Complete() => this.pipeline.Complete();
     }
 }
