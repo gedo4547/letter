@@ -193,7 +193,7 @@ namespace System.IO.Pipelines
 
 
 #if DEBUG
-            Logger.Info($"创建的buffer:{this.c_count},    回收的buffer:{this.d_count}");
+            Logger.Info($"create buffer count:{this.c_count},    recycle buffer count:{this.d_count}");
 #endif
         }
     }

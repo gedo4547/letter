@@ -301,9 +301,11 @@ namespace Letter.Udp
             await this.readTask;
             
             this.sndPipeline.Complete();
+
+#if DEBUG
+            Logger.Error("session close");
+#endif
             
-            
-            Console.WriteLine("session 关闭");
         }
     }
 }
