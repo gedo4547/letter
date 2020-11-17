@@ -3,7 +3,7 @@ using System.IO;
 using System.IO.Pipelines;
 using System.Net.Security;
 
-namespace Letter
+namespace Letter.Tcp
 {
     internal class SslStreamDuplexPipe : DuplexPipeStreamAdapter<SslStream>
     {

@@ -1,7 +1,7 @@
 ﻿using System.Buffers;
 using System.IO.Pipelines;
 
-namespace Letter
+namespace Letter.Tcp
 {
     static class StreamPipeOptionsHelper
     {

@@ -4,7 +4,7 @@ using System.IO.Pipelines;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 
-namespace Letter
+namespace Letter.Tcp
 {
     /// <summary>
     /// A helper for wrapping a Stream decorator from an <see cref="IDuplexPipe"/>.
@@ -28,28 +28,24 @@ namespace Letter
             
             this.WrappedInput = new StreamPipelineReader(PipeReader.Create(stream, readerOptions));
             this.WrappedOutput = new StreamPipelineWriter(PipeWriter.Create(stream, writerOptions));
-            
-            // Input = PipeReader.Create(stream, readerOptions);
-            // Output = PipeWriter.Create(stream, writerOptions);
         }
 
         public TStream Stream { get; }
 
         public StreamPipelineReader WrappedInput
         {
-            get;
+            [MethodImpl(MethodImplOptions.AggressiveInlining)] get;
         }
 
         public StreamPipelineWriter WrappedOutput
         {
-            [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            get;
+            [MethodImpl(MethodImplOptions.AggressiveInlining)] get;
         }
 
         
         public PipeReader Input
         {
-            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            [MethodImpl(MethodImplOptions.AggressiveInlining)] 
             get { return this.WrappedInput; }
         }
         

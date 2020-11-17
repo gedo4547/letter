@@ -5,7 +5,7 @@ using System.IO.Pipelines;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Letter
+namespace Letter.Tcp
 {
     internal class DuplexPipeStream : Stream, IAsyncDisposable
     {
