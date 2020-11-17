@@ -38,7 +38,7 @@ namespace udp_text
                     {
                         for (int j = 1; j <= 5; j++)
                         {
-                            string com = $"你好:{i}_temp:{j}";
+                            string com = $"{i}______{j}";
                             var bytes = System.Text.Encoding.UTF8.GetBytes(com);
                             M.session.Write(Program.s_p, bytes);
                         }

@@ -46,6 +46,11 @@ namespace System.IO.Pipelines
         private volatile bool isDispose = false;
         private int awaitRcv = FALSE;
         
+#if DEBUG
+        private int c_count = 0;
+        private int d_count = 0;
+#endif
+        
         
         public MemorySegment GetSegment()
         {
@@ -54,6 +59,10 @@ namespace System.IO.Pipelines
             {
                 segment = new MemorySegment(this.segmentStack1);
                 segment.SetMemoryBlock(this.memoryPool.Rent());
+
+#if DEBUG
+                Interlocked.Increment(ref c_count);
+#endif
             }
 
             this.awaitWriteSegment = segment;
@@ -152,6 +161,9 @@ namespace System.IO.Pipelines
                 if (this.awaitWriteSegment != null)
                 {
                     this.awaitWriteSegment.Dispose();
+#if DEBUG
+                    Interlocked.Increment(ref d_count);
+#endif
                 }
                 
                 ASegment segment = this.headBufferSegment;
@@ -161,6 +173,9 @@ namespace System.IO.Pipelines
                     segment = segment.ChildSegment;
 
                     returnSegment.Dispose();
+#if DEBUG
+                    Interlocked.Increment(ref d_count);
+#endif
                 }
             }
             
@@ -169,9 +184,17 @@ namespace System.IO.Pipelines
             while (this.segmentStack1.TryPop(out var item))
             {
                 item.Dispose();
+#if DEBUG
+                Interlocked.Increment(ref d_count);
+#endif
             }
             
             this.segmentStack1.Clear();
+
+
+#if DEBUG
+            Logger.Info($"创建的buffer:{this.c_count},    回收的buffer:{this.d_count}");
+#endif
         }
     }
 }

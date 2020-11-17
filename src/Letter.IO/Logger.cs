@@ -1,4 +1,4 @@
-﻿﻿using System;
+﻿using System;
 
 
  
@@ -16,11 +16,11 @@
          Logger.exceptionFunc = exception;
      }
 
-     private static Action<string> infoFunc = (str) => { Console.WriteLine($"info>>{str}"); };
-     private static Action<string> warnFunc = (str) => { Console.WriteLine($"warn>>{str}"); };
-     private static Action<string> errorFunc = (str) => { Console.WriteLine($"error>>{str}"); };
-     private static Action<string> debugFunc = (str) => { Console.WriteLine($"debug>>{str}"); };
-     private static Action<string> exceptionFunc = (str) => { Console.WriteLine($"exc>>{str}"); };
+     private static Action<string> infoFunc = (str) => { Console.WriteLine($"[info]{str}"); };
+     private static Action<string> warnFunc = (str) => { Console.WriteLine($"[warn]{str}"); };
+     private static Action<string> errorFunc = (str) => { Console.WriteLine($"[error]{str}"); };
+     private static Action<string> debugFunc = (str) => { Console.WriteLine($"[debug]{str}"); };
+     private static Action<string> exceptionFunc = (str) => { Console.WriteLine($"[exc]{str}"); };
 
 
      public static void Info(object text)
