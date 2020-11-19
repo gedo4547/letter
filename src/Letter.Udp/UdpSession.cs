@@ -303,7 +303,7 @@ namespace Letter.Udp
             this.sndPipeline.Complete();
 
 #if DEBUG
-            Logger.Error("session close");
+            Logger.Info("session close");
 #endif
             
         }

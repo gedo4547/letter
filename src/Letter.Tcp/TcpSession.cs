@@ -13,7 +13,6 @@ namespace Letter.Tcp
         public TcpSession(Socket socket, ATcpOptions options, PipeScheduler scheduler, MemoryPool<byte> pool, FilterPipeline<ITcpSession> filterPipeline) 
             : base(socket, options, scheduler, pool, filterPipeline)
         {
-            Console.WriteLine("TcpSession");
             this.readerFlushCallback = this.OnFilterReadFlush;
             this.writerFlushCallback = (writer) => { };
         }
@@ -118,11 +117,13 @@ namespace Letter.Tcp
         
         public override async ValueTask DisposeAsync()
         {
-            //Logger.Error("GGGGGGGGGGGGG");
             await base.DisposeAsync();
-            Console.WriteLine("-----------------------------");
             await this.readTask;
-            Console.WriteLine("================");
+            
+#if DEBUG
+         Logger.Info("tcpSession transport out");   
+#endif
+            
         }
     }
 }

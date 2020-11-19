@@ -20,7 +20,7 @@ namespace Letter.Tcp
             this.Scheduler = scheduler;
             this.MemoryPool = pool;
             this.Scheduler = scheduler;
-            this.isWaitData = options.WaitForDataBeforeAllocatingBuffer;
+            this.isWaitData = options.WaitForData;
             this.minAllocBufferSize = this.MemoryPool.MaxBufferSize / 2;
             
             this.filterPipeline = filterPipeline;
@@ -125,12 +125,11 @@ namespace Letter.Tcp
                 var rcvTask = this.DoRcvAsync();
                 var sndTask = this.DoSndAsync();
 
-                Console.WriteLine("111111111111111111111111111111111111");
                 await rcvTask;
-                Console.WriteLine("222222222222222222222222222222222222");
                 await sndTask;
-                Console.WriteLine("333333333333333333333333333333333333");
-               
+#if DEBUG
+                Logger.Info("tcpSession application SocketStartAsync End");
+#endif
             }
             catch (Exception ex)
             {
@@ -150,8 +149,10 @@ namespace Letter.Tcp
             }
             finally
             {
-                Console.WriteLine("DoReceive 结束");
                 this.Input.Complete();
+#if DEBUG
+                Logger.Info("tcpSession application DoRcvAsync End");
+#endif
             }
         }
         
@@ -194,8 +195,10 @@ namespace Letter.Tcp
             }
             finally
             {
-                Console.WriteLine("DoSend 结束");
                 this.Output.Complete();
+#if DEBUG
+                Logger.Info("tcpSession application DoSndAsync End");
+#endif
             }
         }
         
@@ -271,21 +274,19 @@ namespace Letter.Tcp
 
         public virtual async ValueTask DisposeAsync()
         {
-            Console.WriteLine("关闭>>>"+this.isDisposed);
             if (!this.isDisposed)
             {
                 this.isDisposed = true;
 
                 this.filterPipeline.OnTransportInactive(this);
-                Console.WriteLine("ATcpSession.DisposeAsync>>1111111");
                 this.Input.CancelPendingFlush();
                 this.Output.CancelPendingRead();
-                Console.WriteLine("ATcpSession.DisposeAsync>>2222222");
                 await this.socket.DisposeAsync();
-                Console.WriteLine("ATcpSession.DisposeAsync>>3333333");
                 await this.processingTask;
 
-                Console.WriteLine("ATcpSession.DisposeAsync>>4444444");
+#if DEBUG
+                Logger.Info("tcpSession application out");
+#endif
             }
         }
     }

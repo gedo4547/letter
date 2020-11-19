@@ -18,12 +18,8 @@ namespace Letter.Udp
         public int? RcvTimeout { get; set; }
         public int? SndTimeout { get; set; }
         public BinaryOrder Order { get; set; } = BinaryOrder.BigEndian;
-        
-        public MemoryPoolOptions MemoryPoolOptions { get; set; } = new MemoryPoolOptions()
-        {
-            MemoryBlockSize = 4096, 
-            MemoryBlockCount = 32
-        };
+
+        public MemoryPoolOptions MemoryPoolOptions { get; set; } = new MemoryPoolOptions(4096, 32);
 
         private SchedulerOptions schedulerOptions = new SchedulerOptions(SchedulerType.ThreadPool);
         public SchedulerOptions SchedulerOptions

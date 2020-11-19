@@ -2,8 +2,14 @@
 {
     public sealed class MemoryPoolOptions
     {
-        public int MemoryBlockSize { get; set; }
-        public int MemoryBlockCount { get; set; }
+        public MemoryPoolOptions(int blockSize, int blockCount)
+        {
+            this.MemoryBlockSize = blockSize;
+            this.MemoryBlockCount = blockCount;
+        }
+
+        public int MemoryBlockSize { get; }
+        public int MemoryBlockCount { get; }
 
         public override string ToString()
         {

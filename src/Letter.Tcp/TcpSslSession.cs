@@ -13,7 +13,6 @@ namespace Letter.Tcp
         public TcpSslSession(Socket socket, ATcpOptions options, PipeScheduler scheduler, MemoryPool<byte> pool, SslFeature sslFeature, FilterPipeline<ITcpSession> filterPipeline)
             : base(socket, options, scheduler, pool, filterPipeline)
         {
-            Console.WriteLine("TcpSslSession");
             var inputPipeOptions = StreamPipeOptionsHelper.ReaderOptionsCreator(pool);
             var outputPipeOptions = StreamPipeOptionsHelper.WriterOptionsCreator(pool);
             var sslDuplexPipe = new SslStreamDuplexPipe(base.Transport, inputPipeOptions, outputPipeOptions, sslFeature.sslStreamFactory);
@@ -44,8 +43,9 @@ namespace Letter.Tcp
             var tlsOptions = this.sslOptions;
             var sslDuplexPipe = this.sslTransport;
             
-            Console.WriteLine("ssl>>>StartAsync");
-            
+#if DEBUG
+            Logger.Info("tcpSslSession transport start ready");   
+#endif            
             switch (tlsOptions)
             {
                 case SslServerOptions serverTlsOptions:
@@ -63,19 +63,21 @@ namespace Letter.Tcp
                         clientTlsOptions.CheckCertificateRevocation);
                     break;
             }
-            Console.WriteLine("ssl>>>end    >>>>>");
+#if DEBUG
+            Logger.Info("tcpSslSession transport ready finish");   
+#endif
             this.readTask = base.ReadBufferAsync();
         }
 
         public override async ValueTask DisposeAsync()
         {
-            Console.WriteLine("ssl>>>DisposeAsync    >>>>11111111111111111>");
             await base.DisposeAsync();
-            Console.WriteLine("ssl>>>DisposeAsync    >>>>22222222222222222>");
             await this.sslTransport.DisposeAsync();
-            Console.WriteLine("ssl>>>DisposeAsync    >>>>33333333333333333>");
             await this.readTask;
-            Console.WriteLine("ssl>>>DisposeAsync    >>>>44444444444444444>");
+            
+#if DEBUG
+            Logger.Info("tcpSslSession transport out");
+#endif
         }
     }
 }

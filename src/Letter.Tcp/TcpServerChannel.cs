@@ -14,8 +14,8 @@ namespace Letter.Tcp
             : base(handler, sslFeature)
         {
             this.options = options;
-            this.memoryPool = this.options.MemoryPoolFactory();
-            this.schedulerAllocator = this.options.SchedulerAllocator;
+            this.memoryPool = SlabMemoryPoolFactory.Create(this.options.MemoryPoolOptions);
+            this.schedulerAllocator = new SchedulerAllocator(this.options.SchedulerCount);
         }
         
         private Socket listenSocket;

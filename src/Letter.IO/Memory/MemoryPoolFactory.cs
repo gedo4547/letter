@@ -5,20 +5,16 @@ namespace System.Buffers
 {
     public static class SlabMemoryPoolFactory
     {
-        public static MemoryPool<byte> shared = Create(new MemoryPoolOptions()
-        {
-            MemoryBlockSize = 4096,
-            MemoryBlockCount = 32
-        });
+        public static MemoryPool<byte> shared = Create(new MemoryPoolOptions(4096, 32));
 
         public static MemoryPool<byte> Create(MemoryPoolOptions options)
         {
-            options.MemoryBlockSize = BufferCapacityHelper.GetSuitableBufferSize(options.MemoryBlockSize);
-            
+            int memoryBlockSize = BufferCapacityHelper.GetSuitableBufferSize(options.MemoryBlockSize);
+
 #if DEBUG
-            return new DiagnosticMemoryPool(CreateSlabMemoryPool(options.MemoryBlockSize, options.MemoryBlockCount));
+            return new DiagnosticMemoryPool(CreateSlabMemoryPool(memoryBlockSize, options.MemoryBlockCount));
 #else
-            return CreateSlabMemoryPool(options.MemoryBlockSize, options.MemoryBlockCount);
+            return CreateSlabMemoryPool(memoryBlockSize, options.MemoryBlockCount);
 #endif
         }
 

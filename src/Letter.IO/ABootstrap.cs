@@ -33,7 +33,14 @@ namespace Letter.IO
             this.filterPipelineHandler = handler;
         }
         
-        public virtual Task<TChannel> BuildAsync()
+        public Task<TChannel> BuildAsync()
+        {
+            this.BuildOptions();
+            
+            return this.ChannelFactoryAsync(this.options, this.filterPipelineHandler);
+        }
+
+        private void BuildOptions()
         {
             if (this.options == null)
             {
@@ -44,10 +51,8 @@ namespace Letter.IO
                 this.options = new TOptions();
                 this.optionsFactory(this.options);
             }
-            
-            return this.ChannelFactoryAsync(this.options, this.filterPipelineHandler);
         }
-        
+
         protected abstract Task<TChannel> ChannelFactoryAsync(TOptions options, Action<IFilterPipeline<TSession>> handler);
         
         public virtual ValueTask DisposeAsync()
