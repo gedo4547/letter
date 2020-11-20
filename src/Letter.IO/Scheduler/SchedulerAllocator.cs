@@ -4,10 +4,6 @@ namespace System.Threading
 {
     public sealed class SchedulerAllocator
     {
-        public readonly static SchedulerAllocator threadPool = new SchedulerAllocator(0);
-        public readonly static SchedulerAllocator kestrel = new SchedulerAllocator(Math.Min(Environment.ProcessorCount, 16));
-        public readonly static SchedulerAllocator processor = new SchedulerAllocator(Environment.ProcessorCount * 2);
-        
         public SchedulerAllocator(int count)
         {
             var ioQueueCount = count;

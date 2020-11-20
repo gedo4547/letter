@@ -35,7 +35,8 @@ namespace tcp_test1
                     return new SslStream(stream, true, (sender, certificate, chain, sslPolicyErrors) => true);
                 });
             }
-            
+
+            await server_bootstrap.BuildAsync();
 
             var client_bootstrap = TcpFactory.ClientBootstrap();
             client_bootstrap.ConfigurationOptions((options =>
@@ -58,11 +59,13 @@ namespace tcp_test1
                     }
                 );
             }
+
+            await client_bootstrap.BuildAsync();
             
-            var s_channel = await server_bootstrap.BuildAsync();
+            var s_channel = await server_bootstrap.CreateAsync();
             await s_channel.StartAsync(address);
 
-            var c_channel = await client_bootstrap.BuildAsync();
+            var c_channel = await client_bootstrap.CreateAsync();
             await c_channel.StartAsync(address);
 
 

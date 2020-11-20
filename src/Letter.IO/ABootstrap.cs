@@ -33,24 +33,20 @@ namespace Letter.IO
             this.filterPipelineHandler = handler;
         }
         
-        public Task<TChannel> BuildAsync()
+        public virtual Task BuildAsync()
         {
-            this.BuildOptions();
-            
-            return this.ChannelFactoryAsync(this.options, this.filterPipelineHandler);
-        }
-
-        private void BuildOptions()
-        {
-            if (this.options == null)
+            this.options = new TOptions();
+            if (this.optionsFactory != null)
             {
-                if (this.optionsFactory == null)
-                {
-                    throw new NullReferenceException(nameof(this.optionsFactory));
-                }
-                this.options = new TOptions();
                 this.optionsFactory(this.options);
             }
+            
+            return Task.CompletedTask;
+        }
+
+        public Task<TChannel> CreateAsync()
+        {
+            return ChannelFactoryAsync(this.options, this.filterPipelineHandler);
         }
 
         protected abstract Task<TChannel> ChannelFactoryAsync(TOptions options, Action<IFilterPipeline<TSession>> handler);

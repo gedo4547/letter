@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Buffers;
 using System.Net;
 using System.Net.Sockets;
 using System.Runtime.InteropServices;
+using System.Threading;
 using System.Threading.Tasks;
 using Letter.IO;
 
@@ -9,8 +11,10 @@ namespace Letter.Udp
 {
     sealed class UdpChannel : IUdpChannel
     {
-        public UdpChannel(UdpOptions options, Action<IFilterPipeline<IUdpSession>> handler)
+        public UdpChannel(SchedulerAllocator allocator, MemoryPool<byte> memoryPool, UdpOptions options, Action<IFilterPipeline<IUdpSession>> handler)
         {
+            this.memoryPool = memoryPool;
+            this.schedulerAllocator = allocator;
             this.options = options;
             this.filterPipeline = new FilterPipeline<IUdpSession>();
             if (handler != null) handler(this.filterPipeline);
@@ -19,6 +23,8 @@ namespace Letter.Udp
         private Socket socket;
         private UdpSession session;
         private UdpOptions options;
+        private MemoryPool<byte> memoryPool;
+        private SchedulerAllocator schedulerAllocator;
         private FilterPipeline<IUdpSession> filterPipeline;
         
         public EndPoint BindAddress { get; private set; }
@@ -66,9 +72,8 @@ namespace Letter.Udp
 
         private void Run()
         {
-            var memoryPool = this.options.MemoryPoolFactory();
-            var scheduler = this.options.SchedulerAllocator.Next();
-            this.session = new UdpSession(this.socket, options, memoryPool, scheduler, filterPipeline);
+            var scheduler = this.schedulerAllocator.Next();
+            this.session = new UdpSession(this.socket, options, this.memoryPool, scheduler, filterPipeline);
             session.Start();
         }
 

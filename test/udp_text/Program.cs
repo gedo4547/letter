@@ -22,11 +22,13 @@ namespace udp_text
             {
                 pipeline.Add(new UdpFilter_2());
             });
+
+            await bootstrap.BuildAsync();
             
-            IUdpChannel s_channel = await bootstrap.BuildAsync();
+            IUdpChannel s_channel = await bootstrap.CreateAsync();
             await s_channel.StartAsync(s_p);
             
-            IUdpChannel c_channel = await bootstrap.BuildAsync();
+            IUdpChannel c_channel = await bootstrap.CreateAsync();
             await c_channel.StartAsync(c_p);
             
             while (true)

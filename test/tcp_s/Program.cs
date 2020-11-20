@@ -37,8 +37,10 @@ namespace tcp_s
                 });
             }
 
+            await server_bootstrap.BuildAsync();
 
-            var s_channel = await server_bootstrap.BuildAsync();
+
+            var s_channel = await server_bootstrap.CreateAsync();
             await s_channel.StartAsync(address);
 
 

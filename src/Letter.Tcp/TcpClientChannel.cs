@@ -10,12 +10,14 @@ namespace Letter.Tcp
 {
     class TcpClientChannel : ATcpChannel, ITcpClientChannel
     {
-        public TcpClientChannel(TcpClientOptions options, Action<IFilterPipeline<ITcpSession>> handler, SslFeature sslFeature) 
+        public TcpClientChannel(SchedulerAllocator allocator, MemoryPool<byte> memoryPool, TcpClientOptions options,
+            Action<IFilterPipeline<ITcpSession>> handler, SslFeature sslFeature) 
+        
             : base(handler, sslFeature)
         {
             this.options = options;
-            this.memoryPool = SlabMemoryPoolFactory.Create(this.options.MemoryPoolOptions);
-            this.schedulerAllocator = new SchedulerAllocator(this.options.SchedulerCount);
+            this.memoryPool = memoryPool;
+            this.schedulerAllocator = allocator;
         }
         
         private Socket connectSocket;

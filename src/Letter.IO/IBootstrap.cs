@@ -11,6 +11,8 @@ namespace Letter.IO
         void ConfigurationOptions(Action<TOptions> handler);
         void ConfigurationFilter(Action<IFilterPipeline<TSession>> handler);
 
-        Task<TChannel> BuildAsync();
+        Task BuildAsync();
+
+        Task<TChannel> CreateAsync();
     }
 }

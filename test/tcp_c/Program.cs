@@ -38,7 +38,9 @@ namespace tcp_c
                 });
             }
 
-            var c_channel = await client_bootstrap.BuildAsync();
+            await client_bootstrap.BuildAsync();
+
+            var c_channel = await client_bootstrap.CreateAsync();
             await c_channel.StartAsync(address);
 
             int num = 0;
