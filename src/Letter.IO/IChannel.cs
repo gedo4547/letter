@@ -1,9 +1,9 @@
-﻿using System;
+﻿using System.Threading.Tasks;
 
 namespace Letter.IO
 {
-    public interface IChannel : IAsyncDisposable
+    public interface IChannel
     {
-        
+        Task StopAsync();
     }
 }

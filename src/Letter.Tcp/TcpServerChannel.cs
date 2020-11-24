@@ -114,13 +114,8 @@ namespace Letter.Tcp
             }
         }
         
-        public async ValueTask DisposeAsync()
+        public async Task StopAsync()
         {
-            //if (this.socketHandle != null)
-            //{
-            //    this.socketHandle.Dispose();
-            //}
-
             if (this.listenSocket != null)
             {
                 this.listenSocket.Dispose();

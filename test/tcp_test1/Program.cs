@@ -82,7 +82,7 @@ namespace tcp_test1
                 }
                 else if(str == "c")
                 {
-                    await M.session.DisposeAsync();
+                    await M.session.CloseAsync();
                 }
             }
         }

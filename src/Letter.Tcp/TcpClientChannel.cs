@@ -45,9 +45,9 @@ namespace Letter.Tcp
             await this.session.StartAsync();
         }
         
-        public ValueTask DisposeAsync()
+        public Task StopAsync()
         {
-            return default;
+            return Task.CompletedTask;
         }
     }
 }

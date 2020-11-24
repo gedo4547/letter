@@ -114,7 +114,7 @@ namespace Letter.Tcp
             catch (Exception e)
             {
                 this.filterPipeline.OnTransportException(this, e);
-                this.DisposeAsync().NoAwait();
+                this.CloseAsync().NoAwait();
             }
         }
         
@@ -134,7 +134,7 @@ namespace Letter.Tcp
             catch (Exception ex)
             {
                 this.filterPipeline.OnTransportException(this, ex);
-                this.DisposeAsync().NoAwait();
+                this.CloseAsync().NoAwait();
             }
         }
 
@@ -171,7 +171,7 @@ namespace Letter.Tcp
                 if (this.SocketErrorNotify(socketResult.error)) break;
                 if (socketResult.bytesTransferred == 0)
                 {
-                    this.DisposeAsync().NoAwait();
+                    this.CloseAsync().NoAwait();
                     break;
                 }
                 
@@ -235,7 +235,7 @@ namespace Letter.Tcp
                 if (!SocketErrorHelper.IsSocketDisabledError(error))
                 {
                     this.filterPipeline.OnTransportException(this, new SocketException((int)error));
-                    this.DisposeAsync().NoAwait();
+                    this.CloseAsync().NoAwait();
                 }
 
                 return true;
@@ -272,7 +272,7 @@ namespace Letter.Tcp
             this.Application = pair.Application;
         }
 
-        public virtual async ValueTask DisposeAsync()
+        public virtual async Task CloseAsync()
         {
             if (!this.isDisposed)
             {

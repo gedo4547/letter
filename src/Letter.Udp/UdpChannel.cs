@@ -77,9 +77,9 @@ namespace Letter.Udp
             session.Start();
         }
 
-        public async ValueTask DisposeAsync()
+        public async Task StopAsync()
         {
-            await this.session.DisposeAsync();
+            await this.session.CloseAsync();
         }
     }
 }

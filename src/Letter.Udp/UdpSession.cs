@@ -94,7 +94,7 @@ namespace Letter.Udp
             catch (Exception e)
             {
                 this.filterPipeline.OnTransportException(this, e);
-                this.DisposeAsync().NoAwait();
+                this.CloseAsync().NoAwait();
             }
         }
         
@@ -128,7 +128,7 @@ namespace Letter.Udp
             catch (Exception ex)
             {
                 this.filterPipeline.OnTransportException(this, ex);
-                this.DisposeAsync().NoAwait();
+                this.CloseAsync().NoAwait();
             }
             finally
             {
@@ -174,7 +174,7 @@ namespace Letter.Udp
             catch (Exception e)
             {
                 this.filterPipeline.OnTransportException(this, e);
-                this.DisposeAsync().NoAwait();
+                this.CloseAsync().NoAwait();
                 
                 this.RcvPipeReader.Complete();
             }
@@ -196,7 +196,7 @@ namespace Letter.Udp
                 catch (Exception e)
                 {
                     this.filterPipeline.OnTransportException(this, e);
-                    this.DisposeAsync().NoAwait();
+                    this.CloseAsync().NoAwait();
                     
                     this.SndPipeWriter.Complete();
                 }
@@ -251,7 +251,7 @@ namespace Letter.Udp
             catch (Exception e)
             {
                 this.filterPipeline.OnTransportException(this, e);
-                this.DisposeAsync().NoAwait();
+                this.CloseAsync().NoAwait();
                 
                 this.SndPipeReader.Complete();
             }
@@ -264,7 +264,7 @@ namespace Letter.Udp
             {
                 if (!SocketErrorHelper.IsSocketDisabledError(error))
                 {
-                    this.DisposeAsync().NoAwait();
+                    this.CloseAsync().NoAwait();
                     this.filterPipeline.OnTransportException(this, new SocketException((int)error));
                 }
 
@@ -287,7 +287,7 @@ namespace Letter.Udp
                 socket.SettingSndBufferSize(options.SndBufferSize.Value);
         }
 
-        public async ValueTask DisposeAsync()
+        public async Task CloseAsync()
         {
             if (this.isDisposed)
             {

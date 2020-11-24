@@ -70,7 +70,7 @@ namespace Letter.Tcp
             catch (Exception ex)
             {
                 this.filterPipeline.OnTransportException(this, ex);
-                this.DisposeAsync().NoAwait();
+                this.CloseAsync().NoAwait();
             }
             finally
             {
@@ -97,7 +97,7 @@ namespace Letter.Tcp
                 catch (Exception e)
                 {
                     this.filterPipeline.OnTransportException(this, e);
-                    this.DisposeAsync().NoAwait();
+                    this.CloseAsync().NoAwait();
                 }
                 finally
                 {
@@ -115,9 +115,9 @@ namespace Letter.Tcp
             }
         }
         
-        public override async ValueTask DisposeAsync()
+        public override async Task CloseAsync()
         {
-            await base.DisposeAsync();
+            await base.CloseAsync();
             await this.readTask;
             
 #if DEBUG
