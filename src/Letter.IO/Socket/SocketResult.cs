@@ -1,14 +1,8 @@
 ﻿namespace System.Net.Sockets
 {
-    public readonly struct SocketResult
+    public struct SocketResult
     {
-        public SocketResult(int bytesTransferred, SocketError error)
-        {
-            this.error = error;
-            this.bytesTransferred = bytesTransferred;
-        }
-
-        public readonly SocketError error;
-        public readonly int bytesTransferred;
+        public SocketError error;
+        public int bytesTransferred;
     }
 }

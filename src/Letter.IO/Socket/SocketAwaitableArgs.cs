@@ -30,7 +30,11 @@ namespace System.Net.Sockets
         {
             _callback = null;
             
-            return new SocketResult(this.BytesTransferred, this.SocketError);
+            return new SocketResult()
+            {
+                error = this.SocketError,
+                bytesTransferred = this.BytesTransferred
+            };
         }
 
         public void OnCompleted(Action continuation)
