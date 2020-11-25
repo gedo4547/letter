@@ -10,7 +10,7 @@ namespace tcp_test1
 {
     class Program
     {
-        private static bool isUseSsl = false;
+        private static bool isUseSsl = true;
         private static IPEndPoint address = new IPEndPoint(IPAddress.Loopback, 20001);
         private static  X509Certificate2 cert = new X509Certificate2(Path.Combine(AppContext.BaseDirectory, "dotnetty.com.pfx"), "password");
         static async Task Main(string[] args)
@@ -69,20 +69,32 @@ namespace tcp_test1
             await c_channel.StartAsync(address);
 
 
-            int num = 0;
+            int count = 0;
             while (true)
             {
                 string str = Console.ReadLine();
                 if (str == "send")
                 {
-                    num++;
-                    var bytes = System.Text.Encoding.UTF8.GetBytes("你好" + num);
-                    M.session.Write(bytes);
-                    await M.session.FlushAsync();
+                    count++;
+                    for (int i = 1; i <= 100; i++)
+                    {
+                        for (int j = 1; j <= 5; j++)
+                        {
+                            string com = $"{count}____{i}______{j}";
+                            var bytes = System.Text.Encoding.UTF8.GetBytes(com);
+                            M.session.Write(bytes);
+                        }
+
+                        await M.session.FlushAsync();
+                    }
                 }
                 else if(str == "c")
                 {
                     await M.session.CloseAsync();
+                }
+                else if(str == "s")
+                {
+                    return;
                 }
             }
         }

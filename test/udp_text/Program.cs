@@ -30,17 +30,18 @@ namespace udp_text
             
             IUdpChannel c_channel = await bootstrap.CreateAsync();
             await c_channel.StartAsync(c_p);
-            
+            int count = 0;
             while (true)
             {
                 string str = Console.ReadLine();
                 if (str == "send")
                 {
+                    count++;
                     for (int i = 1; i <= 100; i++)
                     {
                         for (int j = 1; j <= 5; j++)
                         {
-                            string com = $"{i}______{j}";
+                            string com = $"{count}____{i}______{j}";
                             var bytes = System.Text.Encoding.UTF8.GetBytes(com);
                             M.session.Write(Program.s_p, bytes);
                         }
