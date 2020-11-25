@@ -69,8 +69,7 @@ namespace Letter.Tcp
             }
             catch (Exception ex)
             {
-                this.filterPipeline.OnTransportException(this, ex);
-                this.CloseAsync().NoAwait();
+                this.DeliverException(ex);
             }
             finally
             {
@@ -96,8 +95,7 @@ namespace Letter.Tcp
                 }
                 catch (Exception e)
                 {
-                    this.filterPipeline.OnTransportException(this, e);
-                    this.CloseAsync().NoAwait();
+                    this.DeliverException(e);
                 }
                 finally
                 {

@@ -143,7 +143,7 @@ namespace System.Net.Sockets
                 this.sndArgs.Complete();
             }
 
-            return sndArgs;
+            return this.sndArgs;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

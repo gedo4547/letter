@@ -93,8 +93,7 @@ namespace Letter.Udp
             }
             catch (Exception e)
             {
-                this.filterPipeline.OnTransportException(this, e);
-                this.CloseAsync().NoAwait();
+                this.DeliverException(e);
             }
         }
         
@@ -127,8 +126,7 @@ namespace Letter.Udp
             }
             catch (Exception ex)
             {
-                this.filterPipeline.OnTransportException(this, ex);
-                this.CloseAsync().NoAwait();
+                this.DeliverException(ex);
             }
             finally
             {
@@ -173,8 +171,7 @@ namespace Letter.Udp
             }
             catch (Exception e)
             {
-                this.filterPipeline.OnTransportException(this, e);
-                this.CloseAsync().NoAwait();
+                this.DeliverException(e);
                 
                 this.RcvPipeReader.Complete();
             }
@@ -195,9 +192,8 @@ namespace Letter.Udp
                 }
                 catch (Exception e)
                 {
-                    this.filterPipeline.OnTransportException(this, e);
-                    this.CloseAsync().NoAwait();
-                    
+                    this.DeliverException(e);
+
                     this.SndPipeWriter.Complete();
                 }
             }
@@ -250,9 +246,8 @@ namespace Letter.Udp
             }
             catch (Exception e)
             {
-                this.filterPipeline.OnTransportException(this, e);
-                this.CloseAsync().NoAwait();
-                
+                this.DeliverException(e);
+
                 this.SndPipeReader.Complete();
             }
         }
@@ -264,8 +259,7 @@ namespace Letter.Udp
             {
                 if (!SocketErrorHelper.IsSocketDisabledError(error))
                 {
-                    this.CloseAsync().NoAwait();
-                    this.filterPipeline.OnTransportException(this, new SocketException((int)error));
+                    this.DeliverException(new SocketException((int) error));
                 }
 
                 return true;
@@ -273,7 +267,13 @@ namespace Letter.Udp
 
             return false;
         }
-        
+
+        private void DeliverException(Exception ex)
+        {
+            this.filterPipeline.OnTransportException(this, ex);
+            this.CloseAsync().NoAwait();
+        }
+
         private void SettingSocket(UdpSocket socket, UdpOptions options)
         {
             if (options.RcvTimeout != null)

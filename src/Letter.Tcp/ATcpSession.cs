@@ -113,8 +113,7 @@ namespace Letter.Tcp
             }
             catch (Exception e)
             {
-                this.filterPipeline.OnTransportException(this, e);
-                this.CloseAsync().NoAwait();
+                this.DeliverException(e);
             }
         }
         
@@ -133,8 +132,7 @@ namespace Letter.Tcp
             }
             catch (Exception ex)
             {
-                this.filterPipeline.OnTransportException(this, ex);
-                this.CloseAsync().NoAwait();
+                this.DeliverException(ex);
             }
         }
 
@@ -234,14 +232,19 @@ namespace Letter.Tcp
             {
                 if (!SocketErrorHelper.IsSocketDisabledError(error))
                 {
-                    this.filterPipeline.OnTransportException(this, new SocketException((int)error));
-                    this.CloseAsync().NoAwait();
+                    this.DeliverException(new SocketException((int) error));
                 }
 
                 return true;
             }
 
             return false;
+        }
+        
+        protected void DeliverException(Exception ex)
+        {
+            this.filterPipeline.OnTransportException(this, ex);
+            this.CloseAsync().NoAwait();
         }
         
         private void SettingSocket(TcpSocket socket, ATcpOptions options)
