@@ -31,7 +31,7 @@ namespace System.Net.Sockets
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public SocketAwaitableArgs Wait()
+        public SocketAwaitableArgs WaitAsync()
         {
             return base.InternalReceiveAsync(EmptyMemory);
         }

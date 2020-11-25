@@ -163,7 +163,7 @@ namespace Letter.Tcp
             {
                 if(this.isWaitData)
                 {
-                    await this.socket.Wait();
+                    await this.socket.WaitAsync();
                 }
                 var buffer = input.GetMemory(this.minAllocBufferSize);
                 var socketResult = await this.socket.ReceiveAsync(buffer);
