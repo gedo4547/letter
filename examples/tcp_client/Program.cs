@@ -47,7 +47,9 @@ namespace tcp_client
                 await c_channel.StartAsync(address);
             }
             
+            System.Threading.Thread.Sleep(3 * 1000);
             Console.WriteLine("start send");
+            
             startTime = DateTime.Now;
             startSend();
             
