@@ -1,0 +1,9 @@
+F:\letter-github\test\test\bin\Release\net48\test.exe.config
+F:\letter-github\test\test\bin\Release\net48\test.exe
+F:\letter-github\test\test\bin\Release\net48\test.pdb
+F:\letter-github\test\test\obj\Release\net48\test.csprojAssemblyReference.cache
+F:\letter-github\test\test\obj\Release\net48\test.AssemblyInfoInputs.cache
+F:\letter-github\test\test\obj\Release\net48\test.AssemblyInfo.cs
+F:\letter-github\test\test\obj\Release\net48\test.csproj.CoreCompileInputs.cache
+F:\letter-github\test\test\obj\Release\net48\test.exe
+F:\letter-github\test\test\obj\Release\net48\test.pdb

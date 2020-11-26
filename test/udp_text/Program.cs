@@ -13,16 +13,11 @@ namespace udp_text
         static async Task Main(string[] args)
         {
             IUdpBootstrap bootstrap = UdpFactory.Bootstrap();
-            bootstrap.ConfigurationOptions((options =>
-            {
-                
-            }));
-            
+            bootstrap.ConfigurationOptions(options => { });
             bootstrap.ConfigurationFilter((pipeline) =>
             {
                 pipeline.Add(new UdpFilter_2());
             });
-
             await bootstrap.BuildAsync();
             
             IUdpChannel s_channel = await bootstrap.CreateAsync();

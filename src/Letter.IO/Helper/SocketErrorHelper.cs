@@ -23,8 +23,7 @@ namespace System.Net.Sockets
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool IsSocketDisabledError(SocketError error)
         {
-            return IsConnectionResetError(error) ||
-                   IsConnectionAbortError(error);
+            return IsConnectionResetError(error) || IsConnectionAbortError(error);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

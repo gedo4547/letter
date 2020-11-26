@@ -108,11 +108,17 @@ namespace Letter.Udp
                     segment = this.RcvPipeWriter.GetSegment();
                     var memory = segment.GetWritableMemory(this.memoryBlockSize);
                     var socketResult = await this.socket.ReceiveAsync(address, memory);
-                    if (this.SocketErrorNotify(socketResult.error))
+                    
+                    if (socketResult.error != SocketError.Success)
                     {
+                        if (!SocketErrorHelper.IsSocketDisabledError(socketResult.error))
+                            this.DeliverException(new SocketException((int) socketResult.error));
+                        else
+                            this.CloseAsync().NoAwait();
+                    
                         break;
                     }
-
+                    
                     segment.Token = this.socket.RemoteAddress;
                     segment.WriterAdvance(socketResult.bytesTransferred);
                     
@@ -228,8 +234,12 @@ namespace Letter.Udp
                         EndPoint address = (EndPoint) segment.Token;
                         ReadOnlySequence<byte> sequence = new ReadOnlySequence<byte>(memory);
                         SocketResult socketResult = await this.socket.SendAsync(address, sequence);
-                        if (this.SocketErrorNotify(socketResult.error))
+                        
+                        if (socketResult.error != SocketError.Success)
                         {
+                            if (!SocketErrorHelper.IsSocketDisabledError(socketResult.error))
+                                this.DeliverException(new SocketException((int) socketResult.error));
+                            
                             this.SndPipeReader.Complete();
                             break;
                         }
@@ -252,22 +262,6 @@ namespace Letter.Udp
             }
         }
         
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private bool SocketErrorNotify(SocketError error)
-        {
-            if (error != SocketError.Success)
-            {
-                if (!SocketErrorHelper.IsSocketDisabledError(error))
-                {
-                    this.DeliverException(new SocketException((int) error));
-                }
-
-                return true;
-            }
-
-            return false;
-        }
-
         private void DeliverException(Exception ex)
         {
             this.filterPipeline.OnTransportException(this, ex);

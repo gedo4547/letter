@@ -30,8 +30,6 @@ namespace Letter.Tcp
 
             this.SettingSocket(this.socket, options);
             this.SettingPipeline(options.MaxPipelineReadBufferSize, options.MaxPipelineWriteBufferSize);
-            
-            
         }
 
         public string Id
@@ -166,7 +164,16 @@ namespace Letter.Tcp
                 var buffer = input.GetMemory(this.minAllocBufferSize);
                 var socketResult = await this.socket.ReceiveAsync(buffer);
 
-                if (this.SocketErrorNotify(socketResult.error)) break;
+                if (socketResult.error != SocketError.Success)
+                {
+                    if (!SocketErrorHelper.IsSocketDisabledError(socketResult.error))
+                        this.DeliverException(new SocketException((int) socketResult.error));
+                    else
+                        this.CloseAsync().NoAwait();
+                    
+                    break;
+                }
+                
                 if (socketResult.bytesTransferred == 0)
                 {
                     this.CloseAsync().NoAwait();
@@ -217,28 +224,18 @@ namespace Letter.Tcp
                 {
                     var socketResult = await this.socket.SendAsync(buffer);
                     
-                    if (this.SocketErrorNotify(socketResult.error)) break;
+                    if (socketResult.error != SocketError.Success)
+                    {
+                        if (!SocketErrorHelper.IsSocketDisabledError(socketResult.error))
+                            this.DeliverException(new SocketException((int) socketResult.error));
+                        break;
+                    }
+
                     if (socketResult.bytesTransferred == 0) break;
                 }
 
                 output.AdvanceTo(end);
             }
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private bool SocketErrorNotify(SocketError error)
-        {
-            if (error != SocketError.Success)
-            {
-                if (!SocketErrorHelper.IsSocketDisabledError(error))
-                {
-                    this.DeliverException(new SocketException((int) error));
-                }
-
-                return true;
-            }
-
-            return false;
         }
         
         protected void DeliverException(Exception ex)
