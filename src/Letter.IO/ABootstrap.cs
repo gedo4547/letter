@@ -8,7 +8,7 @@ namespace Letter.IO
         where TChannel : IChannel
         where TSession : ISession
     {
-        protected TOptions options;
+        protected TOptions options = new TOptions();
         
         private Action<TOptions> optionsFactory;
         private Action<IFilterPipeline<TSession>> filterPipelineHandler;
@@ -35,7 +35,6 @@ namespace Letter.IO
         
         public virtual Task BuildAsync()
         {
-            this.options = new TOptions();
             if (this.optionsFactory != null)
             {
                 this.optionsFactory(this.options);
@@ -46,7 +45,7 @@ namespace Letter.IO
 
         public Task<TChannel> CreateAsync()
         {
-            return ChannelFactoryAsync(this.options, this.filterPipelineHandler);
+            return this.ChannelFactoryAsync(this.options, this.filterPipelineHandler);
         }
 
         protected abstract Task<TChannel> ChannelFactoryAsync(TOptions options, Action<IFilterPipeline<TSession>> handler);

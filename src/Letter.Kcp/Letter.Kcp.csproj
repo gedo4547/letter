@@ -4,4 +4,16 @@
         <TargetFrameworks>netstandard2.0;net5.0</TargetFrameworks>
     </PropertyGroup>
 
+    <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
+      <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    </PropertyGroup>
+
+    <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+      <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\Letter.Udp\Letter.Udp.csproj" />
+    </ItemGroup>
+
 </Project>
