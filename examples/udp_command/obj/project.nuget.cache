@@ -1,0 +1,10 @@
+{
+  "version": 2,
+  "dgSpecHash": "2bIUUp88+Fy3DuLFxhS/YMxVfCHZVWWmv21YRmIa9o43zJK/9TzLJAtEIgIJ6PGkRFyk1p5imxY3hiYkpxku3Q==",
+  "success": true,
+  "projectFilePath": "F:\\letter-github\\examples\\udp_command\\udp_command.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\pc\\.nuget\\packages\\system.io.pipelines\\5.0.0\\system.io.pipelines.5.0.0.nupkg.sha512"
+  ],
+  "logs": []
+}
