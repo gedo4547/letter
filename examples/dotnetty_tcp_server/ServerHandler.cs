@@ -1,8 +1,5 @@
 ﻿using DotNetty.Buffers;
 using DotNetty.Transport.Channels;
-using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace dotnetty_tcp_server
@@ -13,13 +10,18 @@ namespace dotnetty_tcp_server
 
         public ServerHandler()
         {
+            this.initialMessage = Unpooled.Buffer(common.SocketConfig.message.Length);
             this.initialMessage.WriteBytes(common.SocketConfig.message);
         }
 
         public override void ChannelActive(IChannelHandlerContext context)
         {
-            Console.WriteLine("发送");
-            context.WriteAndFlushAsync(this.initialMessage);
+            System.Threading.Interlocked.Increment(ref ServerStatistics.client_count);
+        }
+
+        public override void ChannelInactive(IChannelHandlerContext context)
+        {
+            System.Threading.Interlocked.Decrement(ref ServerStatistics.client_count);
         }
 
         public override void ChannelRead(IChannelHandlerContext context, object message)

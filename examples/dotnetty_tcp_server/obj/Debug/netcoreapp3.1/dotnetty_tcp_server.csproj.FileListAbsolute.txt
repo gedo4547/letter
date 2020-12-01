@@ -20,3 +20,5 @@ F:\letter-github\examples\dotnetty_tcp_server\obj\Debug\netcoreapp3.1\dotnetty_t
 F:\letter-github\examples\dotnetty_tcp_server\obj\Debug\netcoreapp3.1\dotnetty_tcp_server.dll
 F:\letter-github\examples\dotnetty_tcp_server\obj\Debug\netcoreapp3.1\dotnetty_tcp_server.pdb
 F:\letter-github\examples\dotnetty_tcp_server\obj\Debug\netcoreapp3.1\dotnetty_tcp_server.genruntimeconfig.cache
+F:\letter-github\examples\dotnetty_tcp_server\bin\Debug\netcoreapp3.1\common.dll
+F:\letter-github\examples\dotnetty_tcp_server\bin\Debug\netcoreapp3.1\common.pdb

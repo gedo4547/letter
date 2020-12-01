@@ -1,13 +1,10 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <TargetFramework>net5.0</TargetFramework>
   </PropertyGroup>
 
-  <ItemGroup>
-    <None Remove="Program.cs~RF14eb7f62.TMP" />
-  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="DotNetty.Handlers" Version="0.6.0" />

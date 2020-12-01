@@ -20,7 +20,6 @@ namespace Letter.Tcp
             this.Scheduler = scheduler;
             this.MemoryPool = pool;
             this.Scheduler = scheduler;
-            this.isWaitData = options.WaitForData;
             this.minAllocBufferSize = this.MemoryPool.MaxBufferSize / 2;
             
             this.filterPipeline = filterPipeline;
@@ -89,8 +88,7 @@ namespace Letter.Tcp
         private TcpSocket socket;
         private Task processingTask;
         private int minAllocBufferSize;
-        private bool isWaitData;
-
+        
         protected volatile bool isDisposed = false;
         protected FilterPipeline<ITcpSession> filterPipeline;
         
@@ -157,13 +155,10 @@ namespace Letter.Tcp
             var input = Input;
             while (true)
             {
-                if(this.isWaitData)
-                {
-                    await this.socket.WaitAsync();
-                }
+                await this.socket.WaitAsync();
                 var buffer = input.GetMemory(this.minAllocBufferSize);
                 var socketResult = await this.socket.ReceiveAsync(buffer);
-
+                
                 if (socketResult.error != SocketError.Success)
                 {
                     if (!SocketErrorHelper.IsSocketDisabledError(socketResult.error))
@@ -173,7 +168,7 @@ namespace Letter.Tcp
                     
                     break;
                 }
-                
+
                 if (socketResult.bytesTransferred == 0)
                 {
                     this.CloseAsync().NoAwait();
@@ -279,6 +274,7 @@ namespace Letter.Tcp
                 this.isDisposed = true;
 
                 this.filterPipeline.OnTransportInactive(this);
+                
                 this.Input.CancelPendingFlush();
                 this.Output.CancelPendingRead();
                 await this.socket.DisposeAsync();

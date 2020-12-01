@@ -18,6 +18,7 @@ namespace tcp_server
 
         public void OnTransportInactive(ITcpSession session)
         {
+            Console.WriteLine("客户端断开");
             System.Threading.Interlocked.Decrement(ref ServerStatistics.client_count);
         }
 

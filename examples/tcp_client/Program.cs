@@ -19,6 +19,14 @@ namespace tcp_client
         
         static async Task Main(string[] args)
         {
+            foreach (var item in common.SocketConfig.message)
+            {
+                Console.Write(item+",");
+            }
+           
+            return;
+            
+            
             Console.Title = "client";
             var client_bootstrap = TcpFactory.ClientBootstrap();
             client_bootstrap.ConfigurationOptions(options => { });

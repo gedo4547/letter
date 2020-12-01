@@ -9,14 +9,6 @@ namespace Letter.Tcp
     public class ATcpOptions : IOptions
     {
         /// <summary>
-        /// Wait until there is data available to allocate a buffer. Setting this to false can increase throughput at the cost of increased memory usage.
-        /// </summary>
-        /// <remarks>
-        /// Defaults to true.
-        /// </remarks>
-        public bool WaitForData { get; set; } = true;
-
-        /// <summary>
         /// Set to false to enable Nagle's algorithm for all connections.
         /// </summary>
         /// <remarks>

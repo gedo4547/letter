@@ -1,7 +1,7 @@
 {
   "version": 3,
   "targets": {
-    ".NETCoreApp,Version=v3.1": {
+    "net5.0": {
       "DotNetty.Buffers/0.6.0": {
         "type": "package",
         "dependencies": {
@@ -5506,7 +5506,7 @@
     }
   },
   "projectFileDependencyGroups": {
-    ".NETCoreApp,Version=v3.1": [
+    "net5.0": [
       "DotNetty.Codecs >= 0.6.0",
       "DotNetty.Transport >= 0.6.0",
       "common >= 1.0.0"
@@ -5533,7 +5533,7 @@
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "originalTargetFrameworks": [
-        "netcoreapp3.1"
+        "net5.0"
       ],
       "sources": {
         "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
@@ -5541,8 +5541,8 @@
         "https://nuget.cdn.azure.cn/v3/index.json": {}
       },
       "frameworks": {
-        "netcoreapp3.1": {
-          "targetAlias": "netcoreapp3.1",
+        "net5.0": {
+          "targetAlias": "net5.0",
           "projectReferences": {
             "F:\\letter-github\\examples\\common\\common.csproj": {
               "projectPath": "F:\\letter-github\\examples\\common\\common.csproj"
@@ -5557,8 +5557,8 @@
       }
     },
     "frameworks": {
-      "netcoreapp3.1": {
-        "targetAlias": "netcoreapp3.1",
+      "net5.0": {
+        "targetAlias": "net5.0",
         "dependencies": {
           "DotNetty.Codecs": {
             "target": "Package",
