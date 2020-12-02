@@ -99,7 +99,7 @@ namespace Letter.Tcp
                 }
                 finally
                 {
-                    writer.Flush();    
+                    writer.Flush();
                 }
             }
         }
