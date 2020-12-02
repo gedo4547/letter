@@ -2,12 +2,12 @@
 using System.Threading.Tasks;
 using Letter.IO;
 
-namespace Letter.Tcp
+namespace Letter.Kcp
 {
-    public interface ITcpSession : ISession
+    public interface IKcpSession : ISession
     {
         EndPoint RemoteAddress { get; }
-
+        
         void Write(object o);
 
         Task FlushAsync();
