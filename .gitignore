@@ -17,3 +17,13 @@
 /test/tcp_test1/bin
 /test/udp_text/obj
 /test/udp_text/bin
+/examples/udp_command/bin
+/examples/udp_command/obj
+/examples/tcp_server/bin
+/examples/tcp_server/obj
+/examples/tcp_command/obj
+/examples/tcp_command/bin
+/examples/tcp_client/obj
+/examples/tcp_client/bin
+/examples/common/obj
+/examples/common/bin

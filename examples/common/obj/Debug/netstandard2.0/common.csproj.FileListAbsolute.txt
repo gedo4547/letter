@@ -1,9 +1,0 @@
-F:\letter-github\examples\common\bin\Debug\netstandard2.0\common.deps.json
-F:\letter-github\examples\common\bin\Debug\netstandard2.0\common.dll
-F:\letter-github\examples\common\bin\Debug\netstandard2.0\common.pdb
-F:\letter-github\examples\common\obj\Debug\netstandard2.0\common.csprojAssemblyReference.cache
-F:\letter-github\examples\common\obj\Debug\netstandard2.0\common.AssemblyInfoInputs.cache
-F:\letter-github\examples\common\obj\Debug\netstandard2.0\common.AssemblyInfo.cs
-F:\letter-github\examples\common\obj\Debug\netstandard2.0\common.csproj.CoreCompileInputs.cache
-F:\letter-github\examples\common\obj\Debug\netstandard2.0\common.dll
-F:\letter-github\examples\common\obj\Debug\netstandard2.0\common.pdb
