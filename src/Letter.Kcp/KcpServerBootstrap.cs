@@ -4,9 +4,9 @@ using Letter.IO;
 
 namespace Letter.Kcp
 {
-    sealed class KcpServerBootstrap : AKcpBootstrap<KcpServerOptions>, IKcpServerBootstrap
+    sealed class KcpServerBootstrap : AKcpBootstrap<KcpServerOptions, IKcpServerChannel>, IKcpServerBootstrap
     {
-        protected override Task<IKcpChannel> ChannelFactoryAsync(KcpServerOptions options, Action<IFilterPipeline<IKcpSession>> handler)
+        protected override Task<IKcpServerChannel> ChannelFactoryAsync(KcpServerOptions options, Action<IFilterPipeline<IKcpSession>> handler)
         {
             throw new NotImplementedException();
         }

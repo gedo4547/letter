@@ -1,6 +1,6 @@
 ﻿namespace Letter.Kcp
 {
-    public interface IKcpServerBootstrap : IKcpBootstrap<KcpServerOptions>
+    public interface IKcpServerBootstrap : IKcpBootstrap<KcpServerOptions, IKcpServerChannel>
     {
         
     }

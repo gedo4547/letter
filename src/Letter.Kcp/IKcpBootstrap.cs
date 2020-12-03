@@ -2,8 +2,9 @@
 
 namespace Letter.Kcp
 {
-    public interface IKcpBootstrap<TOptions> : IBootstrap<TOptions, IKcpSession, IKcpChannel>
+    public interface IKcpBootstrap<TOptions, TChannel> : IBootstrap<TOptions, IKcpSession, TChannel>
         where TOptions : AKcpOptions, new()
+        where TChannel : IKcpChannel
     {
     }
 }
