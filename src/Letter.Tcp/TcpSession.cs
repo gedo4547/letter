@@ -104,7 +104,7 @@ namespace Letter.Tcp
             }
         }
         
-        public async override Task FlushAsync()
+        public async override ValueTask FlushAsync()
         {
             FlushResult result = await this.Output.FlushAsync();
             if (result.IsCompleted || result.IsCanceled)

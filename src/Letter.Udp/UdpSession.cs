@@ -205,10 +205,10 @@ namespace Letter.Udp
             }
         }
 
-        public Task FlushAsync()
+        public ValueTask FlushAsync()
         {
             this.SndPipeWriter.FlushAsync();
-            return Task.CompletedTask;
+            return default;
         }
 
         private async void OnSndPipelineRead()

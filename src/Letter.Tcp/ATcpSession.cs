@@ -97,7 +97,7 @@ namespace Letter.Tcp
 
         public abstract void Write(object obj);
 
-        public abstract Task FlushAsync();
+        public abstract ValueTask FlushAsync();
         
         protected void Run()
         {

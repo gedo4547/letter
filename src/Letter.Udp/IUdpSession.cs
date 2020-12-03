@@ -11,6 +11,6 @@ namespace Letter.Udp
         
         void Write(EndPoint remoteAddress, object obj);
         
-        Task FlushAsync();
+        ValueTask FlushAsync();
     }
 }

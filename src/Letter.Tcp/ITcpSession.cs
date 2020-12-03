@@ -10,6 +10,6 @@ namespace Letter.Tcp
 
         void Write(object o);
 
-        Task FlushAsync();
+        ValueTask FlushAsync();
     }
 }

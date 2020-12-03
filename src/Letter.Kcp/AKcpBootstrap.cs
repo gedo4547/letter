@@ -12,8 +12,9 @@ namespace Letter.Kcp
         {
             this.udpBootstrap = UdpFactory.Bootstrap();
             this.udpBootstrap.ConfigurationOptions(this.OnConfigurationOptions);
+            this.udpBootstrap.ConfigurationFilter(this.OnConfigurationFilter);
         }
-
+        
         private IUdpBootstrap udpBootstrap;
         
         private void OnConfigurationOptions(UdpOptions options)
@@ -28,6 +29,11 @@ namespace Letter.Kcp
                 
             options.SchedulerCount = this.options.SchedulerCount;
             options.MemoryPoolOptions = this.options.MemoryPoolOptions;
+        }
+        
+        private void OnConfigurationFilter(IFilterPipeline<IUdpSession> pipeline)
+        {
+            pipeline.Add(new DefaultBytesFilter());
         }
         
         public override async Task BuildAsync()
