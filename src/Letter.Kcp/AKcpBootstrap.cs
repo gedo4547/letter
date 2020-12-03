@@ -1,4 +1,5 @@
-﻿using Letter.IO;
+﻿using System.Threading.Tasks;
+using Letter.IO;
 using Letter.Udp;
 
 namespace Letter.Kcp
@@ -10,8 +11,35 @@ namespace Letter.Kcp
         public AKcpBootstrap()
         {
             this.udpBootstrap = UdpFactory.Bootstrap();
+            this.udpBootstrap.ConfigurationOptions(this.OnConfigurationOptions);
         }
 
         private IUdpBootstrap udpBootstrap;
+        
+        private void OnConfigurationOptions(UdpOptions options)
+        {
+            options.Order = this.options.Order;
+                
+            options.RcvTimeout = this.options.RcvTimeout;
+            options.SndTimeout = this.options.SndTimeout;
+                
+            options.RcvBufferSize = this.options.RcvBufferSize;
+            options.SndBufferSize = this.options.SndBufferSize;
+                
+            options.SchedulerCount = this.options.SchedulerCount;
+            options.MemoryPoolOptions = this.options.MemoryPoolOptions;
+        }
+        
+        public override async Task BuildAsync()
+        {
+            await base.BuildAsync();
+            await this.udpBootstrap.BuildAsync();
+        }
+
+        public override async ValueTask DisposeAsync()
+        {
+            await base.DisposeAsync();
+            await this.udpBootstrap.DisposeAsync();
+        }
     }
 }
