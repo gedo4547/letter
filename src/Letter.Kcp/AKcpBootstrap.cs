@@ -15,7 +15,7 @@ namespace Letter.Kcp
             this.udpBootstrap.ConfigurationFilter(this.OnConfigurationFilter);
         }
         
-        private IUdpBootstrap udpBootstrap;
+        protected IUdpBootstrap udpBootstrap;
         
         private void OnConfigurationOptions(UdpOptions options)
         {
