@@ -27,6 +27,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "common", "examples\common\c
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "command", "command", "{5CD6B3C8-5FC7-4419-9BD0-87D9FD886C17}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "dotnetty_server_test", "examples\dotnetty_server_test\dotnetty_server_test.csproj", "{5390A491-6430-483F-8C41-22E88023C20C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "dotnetty_client_test", "examples\dotnetty_client_test\dotnetty_client_test.csproj", "{02E22AF3-53C0-4304-A10E-2235EE186261}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -69,6 +73,14 @@ Global
 		{DC73CFD0-FEA5-4379-A924-559BE4BE104F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DC73CFD0-FEA5-4379-A924-559BE4BE104F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DC73CFD0-FEA5-4379-A924-559BE4BE104F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5390A491-6430-483F-8C41-22E88023C20C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5390A491-6430-483F-8C41-22E88023C20C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5390A491-6430-483F-8C41-22E88023C20C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5390A491-6430-483F-8C41-22E88023C20C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{02E22AF3-53C0-4304-A10E-2235EE186261}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{02E22AF3-53C0-4304-A10E-2235EE186261}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{02E22AF3-53C0-4304-A10E-2235EE186261}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{02E22AF3-53C0-4304-A10E-2235EE186261}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -84,6 +96,8 @@ Global
 		{46F71135-3884-4CB4-B1D7-D351A4A45C33} = {89C69379-1DA5-40B6-B34E-91D1EBCDF8C7}
 		{DC73CFD0-FEA5-4379-A924-559BE4BE104F} = {89C69379-1DA5-40B6-B34E-91D1EBCDF8C7}
 		{5CD6B3C8-5FC7-4419-9BD0-87D9FD886C17} = {89C69379-1DA5-40B6-B34E-91D1EBCDF8C7}
+		{5390A491-6430-483F-8C41-22E88023C20C} = {89C69379-1DA5-40B6-B34E-91D1EBCDF8C7}
+		{02E22AF3-53C0-4304-A10E-2235EE186261} = {89C69379-1DA5-40B6-B34E-91D1EBCDF8C7}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {88FE7350-47D0-48BE-9A66-E83D0B53A398}

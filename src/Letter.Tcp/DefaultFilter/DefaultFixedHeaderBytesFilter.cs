@@ -30,7 +30,7 @@ namespace Letter.Tcp
         {
             this.buffers.Clear();
             args.Value = this.buffers;
-            Console.WriteLine(reader.Length);
+            
             while (reader.IsLengthEnough(this.currentReadLength))
             {
                 if (this.currentReadPart == PackPart.Head)

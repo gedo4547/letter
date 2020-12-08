@@ -1,0 +1,25 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <OutputType>Exe</OutputType>
+        <TargetFramework>net5.0</TargetFramework>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="DotNetty.Codecs" Version="0.6.0" />
+        <PackageReference Include="DotNetty.Codecs.Http" Version="0.6.0" />
+        <PackageReference Include="DotNetty.Common" Version="0.6.0" />
+        <PackageReference Include="DotNetty.Transport" Version="0.6.0" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\common\common.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <None Include="..\..\shared\dotnetty.com.pfx" Link="dotnetty.com.pfx">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </None>
+    </ItemGroup>
+
+</Project>
