@@ -27,3 +27,7 @@
 /examples/tcp_client/bin
 /examples/common/obj
 /examples/common/bin
+/examples/dotnetty_client_test/bin
+/examples/dotnetty_client_test/obj
+/examples/dotnetty_server_test/obj
+/examples/dotnetty_server_test/bin
