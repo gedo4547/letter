@@ -6,9 +6,12 @@ namespace Letter.Kcp
 {
     sealed class KcpClientBootstrap : AKcpBootstrap<KcpClientOptions, IKcpClientChannel>, IKcpClientBootstrap
     {
-        protected override Task<IKcpClientChannel> ChannelFactoryAsync(KcpClientOptions options, Action<IFilterPipeline<IKcpSession>> handler)
+        protected override async Task<IKcpClientChannel> ChannelFactoryAsync(KcpClientOptions options, Action<IFilterPipeline<IKcpSession>> handler)
         {
-            throw new NotImplementedException();
+            var udpChannel = await this.udpBootstrap.CreateAsync();
+            IKcpClientChannel channel = new KcpClientChannel(options, udpChannel, handler);
+
+            return channel;
         }
     }
 }
