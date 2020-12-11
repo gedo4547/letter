@@ -4,7 +4,7 @@ using Letter.IO;
 
 namespace Letter.Tcp
 {
-    public interface ITcpClientChannel : IChannel
+    public interface ITcpClientChannel : IChannel<ITcpSession, TcpClientOptions>
     {
         EndPoint ConnectAddress { get; }
         

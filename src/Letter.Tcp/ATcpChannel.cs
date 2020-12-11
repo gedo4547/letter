@@ -6,7 +6,8 @@ using Letter.IO;
 
 namespace Letter.Tcp
 {
-    abstract class ATcpChannel
+    abstract class ATcpChannel<TOptions> : AChannel<ITcpSession, TOptions>
+        where TOptions : ATcpOptions
     {
         public ATcpChannel(Action<IFilterPipeline<ITcpSession>> handler, SslFeature sslFeature)
         {

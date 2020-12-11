@@ -5,7 +5,7 @@ namespace Letter.IO
 { 
     public abstract class ABootstrap<TOptions, TSession, TChannel> : IBootstrap<TOptions, TSession, TChannel>
         where TOptions : class, IOptions, new()
-        where TChannel : IChannel
+        where TChannel : IChannel<TSession, TOptions>
         where TSession : ISession
     {
         protected TOptions options = new TOptions();

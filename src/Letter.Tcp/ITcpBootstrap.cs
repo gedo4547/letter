@@ -7,7 +7,7 @@ namespace Letter.Tcp
 {
     public interface ITcpBootstrap<TOptions, TChannel> : IBootstrap<TOptions, ITcpSession, TChannel>
         where TOptions : class, IOptions, new()
-        where TChannel : IChannel
+        where TChannel : IChannel<ITcpSession, TOptions>
     {
         void ConfigurationSsl(SslOptions sslOptions, Func<Stream, SslStream> sslStreamFactory);
     }

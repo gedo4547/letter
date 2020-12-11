@@ -8,7 +8,7 @@ namespace Letter.Tcp
 {
     abstract class ATcpBootstrap<TOptions, TChannel> : ABootstrap<TOptions, ITcpSession, TChannel>, ITcpBootstrap<TOptions, TChannel>
         where TOptions : class, IOptions, new()
-        where TChannel : IChannel
+        where TChannel : IChannel<ITcpSession, TOptions>
     {
         private SslFeature sslFeature;
         

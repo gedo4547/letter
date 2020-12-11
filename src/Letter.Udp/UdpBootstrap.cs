@@ -14,7 +14,7 @@ namespace Letter.Udp
         public override async Task BuildAsync()
         {
             await base.BuildAsync();
-            this.memoryPool= SlabMemoryPoolFactory.Create(this.options.MemoryPoolOptions);
+            this.memoryPool = SlabMemoryPoolFactory.Create(this.options.MemoryPoolOptions);
             this.schedulerAllocator = new SchedulerAllocator(this.options.SchedulerCount);
         }
         

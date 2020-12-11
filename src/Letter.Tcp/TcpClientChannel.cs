@@ -8,7 +8,7 @@ using Letter.IO;
 
 namespace Letter.Tcp
 {
-    class TcpClientChannel : ATcpChannel, ITcpClientChannel
+    class TcpClientChannel : ATcpChannel<TcpClientOptions>, ITcpClientChannel
     {
         public TcpClientChannel(SchedulerAllocator allocator, MemoryPool<byte> memoryPool, TcpClientOptions options,
             Action<IFilterPipeline<ITcpSession>> handler, SslFeature sslFeature) 
@@ -45,7 +45,7 @@ namespace Letter.Tcp
             await this.session.StartAsync();
         }
         
-        public Task StopAsync()
+        public override Task StopAsync()
         {
             return Task.CompletedTask;
         }

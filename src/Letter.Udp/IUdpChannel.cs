@@ -4,7 +4,7 @@ using Letter.IO;
 
 namespace Letter.Udp
 {
-    public interface IUdpChannel : IChannel
+    public interface IUdpChannel : IChannel<IUdpSession, UdpOptions>
     {
         EndPoint BindAddress { get; }
 

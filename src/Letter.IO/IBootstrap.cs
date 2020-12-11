@@ -5,7 +5,7 @@ namespace Letter.IO
 {
     public interface IBootstrap<TOptions, TSession, TChannel> : IAsyncDisposable
         where TOptions : class, IOptions, new()
-        where TChannel : IChannel
+        where TChannel : IChannel<TSession, TOptions>
         where TSession : ISession
     {
         void ConfigurationOptions(Action<TOptions> handler);

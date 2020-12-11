@@ -8,7 +8,7 @@ using Letter.IO;
 
 namespace Letter.Tcp
 {
-    class TcpServerChannel : ATcpChannel, ITcpServerChannel
+    class TcpServerChannel : ATcpChannel<TcpServerOptions>, ITcpServerChannel
     {
         public TcpServerChannel(TcpServerOptions options, Action<IFilterPipeline<ITcpSession>> handler, SslFeature sslFeature)
             : base(handler, sslFeature)
@@ -114,7 +114,7 @@ namespace Letter.Tcp
             }
         }
         
-        public async Task StopAsync()
+        public async override Task StopAsync()
         {
             if (this.listenSocket != null)
             {

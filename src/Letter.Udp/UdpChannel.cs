@@ -9,7 +9,7 @@ using Letter.IO;
 
 namespace Letter.Udp
 {
-    sealed class UdpChannel : IUdpChannel
+    sealed class UdpChannel : AChannel<IUdpSession, UdpOptions>, IUdpChannel
     {
         public UdpChannel(SchedulerAllocator allocator, MemoryPool<byte> memoryPool, UdpOptions options, Action<IFilterPipeline<IUdpSession>> handler)
         {
@@ -77,7 +77,7 @@ namespace Letter.Udp
             session.Start();
         }
 
-        public async Task StopAsync()
+        public async override Task StopAsync()
         {
             await this.session.CloseAsync();
         }
