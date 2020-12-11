@@ -28,6 +28,7 @@ namespace Letter.Kcp
             options.SndBufferSize = this.options.SndBufferSize;
                 
             options.SchedulerCount = this.options.SchedulerCount;
+            
             options.MemoryPoolOptions = this.options.MemoryPoolOptions;
         }
         
