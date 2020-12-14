@@ -1,7 +1,7 @@
-﻿// namespace Letter.Kcp
-// {
-//     public interface IKcpServerBootstrap : IKcpBootstrap<KcpServerOptions, IKcpServerChannel>
-//     {
-//         
-//     }
-// }
+﻿namespace Letter.Kcp
+{
+    public interface IKcpServerBootstrap : IKcpBootstrap<KcpServerOptions, IKcpServerChannel>
+    {
+        
+    }
+}

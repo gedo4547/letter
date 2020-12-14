@@ -11,16 +11,13 @@ namespace Letter.Tcp
     class TcpServerChannel : ATcpChannel<TcpServerOptions>, ITcpServerChannel
     {
         public TcpServerChannel(TcpServerOptions options, Action<IFilterPipeline<ITcpSession>> handler, SslFeature sslFeature)
-            : base(handler, sslFeature)
+            : base(handler, sslFeature, options)
         {
-            this.options = options;
             this.memoryPool = SlabMemoryPoolFactory.Create(this.options.MemoryPoolOptions);
             this.schedulerAllocator = new SchedulerAllocator(this.options.SchedulerCount);
         }
         
         private Socket listenSocket;
-
-        private TcpServerOptions options;
         private MemoryPool<byte> memoryPool;
         private SchedulerAllocator schedulerAllocator;
         
@@ -127,6 +124,8 @@ namespace Letter.Tcp
             {
                 this.memoryPool.Dispose();
             }
+
+            await base.StopAsync();
         }
     }
 }

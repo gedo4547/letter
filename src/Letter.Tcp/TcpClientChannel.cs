@@ -13,15 +13,13 @@ namespace Letter.Tcp
         public TcpClientChannel(SchedulerAllocator allocator, MemoryPool<byte> memoryPool, TcpClientOptions options,
             Action<IFilterPipeline<ITcpSession>> handler, SslFeature sslFeature) 
         
-            : base(handler, sslFeature)
+            : base(handler, sslFeature, options)
         {
-            this.options = options;
             this.memoryPool = memoryPool;
             this.schedulerAllocator = allocator;
         }
         
         private Socket connectSocket;
-        private TcpClientOptions options;
         private MemoryPool<byte> memoryPool;
         private SchedulerAllocator schedulerAllocator;
 
@@ -47,7 +45,7 @@ namespace Letter.Tcp
         
         public override Task StopAsync()
         {
-            return Task.CompletedTask;
+            return base.StopAsync();
         }
     }
 }

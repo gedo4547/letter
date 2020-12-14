@@ -15,14 +15,14 @@ namespace Letter.Udp
         {
             this.memoryPool = memoryPool;
             this.schedulerAllocator = allocator;
-            this.options = options;
-            this.filterPipeline = new FilterPipeline<IUdpSession>();
-            if (handler != null) handler(this.filterPipeline);
+            
+            base.ConfigurationSelfOptions(options);
+            base.ConfigurationSelfFilter(handler);
+            this.filterPipeline = base.CreateFilterPipeline();
         }
 
         private Socket socket;
         private UdpSession session;
-        private UdpOptions options;
         private MemoryPool<byte> memoryPool;
         private SchedulerAllocator schedulerAllocator;
         private FilterPipeline<IUdpSession> filterPipeline;
@@ -80,6 +80,7 @@ namespace Letter.Udp
         public async override Task StopAsync()
         {
             await this.session.CloseAsync();
+            await base.StopAsync();
         }
     }
 }

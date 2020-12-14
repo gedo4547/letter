@@ -8,26 +8,41 @@ namespace Letter.IO
         where TOptions : IOptions
     {
         protected TOptions options;
+        protected Action<IFilterPipeline<TSession>> handler;
         
-        public void SettingOptions(TOptions options)
+        public void ConfigurationSelfOptions(TOptions options)
         {
             if (options == null)
-            {
                 throw new ArgumentNullException(nameof(options));
-            }
-            
+
             this.options = options;
         }
 
-        public void AddFilter(IFilter<TSession> filter)
+        public void ConfigurationSelfFilter(Action<IFilterPipeline<TSession>> handler)
         {
-            if (filter == null)
+            if (handler == null)
+                return;
+
+            this.handler += handler;
+        }
+        
+        protected FilterPipeline<TSession> CreateFilterPipeline()
+        {
+            FilterPipeline<TSession> filterPipeline = new FilterPipeline<TSession>();
+            if (this.handler != null)
             {
-                throw new ArgumentNullException(nameof(filter));
+                this.handler(filterPipeline);
             }
-            
+
+            return filterPipeline;
         }
 
-        public abstract Task StopAsync();
+        public virtual Task StopAsync()
+        {
+            this.options = default;
+            this.handler = null;
+
+            return Task.CompletedTask;
+        }
     }
 }

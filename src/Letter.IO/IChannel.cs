@@ -7,9 +7,8 @@ namespace Letter.IO
         where TSession : ISession
         where TOptions : IOptions
     {
-        void SettingOptions(TOptions options);
-        void AddFilter(IFilter<TSession> filter);
-        
+        void ConfigurationSelfOptions(TOptions options);
+        void ConfigurationSelfFilter(Action<IFilterPipeline<TSession>> handler);
         Task StopAsync();
     }
 }

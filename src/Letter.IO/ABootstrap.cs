@@ -13,7 +13,7 @@ namespace Letter.IO
         private Action<TOptions> optionsFactory;
         private Action<IFilterPipeline<TSession>> filterPipelineHandler;
         
-        public void ConfigurationOptions(Action<TOptions> optionsFactory)
+        public void ConfigurationGlobalOptions(Action<TOptions> optionsFactory)
         {
             if (optionsFactory == null)
             {
@@ -23,7 +23,7 @@ namespace Letter.IO
             this.optionsFactory = optionsFactory;
         }
 
-        public void ConfigurationFilter(Action<IFilterPipeline<TSession>> handler)
+        public void ConfigurationGlobalFilter(Action<IFilterPipeline<TSession>> handler)
         {
             if (handler == null)
             {

@@ -13,8 +13,8 @@ namespace udp_text
         static async Task Main(string[] args)
         {
             IUdpBootstrap bootstrap = UdpFactory.Bootstrap();
-            bootstrap.ConfigurationOptions(options => { });
-            bootstrap.ConfigurationFilter((pipeline) =>
+            bootstrap.ConfigurationGlobalOptions(options => { });
+            bootstrap.ConfigurationGlobalFilter((pipeline) =>
             {
                 pipeline.Add(new UdpFilter_2());
             });

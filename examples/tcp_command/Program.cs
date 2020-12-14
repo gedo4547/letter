@@ -16,12 +16,12 @@ namespace tcp_test1
         static async Task Main(string[] args)
         {
             var server_bootstrap = TcpFactory.ServerBootstrap();
-            server_bootstrap.ConfigurationOptions(options =>
+            server_bootstrap.ConfigurationGlobalOptions(options =>
             {
                 
             });
             
-            server_bootstrap.ConfigurationFilter((pipeline) =>
+            server_bootstrap.ConfigurationGlobalFilter((pipeline) =>
             {
                 pipeline.Add(new DefaultFixedHeaderBytesFilter());
                 pipeline.Add(new TcpTestFilter_Server());
@@ -39,12 +39,12 @@ namespace tcp_test1
             await server_bootstrap.BuildAsync();
 
             var client_bootstrap = TcpFactory.ClientBootstrap();
-            client_bootstrap.ConfigurationOptions((options =>
+            client_bootstrap.ConfigurationGlobalOptions((options =>
             {
                 
             }));
 
-            client_bootstrap.ConfigurationFilter((pipeline) =>
+            client_bootstrap.ConfigurationGlobalFilter((pipeline) =>
             {
                 pipeline.Add(new DefaultFixedHeaderBytesFilter());
                 pipeline.Add(new TcpTestFilter_Client());

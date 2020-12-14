@@ -21,8 +21,8 @@ namespace tcp_client
         {
             Console.Title = "client";
             var client_bootstrap = TcpFactory.ClientBootstrap();
-            client_bootstrap.ConfigurationOptions(options => { });
-            client_bootstrap.ConfigurationFilter((pipeline) =>
+            client_bootstrap.ConfigurationGlobalOptions(options => { });
+            client_bootstrap.ConfigurationGlobalFilter((pipeline) =>
             {
                 var filter = new TcpClientFilter();
                 _clientFilters.Add(filter);

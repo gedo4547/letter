@@ -8,8 +8,8 @@ namespace Letter.IO
         where TChannel : IChannel<TSession, TOptions>
         where TSession : ISession
     {
-        void ConfigurationOptions(Action<TOptions> handler);
-        void ConfigurationFilter(Action<IFilterPipeline<TSession>> handler);
+        void ConfigurationGlobalOptions(Action<TOptions> handler);
+        void ConfigurationGlobalFilter(Action<IFilterPipeline<TSession>> handler);
 
         Task BuildAsync();
 

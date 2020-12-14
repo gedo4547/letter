@@ -15,8 +15,8 @@ namespace tcp_server
             Console.Title = "server";
             
             ITcpServerBootstrap server_bootstrap = TcpFactory.ServerBootstrap();
-            server_bootstrap.ConfigurationOptions(options => { });
-            server_bootstrap.ConfigurationFilter((pipeline) =>
+            server_bootstrap.ConfigurationGlobalOptions(options => { });
+            server_bootstrap.ConfigurationGlobalFilter((pipeline) =>
             {
                 pipeline.Add(new DefaultFixedHeaderBytesFilter());
                 pipeline.Add(new TcpServerFilter());
