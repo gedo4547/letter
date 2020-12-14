@@ -1,14 +1,21 @@
-﻿using System.Net;
+﻿using System;
+using System.Net;
 using System.Threading.Tasks;
 using Letter.IO;
+using Letter.Udp;
 
 namespace Letter.Kcp
 {
-    class KcpServerChannel : AChannel<IKcpSession, KcpServerOptions>, IKcpServerChannel
+    class KcpServerChannel : AKcpChannel<KcpServerOptions>, IKcpServerChannel
     {
+        public KcpServerChannel(KcpServerOptions options, IUdpChannel channel, Action<IFilterPipeline<IKcpSession>> handler) 
+            : base(options, channel, handler)
+        {
+        }
+
         public Task StartAsync(EndPoint address)
         {
-            throw new System.NotImplementedException();
+            throw new NotImplementedException();
         }
     }
 }

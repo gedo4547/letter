@@ -6,13 +6,13 @@ using Letter.Udp;
 
 namespace Letter.Kcp
 {
-    class KcpClientChannel : AChannel<IKcpSession, KcpClientOptions>, IKcpClientChannel
+    class KcpClientChannel : AKcpChannel<KcpClientOptions>, IKcpClientChannel
     {
-        public KcpClientChannel(KcpClientOptions options, IUdpChannel udpChannel, Action<IFilterPipeline<IKcpSession>> handler)
+        public KcpClientChannel(KcpClientOptions options, IUdpChannel channel, Action<IFilterPipeline<IKcpSession>> handler) 
+            : base(options, channel, handler)
         {
-            
         }
-        
+
         public Task StartAsync(EndPoint address)
         {
             throw new NotImplementedException();
