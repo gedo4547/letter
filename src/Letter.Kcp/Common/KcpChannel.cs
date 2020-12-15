@@ -7,7 +7,7 @@ using Letter.Udp;
 
 namespace Letter.Kcp
 {
-    sealed class KcpChannel : AChannel<IKcpSession, KcpOptions>, IKcpChannel<KcpOptions>, IFilter<IUdpSession>
+    sealed class KcpChannel : AChannel<IKcpSession, KcpOptions>, IKcpChannel, IFilter<IUdpSession>
     {
         public KcpChannel(KcpOptions options, IUdpChannel channel, Action<IFilterPipeline<IKcpSession>> handler)
         {
