@@ -28,7 +28,7 @@ namespace Letter.IO
         
         protected FilterPipeline<TSession> CreateFilterPipeline()
         {
-            FilterPipeline<TSession> filterPipeline = new FilterPipeline<TSession>();
+            var filterPipeline = new FilterPipeline<TSession>();
             if (this.handler != null)
             {
                 this.handler(filterPipeline);

@@ -3,7 +3,7 @@
 namespace Letter.Kcp
 {
     public interface IKcpBootstrap<TOptions, TChannel> : IBootstrap<TOptions, IKcpSession, TChannel>
-        where TOptions : AKcpOptions, new()
+        where TOptions : KcpOptions, new()
         where TChannel : IKcpChannel<TOptions>
     {
     }

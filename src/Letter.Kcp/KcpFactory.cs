@@ -2,14 +2,8 @@
 {
     public static class KcpFactory
     {
-        public static IKcpClientBootstrap ClientBootstrap()
-        {
-            return default;
-        }
+        public static IKcpClientBootstrap ClientBootstrap() => new KcpClientBootstrap();
 
-        public static IKcpServerBootstrap ServerBootstrap()
-        {
-            return default;
-        }
+        public static IKcpServerBootstrap ServerBootstrap() => new KcpServerBootstrap();
     }
 }

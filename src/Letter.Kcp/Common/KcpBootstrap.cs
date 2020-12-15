@@ -1,22 +1,23 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using Letter.IO;
 using Letter.Udp;
 
 namespace Letter.Kcp
 {
-    abstract class AKcpBootstrap<TOptions, TChannel> : ABootstrap<TOptions, IKcpSession, TChannel>, IKcpBootstrap<TOptions, TChannel>
+    sealed class KcpBootstrap<TOptions, TChannel> : ABootstrap<TOptions, IKcpSession, TChannel>, IKcpBootstrap<TOptions, TChannel>
         where TOptions : KcpOptions, new()
         where TChannel : IKcpChannel<TOptions>
     {
-        public AKcpBootstrap()
+        public KcpBootstrap()
         {
             this.udpBootstrap = UdpFactory.Bootstrap();
             this.udpBootstrap.ConfigurationGlobalOptions(this.OnConfigurationOptions);
             this.udpBootstrap.ConfigurationGlobalFilter(this.OnConfigurationFilter);
         }
-        
-        protected IUdpBootstrap udpBootstrap;
-        
+
+        private IUdpBootstrap udpBootstrap; 
+
         private void OnConfigurationOptions(UdpOptions options)
         {
             options.Order = this.options.Order;
@@ -38,11 +39,17 @@ namespace Letter.Kcp
             await base.BuildAsync();
             await this.udpBootstrap.BuildAsync();
         }
+        
+        protected override Task<TChannel> ChannelFactoryAsync(TOptions options, Action<IFilterPipeline<IKcpSession>> handler)
+        {
+            var channel = this.udpBootstrap.CreateAsync();
+            throw new NotImplementedException();
+        }
 
         public override async ValueTask DisposeAsync()
         {
-            await base.DisposeAsync();
             await this.udpBootstrap.DisposeAsync();
+            await base.DisposeAsync();
         }
     }
 }

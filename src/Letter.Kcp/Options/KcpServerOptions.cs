@@ -1,6 +1,6 @@
 ﻿namespace Letter.Kcp
 {
-    public sealed class KcpServerOptions : AKcpOptions
+    public sealed class KcpServerOptions : KcpOptions
     {
         
     }

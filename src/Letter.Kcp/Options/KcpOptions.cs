@@ -5,7 +5,7 @@ using Letter.IO;
 
 namespace Letter.Kcp
 {
-    public abstract class AKcpOptions : IOptions
+    public class KcpOptions : IOptions
     {
         public int? RcvBufferSize { get; set; }
         public int? SndBufferSize { get; set; }

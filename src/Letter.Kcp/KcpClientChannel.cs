@@ -17,5 +17,10 @@ namespace Letter.Kcp
         {
             throw new NotImplementedException();
         }
+
+        public Task BindAsync(EndPoint address)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
