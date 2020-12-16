@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO.Pipelines;
 using System.Net;
 using System.Threading.Tasks;
@@ -23,6 +24,7 @@ namespace Letter.Kcp
         private IUdpSession session;
         
         private IKcpScheduler scheduler;
+        private Dictionary<int, IKcpSession> sessions = new Dictionary<int, IKcpSession>();
         
         public async Task BindAsync(EndPoint address)
         {
