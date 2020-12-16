@@ -6,9 +6,7 @@ namespace Letter.Kcp
 {
     public interface IKcpChannel : IChannel<IKcpSession, KcpOptions>
     {
-        IKcpSession AddSession();
-
-        bool RemoveSession(int num);
+        IKcpSession CreateSession(EndPoint remoteAddress);
         
         Task BindAsync(EndPoint address);
     }

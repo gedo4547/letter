@@ -2,9 +2,8 @@
 
 namespace Letter.Kcp
 {
-    public interface IKcpBootstrap<TOptions, TChannel> : IBootstrap<TOptions, IKcpSession, TChannel>
-        where TOptions : KcpOptions, new()
-        where TChannel : IKcpChannel<TOptions>
+    public interface IKcpBootstrap : IBootstrap<KcpOptions, IKcpSession, IKcpChannel>
     {
+        void ConfigurationGlobalScheduler(IKcpScheduler scheduler);
     }
 }

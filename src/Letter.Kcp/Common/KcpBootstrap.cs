@@ -5,9 +5,7 @@ using Letter.Udp;
 
 namespace Letter.Kcp
 {
-    sealed class KcpBootstrap<TOptions, TChannel> : ABootstrap<TOptions, IKcpSession, TChannel>, IKcpBootstrap<TOptions, TChannel>
-        where TOptions : KcpOptions, new()
-        where TChannel : IKcpChannel<TOptions>
+    sealed class KcpBootstrap : ABootstrap<KcpOptions, IKcpSession, IKcpChannel>, IKcpBootstrap
     {
         public KcpBootstrap()
         {
@@ -16,7 +14,8 @@ namespace Letter.Kcp
             this.udpBootstrap.ConfigurationGlobalFilter(this.OnConfigurationFilter);
         }
 
-        private IUdpBootstrap udpBootstrap; 
+        private IUdpBootstrap udpBootstrap;
+        private IKcpScheduler scheduler;
 
         private void OnConfigurationOptions(UdpOptions options)
         {
@@ -34,16 +33,26 @@ namespace Letter.Kcp
             pipeline.Add(new DefaultBytesFilter());
         }
         
+        public void ConfigurationGlobalScheduler(IKcpScheduler scheduler)
+        {
+            if (scheduler == null)
+            {
+                throw new ArgumentNullException(nameof(scheduler));
+            }
+            
+            this.scheduler = scheduler;
+        }
+        
         public override async Task BuildAsync()
         {
             await base.BuildAsync();
             await this.udpBootstrap.BuildAsync();
         }
         
-        protected override Task<TChannel> ChannelFactoryAsync(TOptions options, Action<IFilterPipeline<IKcpSession>> handler)
+        protected override async Task<IKcpChannel> ChannelFactoryAsync(KcpOptions options, Action<IFilterPipeline<IKcpSession>> handler)
         {
-            var channel = this.udpBootstrap.CreateAsync();
-            throw new NotImplementedException();
+            var channel = await this.udpBootstrap.CreateAsync();
+            return new KcpChannel(options, channel, this.scheduler, handler); 
         }
 
         public override async ValueTask DisposeAsync()

@@ -9,11 +9,12 @@ namespace Letter.Kcp
 {
     sealed class KcpChannel : AChannel<IKcpSession, KcpOptions>, IKcpChannel, IFilter<IUdpSession>
     {
-        public KcpChannel(KcpOptions options, IUdpChannel channel, Action<IFilterPipeline<IKcpSession>> handler)
+        public KcpChannel(KcpOptions options, IUdpChannel channel, IKcpScheduler scheduler, Action<IFilterPipeline<IKcpSession>> handler)
         {
             base.ConfigurationSelfOptions(options);
             base.ConfigurationSelfFilter(handler);
-            
+
+            this.scheduler = scheduler;
             this.channel = channel;
             this.channel.ConfigurationSelfFilter((pipeline) => { pipeline.Add(this); });
         }
@@ -21,9 +22,19 @@ namespace Letter.Kcp
         private IUdpChannel channel;
         private IUdpSession session;
         
+        private IKcpScheduler scheduler;
+        
         public async Task BindAsync(EndPoint address)
         {
             await this.channel.StartAsync(address);
+        }
+        
+        public IKcpSession CreateSession(EndPoint remoteAddress)
+        {
+            FilterPipeline<IKcpSession> pipeline = base.CreateFilterPipeline();
+            var kcpSession = new KcpSession(remoteAddress, session.LocalAddress, options, session, scheduler, pipeline);
+            
+            return kcpSession;
         }
 
         public void OnTransportActive(IUdpSession session) => this.session = session;

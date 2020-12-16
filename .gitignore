@@ -31,3 +31,5 @@
 /examples/dotnetty_client_test/obj
 /examples/dotnetty_server_test/obj
 /examples/dotnetty_server_test/bin
+/examples/kcp_test/bin
+/examples/kcp_test/obj
