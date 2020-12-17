@@ -17,7 +17,7 @@ namespace Letter.IO
         MemoryPool<byte> MemoryPool { get; }
 
         PipeScheduler Scheduler { get; }
-
+        
         Task CloseAsync();
     }
 }

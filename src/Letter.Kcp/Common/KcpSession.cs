@@ -4,6 +4,7 @@ using System.Buffers.Binary;
 using System.IO.Pipelines;
 using System.Net;
 using System.Net.Sockets.Kcp;
+using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 
 using Letter.IO;
@@ -15,7 +16,7 @@ namespace Letter.Kcp
 {
     sealed class KcpSession : IKcpSession, IKcpCallback, IRentable, IKcpRunnable
     {
-        public KcpSession(EndPoint remoteAddress, EndPoint localAddress, KcpOptions options, IUdpSession udpSession, IKcpScheduler scheduler, FilterPipeline<IKcpSession> pipeline)
+        public KcpSession(uint conv, EndPoint remoteAddress, EndPoint localAddress, KcpOptions options, IUdpSession udpSession, IKcpThread thread, FilterPipeline<IKcpSession> pipeline)
         {
             this.Id = IdGeneratorHelper.GetNextId();
 
@@ -24,26 +25,34 @@ namespace Letter.Kcp
 
             this.Order = options.Order;
             this.udpSession = udpSession;
-            this.kcpScheduler = scheduler;
-            this.pipeline = pipeline;
+            this.thread = thread;
+            this.Pipeline = pipeline;
 
-            this.kcptun = new Kcptun(options.Conv, this, this);
+            this.kcptun = new Kcptun(conv, this, this);
             this.kcptun.SetMtu(options.Mtu);
             this.kcptun.SetNoDelay(options.NoDelay);
             this.kcptun.SetWndSize(options.WndSize);
+            
+            this.thread.Register(this);
         }
         
         public string Id { get; }
         public BinaryOrder Order { get; }
         public EndPoint LocalAddress { get; }
         public EndPoint RemoteAddress { get; }
+        public IFilterPipeline<IKcpSession> Pipeline { get; }
         public PipeScheduler Scheduler => this.udpSession.Scheduler;
         public MemoryPool<byte> MemoryPool => this.udpSession.MemoryPool;
         
         private Kcptun kcptun;
+        
+        private IKcpThread thread;
         private IUdpSession udpSession;
-        private IKcpScheduler kcpScheduler;
-        private FilterPipeline<IKcpSession> pipeline;
+
+        public void ReceiveMessage(ref ReadOnlySequence<byte> buffer)
+        {
+            this.kcptun.Input(buffer.First.ToMemory().Span);
+        }
         
         public void Write(object o)
         {
@@ -74,5 +83,7 @@ namespace Letter.Kcp
         {
             throw new System.NotImplementedException();
         }
+
+        
     }
 }

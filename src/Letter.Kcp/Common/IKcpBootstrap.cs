@@ -4,6 +4,6 @@ namespace Letter.Kcp
 {
     public interface IKcpBootstrap : IBootstrap<KcpOptions, IKcpSession, IKcpChannel>
     {
-        void ConfigurationGlobalScheduler(IKcpScheduler scheduler);
+        void ConfigurationGlobalThread(IKcpThread thread);
     }
 }

@@ -15,7 +15,6 @@ namespace Letter.Kcp
         public MemoryPoolOptions MemoryPoolOptions { get; set; } = new MemoryPoolOptions(4096, 32);
         public int SchedulerCount { get; set; } = Math.Min(Environment.ProcessorCount, 16);
         
-        public uint Conv { get; set; } = 0;
         public NoDelayConfig NoDelay { get; set; } = new NoDelayConfig(1, 10, 2, 1);
         public WndSizeConfig WndSize { get; set; } = new WndSizeConfig(256, 256);
         public int Mtu { get; set; } = 512;

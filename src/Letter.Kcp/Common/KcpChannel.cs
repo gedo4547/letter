@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Buffers;
 using System.Collections.Generic;
 using System.IO.Pipelines;
 using System.Net;
@@ -10,12 +11,12 @@ namespace Letter.Kcp
 {
     sealed class KcpChannel : AChannel<IKcpSession, KcpOptions>, IKcpChannel, IFilter<IUdpSession>
     {
-        public KcpChannel(KcpOptions options, IUdpChannel channel, IKcpScheduler scheduler, Action<IFilterPipeline<IKcpSession>> handler)
+        public KcpChannel(KcpOptions options, IUdpChannel channel, IKcpThread thread, Action<IFilterPipeline<IKcpSession>> handler)
         {
             base.ConfigurationSelfOptions(options);
             base.ConfigurationSelfFilter(handler);
 
-            this.scheduler = scheduler;
+            this.thread = thread;
             this.channel = channel;
             this.channel.ConfigurationSelfFilter((pipeline) => { pipeline.Add(this); });
         }
@@ -23,20 +24,27 @@ namespace Letter.Kcp
         private IUdpChannel channel;
         private IUdpSession session;
         
-        private IKcpScheduler scheduler;
-        private Dictionary<int, IKcpSession> sessions = new Dictionary<int, IKcpSession>();
+        private IKcpThread thread;
+        private Dictionary<uint, KcpSession> sessions = new Dictionary<uint, KcpSession>();
         
         public async Task BindAsync(EndPoint address)
         {
             await this.channel.StartAsync(address);
         }
         
-        public IKcpSession CreateSession(EndPoint remoteAddress)
+        public bool Connect(uint conv, EndPoint remoteAddress)
         {
-            FilterPipeline<IKcpSession> pipeline = base.CreateFilterPipeline();
-            var kcpSession = new KcpSession(remoteAddress, session.LocalAddress, options, session, scheduler, pipeline);
+            if (this.sessions.ContainsKey(conv))
+            {
+                return false;
+            }
             
-            return kcpSession;
+            var localAddress = this.session.LocalAddress;
+            FilterPipeline<IKcpSession> pipeline = base.CreateFilterPipeline();
+            var kcpSession = new KcpSession(conv, remoteAddress, localAddress, options, session, thread, pipeline);
+            this.sessions.Add(conv, kcpSession);
+
+            return true;
         }
 
         public void OnTransportActive(IUdpSession session) => this.session = session;
@@ -49,7 +57,20 @@ namespace Letter.Kcp
 
         public void OnTransportRead(IUdpSession session, ref WrappedReader reader, WrappedArgs args)
         {
-            throw new NotImplementedException();
+            var conv = reader.ReadUInt32();
+            if (!this.sessions.ContainsKey(conv))
+            {
+                return;
+            }
+
+            var kcpSession = this.sessions[conv];
+            if (kcpSession.RemoteAddress != session.RcvAddress)
+            {
+                return;
+            }
+
+            ReadOnlySequence<byte> buffer = reader.ReadBuffer((int)reader.Length);
+            kcpSession.ReceiveMessage(ref buffer);
         }
 
         public void OnTransportWrite(IUdpSession session, ref WrappedWriter writer, WrappedArgs args)

@@ -8,18 +8,18 @@ namespace kcp_test
     {
         static async Task Main(string[] args)
         {
-            KcpDefaultScheduler scheduler = new KcpDefaultScheduler();
+            KcpDefaultThread scheduler = new KcpDefaultThread();
             scheduler.Start();
             
             var bootstrap = KcpFactory.Bootstrap();
             bootstrap.ConfigurationGlobalOptions(options => { });
-            bootstrap.ConfigurationGlobalScheduler(scheduler);
+            bootstrap.ConfigurationGlobalThread(scheduler);
             await bootstrap.BuildAsync();
             
             var channel = await bootstrap.CreateAsync();
             await channel.BindAsync(new IPEndPoint(IPAddress.Any, 20001));
             
-            var session = channel.CreateSession(new IPEndPoint(IPAddress.Any, 20001));
+            channel.Connect(1, new IPEndPoint(IPAddress.Any, 20001));
 
             
             

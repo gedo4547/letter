@@ -15,7 +15,7 @@ namespace Letter.Kcp
         }
 
         private IUdpBootstrap udpBootstrap;
-        private IKcpScheduler scheduler;
+        private IKcpThread thread;
 
         private void OnConfigurationOptions(UdpOptions options)
         {
@@ -33,14 +33,14 @@ namespace Letter.Kcp
             pipeline.Add(new DefaultBytesFilter());
         }
         
-        public void ConfigurationGlobalScheduler(IKcpScheduler scheduler)
+        public void ConfigurationGlobalThread(IKcpThread thread)
         {
-            if (scheduler == null)
+            if (thread == null)
             {
-                throw new ArgumentNullException(nameof(scheduler));
+                throw new ArgumentNullException(nameof(thread));
             }
             
-            this.scheduler = scheduler;
+            this.thread = thread;
         }
         
         public override async Task BuildAsync()
@@ -52,7 +52,7 @@ namespace Letter.Kcp
         protected override async Task<IKcpChannel> ChannelFactoryAsync(KcpOptions options, Action<IFilterPipeline<IKcpSession>> handler)
         {
             var channel = await this.udpBootstrap.CreateAsync();
-            return new KcpChannel(options, channel, this.scheduler, handler); 
+            return new KcpChannel(options, channel, this.thread, handler); 
         }
 
         public override async ValueTask DisposeAsync()

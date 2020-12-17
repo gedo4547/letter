@@ -32,8 +32,7 @@ namespace System
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Memory<byte> ToMemory(this ReadOnlyMemory<byte> memory)
         {
-            var segment = memory.GetBinaryArray();
-            return new Memory<byte>(segment.Array, segment.Offset, segment.Count);
+            return MemoryMarshal.AsMemory(memory);
         }
 
 

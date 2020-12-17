@@ -4,7 +4,7 @@ using System.Threading;
 
 namespace Letter.Kcp
 {
-    public sealed class KcpDefaultScheduler : IKcpScheduler
+    public sealed class KcpDefaultThread : IKcpThread
     {
         private bool isStop = false;
         

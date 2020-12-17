@@ -1,6 +1,6 @@
 ﻿namespace Letter.Kcp
 {
-    public interface IKcpScheduler
+    public interface IKcpThread
     {
         void Start();
         void Stop();
