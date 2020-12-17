@@ -4,7 +4,6 @@ using System.Buffers.Binary;
 using System.IO.Pipelines;
 using System.Net;
 using System.Net.Sockets.Kcp;
-using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 
 using Letter.IO;
@@ -32,8 +31,11 @@ namespace Letter.Kcp
             this.kcptun.SetMtu(options.Mtu);
             this.kcptun.SetNoDelay(options.NoDelay);
             this.kcptun.SetWndSize(options.WndSize);
+            this.kcptun.Interval(options.interval);
             
             this.thread.Register(this);
+
+            var me = this.MemoryPool.Rent();
         }
         
         public string Id { get; }
@@ -52,6 +54,7 @@ namespace Letter.Kcp
         public void ReceiveMessage(ref ReadOnlySequence<byte> buffer)
         {
             this.kcptun.Input(buffer.First.ToMemory().Span);
+            
         }
         
         public void Write(object o)

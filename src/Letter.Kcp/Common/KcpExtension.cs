@@ -4,7 +4,7 @@ using Letter.Kcp;
 
 namespace System
 {
-    static class KcptunExtension
+    static class KcpExtension
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void SetNoDelay(this Kcptun kcp, NoDelayConfig config)

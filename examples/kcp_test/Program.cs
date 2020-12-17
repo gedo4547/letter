@@ -8,12 +8,16 @@ namespace kcp_test
     {
         static async Task Main(string[] args)
         {
-            KcpDefaultThread scheduler = new KcpDefaultThread();
-            scheduler.Start();
+            KcpDefaultThread thread = new KcpDefaultThread();
+            thread.Start();
             
             var bootstrap = KcpFactory.Bootstrap();
+            bootstrap.ConfigurationGlobalThread(thread);
             bootstrap.ConfigurationGlobalOptions(options => { });
-            bootstrap.ConfigurationGlobalThread(scheduler);
+            bootstrap.ConfigurationGlobalFilter((pipeline) =>
+            {
+                
+            });
             await bootstrap.BuildAsync();
             
             var channel = await bootstrap.CreateAsync();
@@ -23,7 +27,7 @@ namespace kcp_test
 
             
             
-            scheduler.Stop();
+            thread.Stop();
         }
     }
 }
