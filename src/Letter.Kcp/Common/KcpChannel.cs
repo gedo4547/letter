@@ -25,7 +25,18 @@ namespace Letter.Kcp
         private IUdpSession session;
         
         private IKcpThread thread;
+        private IChannelRouter router;
         private Dictionary<uint, KcpSession> sessions = new Dictionary<uint, KcpSession>();
+        
+        public void ConfigurationRouter(IChannelRouter router)
+        {
+            if (router == null)
+            {
+                throw new ArgumentNullException(nameof(router));
+            }
+
+            this.router = router;
+        }
         
         public async Task BindAsync(EndPoint address)
         {
