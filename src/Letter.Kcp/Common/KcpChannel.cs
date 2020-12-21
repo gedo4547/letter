@@ -25,17 +25,16 @@ namespace Letter.Kcp
         private IUdpSession session;
         
         private IKcpThread thread;
-        private IChannelRouter router;
-        private Dictionary<uint, KcpSession> sessions = new Dictionary<uint, KcpSession>();
+        private IChannelController controller;
         
-        public void ConfigurationRouter(IChannelRouter router)
+        public void ConfigurationController(IChannelController controller)
         {
-            if (router == null)
+            if (controller == null)
             {
-                throw new ArgumentNullException(nameof(router));
+                throw new ArgumentNullException(nameof(controller));
             }
 
-            this.router = router;
+            this.controller = controller;
         }
         
         public async Task BindAsync(EndPoint address)
@@ -45,17 +44,9 @@ namespace Letter.Kcp
         
         public bool Connect(uint conv, EndPoint remoteAddress)
         {
-            if (this.sessions.ContainsKey(conv))
-            {
-                return false;
-            }
-            
             var localAddress = this.session.LocalAddress;
-            FilterPipeline<IKcpSession> pipeline = base.CreateFilterPipeline();
-            var kcpSession = new KcpSession(conv, remoteAddress, localAddress, options, session, thread, pipeline);
-            this.sessions.Add(conv, kcpSession);
-
-            return true;
+            var pipeline = base.CreateFilterPipeline();
+            return this.controller.RegisterSession(new KcpSession(conv, remoteAddress, localAddress, options, session, thread, pipeline));
         }
 
         public void OnTransportActive(IUdpSession session) => this.session = session;
@@ -63,30 +54,23 @@ namespace Letter.Kcp
 
         public void OnTransportException(IUdpSession session, Exception ex)
         {
-            throw new NotImplementedException();
+            session.CloseAsync().NoAwait();
         }
 
         public void OnTransportRead(IUdpSession session, ref WrappedReader reader, WrappedArgs args)
         {
-            var conv = reader.ReadUInt32();
-            if (!this.sessions.ContainsKey(conv))
-            {
-                return;
-            }
-
-            var kcpSession = this.sessions[conv];
-            if (kcpSession.RemoteAddress != session.RcvAddress)
-            {
-                return;
-            }
-
-            ReadOnlySequence<byte> buffer = reader.ReadBuffer((int)reader.Length);
-            kcpSession.ReceiveMessage(ref buffer);
+            this.controller.OnRcvUdpMessage(session, ref reader, args);
         }
 
         public void OnTransportWrite(IUdpSession session, ref WrappedWriter writer, WrappedArgs args)
         {
-            throw new NotImplementedException();
+            this.controller.OnSndUdpMessage(session, ref writer, args);
+        }
+
+        public override Task StopAsync()
+        {
+            this.controller.Dispose();
+            return base.StopAsync();
         }
     }
 }

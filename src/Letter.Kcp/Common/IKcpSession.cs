@@ -6,10 +6,10 @@ namespace Letter.Kcp
 {
     public interface IKcpSession : ISession
     {
+        uint Conv { get; }
+        
         EndPoint RemoteAddress { get; }
-
-        // IFilterPipeline<IKcpSession> Pipeline { get; }
-
+        
         void Write(object o);
 
         Task FlushAsync();

@@ -6,8 +6,7 @@ namespace Letter.Kcp
 {
     public interface IKcpChannel : IChannel<IKcpSession, KcpOptions>
     {
-        void ConfigurationRouter(IChannelRouter router);
-        
+        void ConfigurationController(IChannelController router);
         
         bool Connect(uint conv, EndPoint remoteAddress);
         
