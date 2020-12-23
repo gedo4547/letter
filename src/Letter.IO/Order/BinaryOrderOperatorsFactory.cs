@@ -1,6 +1,6 @@
 ﻿namespace System.Buffers.Binary
 {
-    static class BinaryOrderOperatorsFactory
+    public static class BinaryOrderOperatorsFactory
     {
         private static IBinaryOrderOperators bigEndian = new OrderOperatorsBigEndianImpl();
         private static IBinaryOrderOperators littleEndian = new OrderOperatorsLittleEndianImpl();

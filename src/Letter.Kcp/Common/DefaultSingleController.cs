@@ -3,7 +3,7 @@ using System.IO.Pipelines;
 using Letter.IO;
 using Letter.Udp;
 
-namespace Letter.Kcp.Common
+namespace Letter.Kcp
 {
     public sealed class DefaultSingleController : IChannelController
     {

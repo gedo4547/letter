@@ -6,36 +6,36 @@ namespace Letter.Kcp
 {
     public sealed class KcpDefaultThread : IKcpThread
     {
-        private bool isStop = false;
+        private volatile bool isStop = false;
         
         private Thread thread;
         private HashSet<IKcpRunnable> runnables = new HashSet<IKcpRunnable>();
         
         public void Start()
         {
-            thread = new Thread(Update);
+            thread = new Thread(this.Update);
             thread.IsBackground = true;
             thread.Start();
         }
 
         public void Register(IKcpRunnable runnable)
         {
-            if (thread == null)
+            if (runnable == null)
             {
-                throw new NullReferenceException("");
+                throw new ArgumentNullException(nameof(runnable));
             }
             
-            runnables.Add(runnable);
+            this.runnables.Add(runnable);
         }
 
         public void Unregister(IKcpRunnable runnable)
         {
             if (thread == null)
             {
-                throw new NullReferenceException("");
+                throw new ArgumentNullException(nameof(runnable));
             }
             
-            runnables.Remove(runnable);
+            this.runnables.Remove(runnable);
         }
         
         private void Update(object state)
@@ -43,9 +43,10 @@ namespace Letter.Kcp
             while (!this.isStop)
             {
                 Thread.Sleep(1);
+                DateTime nowTime = TimeHelpr.GetNowTime();
                 foreach (var item in runnables)
                 {
-                    item.Update();
+                    item.Update(ref nowTime);
                 }
             }
         }
@@ -53,6 +54,7 @@ namespace Letter.Kcp
         public void Stop()
         {
             this.isStop = true;
+            this.runnables.Clear();
         }
     }
 }

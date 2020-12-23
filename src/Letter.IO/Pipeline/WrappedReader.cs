@@ -140,6 +140,112 @@ namespace System.IO.Pipelines
             }
         }
 
+        // [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        // public sbyte PeekInt8()
+        // {
+        //     return (sbyte)this.PeekUInt8();
+        // }
+        //
+        // [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        // public byte PeekUInt8()
+        // {
+        //     var segment = this.PeekBuffer(1);
+        //     var arr = segment.First.GetBinaryArray();
+        //     return arr.Array[arr.Offset];
+        // }
+        //
+        // [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        // public short PeekInt16()
+        // {
+        //     int length = 2;
+        //     var segment = this.PeekBuffer(length);
+        //     
+        //     if (segment.First.Length >= length)
+        //         return this.operators.ReadInt16(segment.First.Span);
+        //     else
+        //     {
+        //         Span<byte> local = stackalloc byte[length];
+        //         segment.CopyTo(local);
+        //         return this.operators.ReadInt16(local);
+        //     }
+        // }
+        //
+        // [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        // public ushort PeekUInt16()
+        // {
+        //     int length = 2;
+        //     var segment = this.PeekBuffer(length);
+        //     if (segment.First.Length >= length)
+        //         return this.operators.ReadUInt16(segment.First.Span);
+        //     else
+        //     {
+        //         Span<byte> local = stackalloc byte[length];
+        //         segment.CopyTo(local);
+        //         return this.operators.ReadUInt16(local);
+        //     }
+        // }
+        //
+        // [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        // public int PeekInt32()
+        // {
+        //     int length = 4;
+        //     var segment = this.PeekBuffer(length);
+        //     if (segment.First.Length >= length)
+        //         return this.operators.ReadInt32(segment.First.Span);
+        //     else
+        //     {
+        //         Span<byte> local = stackalloc byte[length];
+        //         segment.CopyTo(local);
+        //         return this.operators.ReadInt32(local);
+        //     }
+        // }
+        //
+        // [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        // public uint PeekUInt32()
+        // {
+        //     int length = 4;
+        //     var segment = this.PeekBuffer(length);
+        //     if (segment.First.Length >= length)
+        //         return this.operators.ReadUInt32(segment.First.Span);
+        //     else
+        //     {
+        //         Span<byte> local = stackalloc byte[length];
+        //         segment.CopyTo(local);
+        //         return this.operators.ReadUInt32(local);
+        //     }
+        // }
+        //
+        // [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        // public long PeekInt64()
+        // {
+        //     int length = 8;
+        //     var segment = this.PeekBuffer(length);
+        //     
+        //     if (segment.First.Length >= length)
+        //         return this.operators.ReadInt64(segment.First.Span);
+        //     else
+        //     {
+        //         Span<byte> local = stackalloc byte[length];
+        //         segment.CopyTo(local);
+        //         return this.operators.ReadInt64(local);
+        //     }
+        // }
+        //
+        // [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        // public ulong PeekUInt64()
+        // {
+        //     int length = 8;
+        //     var segment = this.PeekBuffer(length);
+        //     if (segment.First.Length >= length)
+        //         return this.operators.ReadUInt64(segment.First.Span);
+        //     else
+        //     {
+        //         Span<byte> local = stackalloc byte[length];
+        //         segment.CopyTo(local);
+        //         return this.operators.ReadUInt64(local);
+        //     }
+        // }
+
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public ReadOnlySequence<byte> ReadBuffer(SequencePosition endPosition)
         {
@@ -157,7 +263,14 @@ namespace System.IO.Pipelines
             return segment;
         }
 
-
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public ReadOnlySequence<byte> PeekBuffer(int length)
+        {
+            var endPos = this.buffer.GetPosition(length, this.buffer.Start);
+            var segment = this.buffer.Slice(buffer.Start, endPos);
+            return segment;
+        }
+        
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool TryFindPosition(byte[] value, out SequencePosition lastPosition)
         {

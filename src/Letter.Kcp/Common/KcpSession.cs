@@ -34,9 +34,8 @@ namespace Letter.Kcp
             this.kcptun.SetWndSize(options.WndSize);
             this.kcptun.Interval(options.interval);
             
+            this.nextTime = TimeHelpr.GetNowTime().AddMilliseconds(options.interval);
             this.thread.Register(this);
-
-            var me = this.MemoryPool.Rent();
         }
         
         public string Id { get; }
@@ -53,14 +52,19 @@ namespace Letter.Kcp
         private IKcpThread thread;
         private IUdpSession udpSession;
 
+        private DateTime nextTime;
+
         public void ReceiveMessage(ref ReadOnlySequence<byte> buffer)
         {
+            var span = buffer.First.ToMemory().Span;
             this.kcptun.Input(buffer.First.ToMemory().Span);
-            
+            this.nextTime = TimeHelpr.GetNowTime();
+            // this.kcptun.Recv()
         }
         
         public void Write(object o)
         {
+            // this.kcptun.Send()
             throw new System.NotImplementedException();
         }
 
@@ -79,9 +83,17 @@ namespace Letter.Kcp
             throw new System.NotImplementedException();
         }
         
-        public void Update()
+        public void Update(ref DateTime nowTime)
         {
-            throw new System.NotImplementedException();
+            if (nowTime < this.nextTime) return;
+            
+            
+            
+            
+            this.kcptun.Update(nowTime);
+
+
+            this.nextTime = this.kcptun.Check(nowTime);
         }
         
         public Task CloseAsync()

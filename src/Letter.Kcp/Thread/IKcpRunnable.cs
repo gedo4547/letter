@@ -1,7 +1,9 @@
-﻿namespace Letter.Kcp
+﻿using System;
+
+namespace Letter.Kcp
 {
     public interface IKcpRunnable
     {
-        void Update();
+        void Update(ref DateTime nowTime);
     }
 }

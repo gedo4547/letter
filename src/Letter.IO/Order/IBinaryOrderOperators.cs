@@ -2,7 +2,7 @@
 
 namespace System.Buffers.Binary
 {
-    interface IBinaryOrderOperators
+    public interface IBinaryOrderOperators
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         short ReadInt16(in ReadOnlySpan<byte> span);
