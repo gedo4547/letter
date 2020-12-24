@@ -33,6 +33,8 @@ namespace Letter.Kcp
             this.kcptun.SetNoDelay(options.NoDelay);
             this.kcptun.SetWndSize(options.WndSize);
             this.kcptun.Interval(options.interval);
+            kcptun.Dispose();
+            this.rcvMemoryOwner = this.MemoryPool.Rent();
             
             this.nextTime = TimeHelpr.GetNowTime().AddMilliseconds(options.interval);
             this.thread.Register(this);
@@ -53,17 +55,46 @@ namespace Letter.Kcp
         private IUdpSession udpSession;
 
         private DateTime nextTime;
+        private IMemoryOwner<byte> rcvMemoryOwner;
 
         public void ReceiveMessage(ref ReadOnlySequence<byte> buffer)
         {
-            var span = buffer.First.ToMemory().Span;
             this.kcptun.Input(buffer.First.ToMemory().Span);
             this.nextTime = TimeHelpr.GetNowTime();
-            // this.kcptun.Recv()
+            
+            while (true)
+            {
+                int n = kcptun.PeekSize();
+                if (n < 0)
+                {
+                    return;
+                }
+                if (n == 0)
+                {
+                    //Reset
+                    return;
+                }
+
+                var span = rcvMemoryOwner.Memory.Span.Slice(0, n);
+                int count = kcptun.Recv(span);
+                if (n != count)
+                {
+                    return;
+                }
+                if (count <= 0)
+                {
+                    return;
+                }
+                
+                // this.lastRecvTime = this.GetService().TimeNow;
+
+                // this.OnRead(this.memoryStream);
+            }
         }
         
         public void Write(object o)
         {
+            WrappedWriter writer = new WrappedWriter();
             // this.kcptun.Send()
             throw new System.NotImplementedException();
         }
@@ -80,19 +111,15 @@ namespace Letter.Kcp
 
         public IMemoryOwner<byte> RentBuffer(int length)
         {
-            throw new System.NotImplementedException();
+            return null;
         }
         
         public void Update(ref DateTime nowTime)
         {
             if (nowTime < this.nextTime) return;
             
-            
-            
-            
             this.kcptun.Update(nowTime);
-
-
+            
             this.nextTime = this.kcptun.Check(nowTime);
         }
         
