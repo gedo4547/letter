@@ -21,7 +21,6 @@ namespace kcp_test
             await bootstrap.BuildAsync();
             
             var channel = await bootstrap.CreateAsync();
-            channel.ConfigurationController(null);
             await channel.BindAsync(new IPEndPoint(IPAddress.Any, 20001));
             
             channel.Connect(1, new IPEndPoint(IPAddress.Any, 20001));

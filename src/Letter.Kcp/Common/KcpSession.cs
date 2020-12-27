@@ -33,8 +33,10 @@ namespace Letter.Kcp
             this.kcptun.SetNoDelay(options.NoDelay);
             this.kcptun.SetWndSize(options.WndSize);
             this.kcptun.Interval(options.interval);
-            kcptun.Dispose();
-            this.rcvMemoryOwner = this.MemoryPool.Rent();
+            this.rcvMemory = new WrappedMemory(this.MemoryPool.Rent());
+            this.sndMemory = new WrappedMemory(this.MemoryPool.Rent());
+            this.readerFlushDelegate = (pos, endPos) => { };
+            this.writerFlushDelegate = this.OnWriterComplete;
             
             this.nextTime = TimeHelpr.GetNowTime().AddMilliseconds(options.interval);
             this.thread.Register(this);
@@ -45,7 +47,7 @@ namespace Letter.Kcp
         public BinaryOrder Order { get; }
         public EndPoint LocalAddress { get; }
         public EndPoint RemoteAddress { get; }
-        public IFilterPipeline<IKcpSession> Pipeline { get; }
+        public FilterPipeline<IKcpSession> Pipeline { get; }
         public PipeScheduler Scheduler => this.udpSession.Scheduler;
         public MemoryPool<byte> MemoryPool => this.udpSession.MemoryPool;
         
@@ -55,7 +57,11 @@ namespace Letter.Kcp
         private IUdpSession udpSession;
 
         private DateTime nextTime;
-        private IMemoryOwner<byte> rcvMemoryOwner;
+
+        private WrappedMemory rcvMemory;
+        private WrappedMemory sndMemory;
+        private ReaderFlushDelegate readerFlushDelegate;
+        private WriterFlushDelegate writerFlushDelegate;
 
         public void ReceiveMessage(ref ReadOnlySequence<byte> buffer)
         {
@@ -64,7 +70,7 @@ namespace Letter.Kcp
             
             while (true)
             {
-                int n = kcptun.PeekSize();
+                int n = this.kcptun.PeekSize();
                 if (n < 0)
                 {
                     return;
@@ -74,9 +80,8 @@ namespace Letter.Kcp
                     //Reset
                     return;
                 }
-
-                var span = rcvMemoryOwner.Memory.Span.Slice(0, n);
-                int count = kcptun.Recv(span);
+                
+                int count = this.kcptun.Recv(this.rcvMemory.GetWritableSpan(n));
                 if (n != count)
                 {
                     return;
@@ -86,29 +91,41 @@ namespace Letter.Kcp
                     return;
                 }
                 
-                // this.lastRecvTime = this.GetService().TimeNow;
-
-                // this.OnRead(this.memoryStream);
+                var sequence = rcvMemory.GetReadableMemory().ToSequence();
+                var reader = new WrappedReader(sequence, this.Order, (pos, endPos) => { });
+                this.Pipeline.OnTransportRead(this, ref reader);
             }
         }
         
         public void Write(object o)
         {
-            WrappedWriter writer = new WrappedWriter();
-            // this.kcptun.Send()
-            throw new System.NotImplementedException();
+            var writer = new WrappedWriter(this.sndMemory, this.Order, this.writerFlushDelegate);
+            this.Pipeline.OnTransportWrite(this, ref writer, o);
         }
 
-        public Task FlushAsync()
+        private void OnWriterComplete(IWrappedWriter writer)
         {
-            throw new System.NotImplementedException();
+            WrappedMemory memory = writer as WrappedMemory;
+            var readableMemory = memory.GetReadableMemory();
+            if (readableMemory.Length < 1)
+            {
+                return;
+            }
+
+            this.kcptun.Send(readableMemory.Span);
+            this.nextTime = TimeHelpr.GetNowTime();
         }
         
         public void Output(IMemoryOwner<byte> buffer, int avalidLength)
         {
-            throw new System.NotImplementedException();
+            
         }
 
+        public ValueTask FlushAsync()
+        {
+            return this.udpSession.FlushAsync();
+        }
+        
         public IMemoryOwner<byte> RentBuffer(int length)
         {
             return null;

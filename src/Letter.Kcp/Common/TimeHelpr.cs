@@ -1,12 +1,11 @@
 ﻿using System;
+using System.Runtime.CompilerServices;
 
 namespace Letter.Kcp
 {
     static class TimeHelpr
     {
-        public static DateTime GetNowTime()
-        {
-            return DateTime.UtcNow;
-        }
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static DateTime GetNowTime() => DateTime.UtcNow;
     }
 }

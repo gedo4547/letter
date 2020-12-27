@@ -34,6 +34,19 @@ namespace System
         {
             return MemoryMarshal.AsMemory(memory);
         }
+        
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static ReadOnlySequence<byte> ToSequence(this Memory<byte> memory)
+        {
+            return new ReadOnlySequence<byte>(memory);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static ReadOnlySequence<byte> ToSequence(this ReadOnlyMemory<byte> memory)
+        {
+            return new ReadOnlySequence<byte>(memory);
+        }
+
 
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

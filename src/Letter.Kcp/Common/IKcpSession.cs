@@ -12,6 +12,6 @@ namespace Letter.Kcp
         
         void Write(object o);
 
-        Task FlushAsync();
+        ValueTask FlushAsync();
     }
 }

@@ -11,7 +11,6 @@ namespace Letter.Kcp
         {
             this.udpBootstrap = UdpFactory.Bootstrap();
             this.udpBootstrap.ConfigurationGlobalOptions(this.OnConfigurationOptions);
-            this.udpBootstrap.ConfigurationGlobalFilter(this.OnConfigurationFilter);
         }
 
         private IUdpBootstrap udpBootstrap;
@@ -27,12 +26,7 @@ namespace Letter.Kcp
             options.SchedulerCount = this.options.SchedulerCount;
             options.MemoryPoolOptions = this.options.MemoryPoolOptions;
         }
-        
-        private void OnConfigurationFilter(IFilterPipeline<IUdpSession> pipeline)
-        {
-            pipeline.Add(new DefaultBytesFilter());
-        }
-        
+
         public void ConfigurationGlobalThread(IKcpThread thread)
         {
             if (thread == null)

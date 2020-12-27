@@ -6,8 +6,6 @@ namespace Letter.Kcp
 {
     public interface IKcpChannel : IChannel<IKcpSession, KcpOptions>
     {
-        void ConfigurationController(IChannelController router);
-        
         bool Connect(uint conv, EndPoint remoteAddress);
         
         Task BindAsync(EndPoint address);

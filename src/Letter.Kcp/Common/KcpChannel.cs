@@ -33,18 +33,9 @@ namespace Letter.Kcp
         private IKcpThread thread;
         private IBinaryOrderOperators binaryOrderOperators;
         
-        private IChannelController controller;
         private Dictionary<uint, KcpSession> sessions = new Dictionary<uint, KcpSession>();
         
-        public void ConfigurationController(IChannelController controller)
-        {
-            if (controller == null)
-            {
-                throw new ArgumentNullException(nameof(controller));
-            }
-
-            this.controller = controller;
-        }
+        
         
         public async Task BindAsync(EndPoint address)
         {
@@ -70,8 +61,6 @@ namespace Letter.Kcp
         {
             
         }
-
-
 
         public void OnTransportActive(IUdpSession session) => this.session = session;
         public void OnTransportInactive(IUdpSession session) => this.session = null;
@@ -103,7 +92,6 @@ namespace Letter.Kcp
 
         public override Task StopAsync()
         {
-            this.controller.Dispose();
             return base.StopAsync();
         }
     }
