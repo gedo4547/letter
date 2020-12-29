@@ -72,6 +72,7 @@ namespace Letter.Kcp
 
         public void OnTransportRead(IUdpSession session, ref WrappedReader reader, WrappedArgs args)
         {
+            Console.WriteLine("udp收到数据");
             var buffer = reader.ReadBuffer((int)reader.Length);
             var convBuffer = buffer.Slice(buffer.Start, 4);
             
@@ -87,7 +88,10 @@ namespace Letter.Kcp
 
         public void OnTransportWrite(IUdpSession session, ref WrappedWriter writer, WrappedArgs args)
         {
-            
+            Console.WriteLine("udp写入数据");
+            WrappedMemory memory = args.Value as WrappedMemory;
+            var readableMemory = memory.GetReadableMemory();
+            writer.Write(readableMemory);
         }
 
         public override Task StopAsync()

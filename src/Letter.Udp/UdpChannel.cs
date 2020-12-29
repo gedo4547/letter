@@ -18,7 +18,6 @@ namespace Letter.Udp
             
             base.ConfigurationSelfOptions(options);
             base.ConfigurationSelfFilter(handler);
-            this.filterPipeline = base.CreateFilterPipeline();
         }
 
         private Socket socket;
@@ -31,6 +30,7 @@ namespace Letter.Udp
         
         public Task StartAsync(EndPoint bindAddress)
         {
+            
             this.Bind(bindAddress);
             
             this.Run();
@@ -72,6 +72,7 @@ namespace Letter.Udp
 
         private void Run()
         {
+            this.filterPipeline = base.CreateFilterPipeline();
             var scheduler = this.schedulerAllocator.Next();
             this.session = new UdpSession(this.socket, options, this.memoryPool, scheduler, filterPipeline);
             session.Start();

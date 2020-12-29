@@ -22,13 +22,14 @@ namespace Letter.IO
         {
             if (handler == null)
                 return;
-
+            // Console.WriteLine("ConfigurationSelfFilter");
             this.handler += handler;
         }
         
         protected FilterPipeline<TSession> CreateFilterPipeline()
         {
             var filterPipeline = new FilterPipeline<TSession>();
+            // Logger.Warn("CreateFilterPipeline>>handler is null >" + (this.handler == null));
             if (this.handler != null)
             {
                 this.handler(filterPipeline);

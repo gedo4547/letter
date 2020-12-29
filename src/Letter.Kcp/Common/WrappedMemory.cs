@@ -7,6 +7,10 @@ namespace Letter.Kcp
 {
     sealed class WrappedMemory : IWrappedWriter
     {
+        public WrappedMemory()
+        {
+        }
+
         public WrappedMemory(IMemoryOwner<byte> memoryOwner)
         {
             this.memoryOwner = memoryOwner;
@@ -14,6 +18,12 @@ namespace Letter.Kcp
 
         private int writedLength = 0;
         private IMemoryOwner<byte> memoryOwner;
+
+        public void SettingMemory(IMemoryOwner<byte> memoryOwner, int writedLength)
+        {
+            this.writedLength = writedLength;
+            this.memoryOwner = memoryOwner;
+        }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public Memory<byte> GetWritableMemory(int length)

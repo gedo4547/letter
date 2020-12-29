@@ -33,13 +33,15 @@ namespace Letter.Kcp
             this.kcptun.SetNoDelay(options.NoDelay);
             this.kcptun.SetWndSize(options.WndSize);
             this.kcptun.Interval(options.interval);
-            this.rcvMemory = new WrappedMemory(this.MemoryPool.Rent());
-            this.sndMemory = new WrappedMemory(this.MemoryPool.Rent());
+            this.readerMemory = new WrappedMemory(this.MemoryPool.Rent());
+            this.writerMemory = new WrappedMemory(this.MemoryPool.Rent());
             this.readerFlushDelegate = (pos, endPos) => { };
             this.writerFlushDelegate = this.OnWriterComplete;
             
             this.nextTime = TimeHelpr.GetNowTime().AddMilliseconds(options.interval);
             this.thread.Register(this);
+            
+            this.Pipeline.OnTransportActive(this);
         }
         
         public string Id { get; }
@@ -52,19 +54,25 @@ namespace Letter.Kcp
         public MemoryPool<byte> MemoryPool => this.udpSession.MemoryPool;
         
         private Kcptun kcptun;
-        
         private IKcpThread thread;
         private IUdpSession udpSession;
-
-        private DateTime nextTime;
-
-        private WrappedMemory rcvMemory;
-        private WrappedMemory sndMemory;
+        
+        private WrappedMemory readerMemory;
+        private WrappedMemory writerMemory;
         private ReaderFlushDelegate readerFlushDelegate;
         private WriterFlushDelegate writerFlushDelegate;
-
+        
+        private DateTime nextTime;
+        private bool isClosed = false;
+        
         public void ReceiveMessage(ref ReadOnlySequence<byte> buffer)
         {
+            if (this.isClosed)
+            {
+                return;
+            }
+
+            Console.WriteLine("收到数据");
             this.kcptun.Input(buffer.First.ToMemory().Span);
             this.nextTime = TimeHelpr.GetNowTime();
             
@@ -81,7 +89,7 @@ namespace Letter.Kcp
                     return;
                 }
                 
-                int count = this.kcptun.Recv(this.rcvMemory.GetWritableSpan(n));
+                int count = this.kcptun.Recv(this.readerMemory.GetWritableSpan(n));
                 if (n != count)
                 {
                     return;
@@ -91,22 +99,25 @@ namespace Letter.Kcp
                     return;
                 }
                 
-                var sequence = rcvMemory.GetReadableMemory().ToSequence();
+                var sequence = readerMemory.GetReadableMemory().ToSequence();
                 var reader = new WrappedReader(sequence, this.Order, (pos, endPos) => { });
                 this.Pipeline.OnTransportRead(this, ref reader);
+                reader.Flush();
             }
         }
         
         public void Write(object o)
         {
-            var writer = new WrappedWriter(this.sndMemory, this.Order, this.writerFlushDelegate);
+            var writer = new WrappedWriter(this.writerMemory, this.Order, this.writerFlushDelegate);
             this.Pipeline.OnTransportWrite(this, ref writer, o);
+            writer.Flush();
         }
 
         private void OnWriterComplete(IWrappedWriter writer)
         {
             WrappedMemory memory = writer as WrappedMemory;
             var readableMemory = memory.GetReadableMemory();
+            Console.WriteLine("kcp数据写入完成》》》》" + readableMemory.Length);
             if (readableMemory.Length < 1)
             {
                 return;
@@ -115,10 +126,14 @@ namespace Letter.Kcp
             this.kcptun.Send(readableMemory.Span);
             this.nextTime = TimeHelpr.GetNowTime();
         }
-        
+
+
+        private WrappedMemory sndMemory = new WrappedMemory();
         public void Output(IMemoryOwner<byte> buffer, int avalidLength)
         {
-            
+            Console.WriteLine("kcp抛出发送事件》长度》" + avalidLength + "      目标：" + this.RemoteAddress.ToString());
+            this.sndMemory.SettingMemory(buffer, avalidLength);
+            this.udpSession.Write(this.RemoteAddress, sndMemory);
         }
 
         public ValueTask FlushAsync()
@@ -144,7 +159,5 @@ namespace Letter.Kcp
         {
             throw new System.NotImplementedException();
         }
-
-        
     }
 }

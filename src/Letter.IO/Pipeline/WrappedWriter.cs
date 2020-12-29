@@ -104,18 +104,18 @@ namespace System.IO.Pipelines
         }
         
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void Write(ref ArraySegment<byte> segment)
+        public void Write(in ArraySegment<byte> segment)
         {
             this.Write(segment.AsSpan());
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void Write(ref Memory<byte> memory)
+        public void Write(in Memory<byte> memory)
         {
             this.Write(memory.Span);
         }
 
-        public void Write(ref ReadOnlyMemory<byte> memory)
+        public void Write(in ReadOnlyMemory<byte> memory)
         {
             this.Write(memory.Span);
         }

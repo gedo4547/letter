@@ -82,6 +82,8 @@ namespace Letter.Udp
         
         public void Start()
         {
+            Console.WriteLine("udp session start");
+            
             this.sndPipeline.ReceiveAsync();
             this.rcvPipeline.ReceiveAsync();
 
