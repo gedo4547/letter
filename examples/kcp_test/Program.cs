@@ -26,16 +26,15 @@ namespace kcp_test
                 pipeline.Add(new KcpFilter_S("server"));
             });
             await s_channel.BindAsync(s_address);
-
+            s_channel.Connect(1, c_address);
+            
+            
             var c_channel = await bootstrap.CreateAsync();
             c_channel.ConfigurationSelfFilter((pipeline) =>
             {
                 pipeline.Add(new KcpFilter_C("client"));
             });
             await c_channel.BindAsync(c_address);
-
-
-            s_channel.Connect(1, c_address);
             c_channel.Connect(1, s_address);
             
 

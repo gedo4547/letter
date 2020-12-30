@@ -38,7 +38,6 @@ namespace kcp_test
 
         public void OnTransportWrite(IKcpSession session, ref WrappedWriter writer, WrappedArgs args)
         {
-            Console.WriteLine("写入数据");
             byte[] bytes = args.Value as byte[];
             writer.Write(bytes);
         }

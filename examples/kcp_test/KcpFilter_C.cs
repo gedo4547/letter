@@ -12,10 +12,12 @@ namespace kcp_test
         public override void OnTransportActive(IKcpSession session)
         {
             base.OnTransportActive(session);
-            
-            byte[] bytes = System.Text.Encoding.UTF8.GetBytes("nihao");
-            session.Write(bytes);
-            session.FlushAsync().NoAwait();
+
+            for (int i = 0; i < 10; i++)
+            {
+                byte[] bytes = System.Text.Encoding.UTF8.GetBytes("nihao" + i.ToString());
+                session.Send(bytes);
+            }
         }
     }
 }

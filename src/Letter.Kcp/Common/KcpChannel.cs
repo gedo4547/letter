@@ -72,25 +72,21 @@ namespace Letter.Kcp
 
         public void OnTransportRead(IUdpSession session, ref WrappedReader reader, WrappedArgs args)
         {
-            Console.WriteLine("udp收到数据");
             var buffer = reader.ReadBuffer((int)reader.Length);
             var convBuffer = buffer.Slice(buffer.Start, 4);
             
             var conv = this.binaryOrderOperators.ReadUInt32(convBuffer.First.Span);
+            // Console.WriteLine("udp收到数据      conv::::::" + conv + "        " + this.sessions.ContainsKey(conv));
             if (!this.sessions.ContainsKey(conv)) return;
 
-            var kcpSession = this.sessions[conv];
-            if (kcpSession.RemoteAddress == session.RcvAddress)
-            {
-                kcpSession.ReceiveMessage(ref buffer);
-            }
+            this.sessions[conv].ReceiveMessage(ref buffer);
         }
 
         public void OnTransportWrite(IUdpSession session, ref WrappedWriter writer, WrappedArgs args)
         {
-            Console.WriteLine("udp写入数据");
             WrappedMemory memory = args.Value as WrappedMemory;
             var readableMemory = memory.GetReadableMemory();
+            // Console.WriteLine("udp写入数据::::::::::::::" + readableMemory.Length);
             writer.Write(readableMemory);
         }
 

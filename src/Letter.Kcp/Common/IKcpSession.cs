@@ -10,8 +10,6 @@ namespace Letter.Kcp
         
         EndPoint RemoteAddress { get; }
         
-        void Write(object o);
-
-        ValueTask FlushAsync();
+        void Send(object o);
     }
 }
