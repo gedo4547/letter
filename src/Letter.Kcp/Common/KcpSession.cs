@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 using Letter.IO;
 using Letter.Udp;
 
-using Kcptun = System.Net.Sockets.Kcp.Kcp;
+using Kcplib = System.Net.Sockets.Kcp.Kcp;
 
 namespace Letter.Kcp
 {
@@ -28,11 +28,11 @@ namespace Letter.Kcp
             this.thread = thread;
             this.Pipeline = pipeline;
 
-            this.kcptun = new Kcptun(conv, this, this);
-            this.kcptun.SetMtu(options.Mtu);
-            this.kcptun.SetNoDelay(options.NoDelay);
-            this.kcptun.SetWndSize(options.WndSize);
-            this.kcptun.Interval(options.interval);
+            this.kcplib = new Kcplib(conv, this, this);
+            this.kcplib.SetMtu(options.Mtu);
+            this.kcplib.SetNoDelay(options.NoDelay);
+            this.kcplib.SetWndSize(options.WndSize);
+            this.kcplib.Interval(options.interval);
             this.readerMemory = new WrappedMemory(this.MemoryPool.Rent());
             this.writerMemory = new WrappedMemory(this.MemoryPool.Rent());
             this.readerFlushDelegate = (pos, endPos) => { };
@@ -53,7 +53,7 @@ namespace Letter.Kcp
         public PipeScheduler Scheduler => this.udpSession.Scheduler;
         public MemoryPool<byte> MemoryPool => this.udpSession.MemoryPool;
         
-        private Kcptun kcptun;
+        private Kcplib kcplib;
         private IKcpThread thread;
         private IUdpSession udpSession;
         
@@ -63,8 +63,20 @@ namespace Letter.Kcp
         private WriterFlushDelegate writerFlushDelegate;
         
         private DateTime nextTime;
-        private bool isClosed = false;
+        private volatile bool isClosed = false;
         private object sync = new object();
+       
+        public void Update(ref DateTime nowTime)
+        {
+            if (nowTime < this.nextTime) return;
+            
+            this.kcplib.Update(nowTime);
+
+            this.ReceiveKcpMessage();
+            
+            this.nextTime = this.kcplib.Check(nowTime);
+        }
+        
         
         public void ReceiveMessage(ref ReadOnlySequence<byte> buffer)
         {
@@ -73,12 +85,21 @@ namespace Letter.Kcp
                 return;
             }
             
-            this.kcptun.Input(buffer.First.ToMemory().Span);
-            this.nextTime = TimeHelpr.GetNowTime();
+            var errorCode = this.kcplib.Input(buffer.First.ToMemory().Span);
+            if (errorCode !=  0)
+            {
+                this.CloseAsync().NoAwait();
+                return;
+            }
             
+            this.nextTime = TimeHelpr.GetNowTime();
+        }
+
+        private void ReceiveKcpMessage()
+        {
             while (true)
             {
-                int n = this.kcptun.PeekSize();
+                int n = this.kcplib.PeekSize();
                 if (n < 0) return;
                 
                 if (n == 0)
@@ -88,7 +109,7 @@ namespace Letter.Kcp
                 }
 
                 // Console.WriteLine("kcp收到数据::::" + n);
-                int count = this.kcptun.Recv(this.readerMemory.GetWritableSpan(n));
+                int count = this.kcplib.Recv(this.readerMemory.GetWritableSpan(n));
                 this.readerMemory.WriterAdvance(count);
                 
                 if (n != count) return;
@@ -96,12 +117,12 @@ namespace Letter.Kcp
 
                 var sequence = readerMemory.GetReadableMemory().ToSequence();
                 // Console.WriteLine("得到kcp处理后的数据::::" + sequence.Length);
-                var reader = new WrappedReader(sequence, this.Order, (pos, endPos) => { });
+                var reader = new WrappedReader(sequence, this.Order, this.readerFlushDelegate);
                 this.Pipeline.OnTransportRead(this, ref reader);
                 reader.Flush();
             }
         }
-        
+
         public void Send(object o)
         {
             lock (sync)
@@ -122,7 +143,7 @@ namespace Letter.Kcp
                 return;
             }
 
-            this.kcptun.Send(readableMemory.Span);
+            this.kcplib.Send(readableMemory.Span);
             this.nextTime = TimeHelpr.GetNowTime();
         }
 
@@ -130,7 +151,7 @@ namespace Letter.Kcp
         private WrappedMemory sndMemory = new WrappedMemory();
         public void Output(IMemoryOwner<byte> buffer, int avalidLength)
         {
-            // Console.WriteLine("kcp抛出发送事件》长度》" + avalidLength + "      目标：" + this.RemoteAddress.ToString());
+            if (avalidLength < 1) return;
             this.sndMemory.SettingMemory(buffer, avalidLength);
             this.udpSession.Write(this.RemoteAddress, sndMemory);
             this.udpSession.FlushAsync().NoAwait();
@@ -140,19 +161,24 @@ namespace Letter.Kcp
         {
             return null;
         }
-        
-        public void Update(ref DateTime nowTime)
-        {
-            if (nowTime < this.nextTime) return;
-            
-            this.kcptun.Update(nowTime);
-            
-            this.nextTime = this.kcptun.Check(nowTime);
-        }
-        
+
         public Task CloseAsync()
         {
-            throw new System.NotImplementedException();
+            if (this.isClosed)
+            {
+                return Task.CompletedTask;
+            }
+
+            this.isClosed = true;
+            this.Pipeline.OnTransportInactive(this);
+            this.thread.Unregister(this);
+            
+            this.kcplib.Dispose();
+            this.kcplib = null;
+            this.readerMemory.Dispose();
+            this.writerMemory.Dispose();
+            
+            return Task.CompletedTask;
         }
     }
 }

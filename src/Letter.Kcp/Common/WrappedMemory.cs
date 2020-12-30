@@ -5,7 +5,7 @@ using System.Runtime.CompilerServices;
 
 namespace Letter.Kcp
 {
-    sealed class WrappedMemory : IWrappedWriter
+    sealed class WrappedMemory : IWrappedWriter, IDisposable
     {
         public WrappedMemory()
         {
@@ -59,6 +59,15 @@ namespace Letter.Kcp
             int length = this.writedLength;
             this.writedLength = 0;
             return this.memoryOwner.Memory.Slice(0, length);
+        }
+
+        public void Dispose()
+        {
+            if (this.memoryOwner != null)
+            {
+                this.memoryOwner.Dispose();
+                this.memoryOwner = null;
+            }
         }
     }
 }

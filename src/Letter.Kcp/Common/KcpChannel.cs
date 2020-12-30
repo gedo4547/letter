@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 using Letter.IO;
 using Letter.Udp;
 
-using Kcptun = System.Net.Sockets.Kcp.Kcp;
+using Kcplib = System.Net.Sockets.Kcp.Kcp;
 
 namespace Letter.Kcp
 {
@@ -19,7 +19,7 @@ namespace Letter.Kcp
             base.ConfigurationSelfOptions(options);
             base.ConfigurationSelfFilter(handler);
             
-            var order = Kcptun.IsLittleEndian ? BinaryOrder.LittleEndian : BinaryOrder.BigEndian;
+            var order = Kcplib.IsLittleEndian ? BinaryOrder.LittleEndian : BinaryOrder.BigEndian;
             this.binaryOrderOperators = BinaryOrderOperatorsFactory.GetOperators(order);
 
             this.thread = thread;
@@ -34,8 +34,6 @@ namespace Letter.Kcp
         private IBinaryOrderOperators binaryOrderOperators;
         
         private Dictionary<uint, KcpSession> sessions = new Dictionary<uint, KcpSession>();
-        
-        
         
         public async Task BindAsync(EndPoint address)
         {
@@ -76,7 +74,6 @@ namespace Letter.Kcp
             var convBuffer = buffer.Slice(buffer.Start, 4);
             
             var conv = this.binaryOrderOperators.ReadUInt32(convBuffer.First.Span);
-            // Console.WriteLine("udp收到数据      conv::::::" + conv + "        " + this.sessions.ContainsKey(conv));
             if (!this.sessions.ContainsKey(conv)) return;
 
             this.sessions[conv].ReceiveMessage(ref buffer);
@@ -86,7 +83,6 @@ namespace Letter.Kcp
         {
             WrappedMemory memory = args.Value as WrappedMemory;
             var readableMemory = memory.GetReadableMemory();
-            // Console.WriteLine("udp写入数据::::::::::::::" + readableMemory.Length);
             writer.Write(readableMemory);
         }
 
