@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Buffers;
 using System.Buffers.Binary;
 using System.Collections.Generic;
 using System.IO.Pipelines;
@@ -12,7 +11,7 @@ using Kcplib = System.Net.Sockets.Kcp.Kcp;
 
 namespace Letter.Kcp
 {
-    sealed class KcpChannel : AChannel<IKcpSession, KcpOptions>, IKcpChannel, IFilter<IUdpSession>
+    sealed class KcpChannel : AChannel<IKcpSession, KcpOptions>, IKcpChannel, IFilter<IUdpSession>, IKcpClosable
     {
         public KcpChannel(KcpOptions options, IUdpChannel channel, IKcpThread thread, Action<IFilterPipeline<IKcpSession>> handler)
         {
@@ -49,15 +48,20 @@ namespace Letter.Kcp
             
             var localAddress = this.session.LocalAddress;
             var pipeline = base.CreateFilterPipeline();
-            var kcpSession = new KcpSession(conv, remoteAddress, localAddress, options, session, thread, pipeline);
+            var kcpSession = new KcpSession(conv, remoteAddress, localAddress, options, session, thread, pipeline, this);
             this.sessions.Add(kcpSession.Conv, kcpSession);
             
             return true;
         }
 
-        public void Close()
+        public void Close(uint conv)
         {
-            
+            if(!this.sessions.ContainsKey(conv))
+            {
+                return;
+            }
+
+            this.sessions.Remove(conv);
         }
 
         public void OnTransportActive(IUdpSession session) => this.session = session;
@@ -66,6 +70,13 @@ namespace Letter.Kcp
         public void OnTransportException(IUdpSession session, Exception ex)
         {
             session.CloseAsync().NoAwait();
+
+            foreach (var item in this.sessions)
+            {
+                item.Value.OnUdpMessageException(ex);
+            }
+
+            this.sessions.Clear();
         }
 
         public void OnTransportRead(IUdpSession session, ref WrappedReader reader, WrappedArgs args)
@@ -74,7 +85,10 @@ namespace Letter.Kcp
             var convBuffer = buffer.Slice(buffer.Start, 4);
             
             var conv = this.binaryOrderOperators.ReadUInt32(convBuffer.First.Span);
-            if (!this.sessions.ContainsKey(conv)) return;
+            if (!this.sessions.ContainsKey(conv)) 
+            {
+                return;
+            }
 
             this.sessions[conv].ReceiveMessage(ref buffer);
         }
@@ -83,6 +97,7 @@ namespace Letter.Kcp
         {
             WrappedMemory memory = args.Value as WrappedMemory;
             var readableMemory = memory.GetReadableMemory();
+
             writer.Write(readableMemory);
         }
 

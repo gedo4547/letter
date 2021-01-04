@@ -15,7 +15,7 @@ namespace Letter.Kcp
 {
     sealed class KcpSession : IKcpSession, IKcpCallback, IRentable, IKcpRunnable
     {
-        public KcpSession(uint conv, EndPoint remoteAddress, EndPoint localAddress, KcpOptions options, IUdpSession udpSession, IKcpThread thread, FilterPipeline<IKcpSession> pipeline)
+        public KcpSession(uint conv, EndPoint remoteAddress, EndPoint localAddress, KcpOptions options, IUdpSession udpSession, IKcpThread thread, FilterPipeline<IKcpSession> pipeline, IKcpClosable closable)
         {
             this.Id = IdGeneratorHelper.GetNextId();
             this.Conv = conv;
@@ -27,6 +27,7 @@ namespace Letter.Kcp
             this.udpSession = udpSession;
             this.thread = thread;
             this.Pipeline = pipeline;
+            this.closable = closable;
 
             this.kcplib = new Kcplib(conv, this, this);
             this.kcplib.SetMtu(options.Mtu);
@@ -56,6 +57,7 @@ namespace Letter.Kcp
         private Kcplib kcplib;
         private IKcpThread thread;
         private IUdpSession udpSession;
+        private IKcpClosable closable;
         
         private WrappedMemory readerMemory;
         private WrappedMemory writerMemory;
@@ -69,7 +71,6 @@ namespace Letter.Kcp
         public void Update(ref DateTime nowTime)
         {
             if (this.isClosed) return;
-
             if (nowTime < this.nextTime) return;
             
             this.kcplib.Update(nowTime);
@@ -128,6 +129,11 @@ namespace Letter.Kcp
         {
             lock (sync)
             {
+                if(this.isClosed)
+                {
+                    return;
+                }
+
                 try
                 {
                     var writer = new WrappedWriter(this.writerMemory, this.Order, this.writerFlushDelegate);
@@ -169,6 +175,11 @@ namespace Letter.Kcp
         {
             return null;
         }
+
+        public void OnUdpMessageException(Exception ex)
+        {
+            this.DeliverException(ex);
+        }
         
         private void DeliverException(Exception ex)
         {
@@ -191,6 +202,8 @@ namespace Letter.Kcp
             this.kcplib = null;
             this.readerMemory.Dispose();
             this.writerMemory.Dispose();
+
+            this.closable.Close(this.Conv);
             
             return Task.CompletedTask;
         }
