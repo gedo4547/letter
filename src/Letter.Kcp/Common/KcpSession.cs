@@ -9,8 +9,6 @@ using System.Threading.Tasks;
 using Letter.IO;
 using Letter.Udp;
 
-using Kcplib = System.Net.Sockets.Kcp.Kcp;
-
 namespace Letter.Kcp
 {
     sealed class KcpSession : IKcpSession, IKcpCallback, IRentable, IKcpRunnable
@@ -18,7 +16,6 @@ namespace Letter.Kcp
         public KcpSession(uint conv, EndPoint remoteAddress, EndPoint localAddress, KcpOptions options, IUdpSession udpSession, IKcpThread thread, FilterPipeline<IKcpSession> pipeline, IKcpClosable closable)
         {
             this.Id = IdGeneratorHelper.GetNextId();
-            this.Conv = conv;
             
             this.LocalAddress = localAddress;
             this.RemoteAddress = remoteAddress;
@@ -29,11 +26,12 @@ namespace Letter.Kcp
             this.Pipeline = pipeline;
             this.closable = closable;
 
-            this.kcplib = new Kcplib(conv, this, this);
+            this.kcplib = new KcpImpl(conv, this, this);
             this.kcplib.SetMtu(options.Mtu);
             this.kcplib.SetNoDelay(options.NoDelay);
             this.kcplib.SetWndSize(options.WndSize);
             this.kcplib.Interval(options.interval);
+
             this.readerMemory = new WrappedMemory(this.MemoryPool.Rent());
             this.writerMemory = new WrappedMemory(this.MemoryPool.Rent());
             this.readerFlushDelegate = (pos, endPos) => { };
@@ -46,7 +44,11 @@ namespace Letter.Kcp
         }
         
         public string Id { get; }
-        public uint Conv { get; }
+        public uint CurrentConv 
+        {
+            get { return this.kcplib.CurrentConv; }
+            set { this.kcplib.CurrentConv = value; }
+        }
         public BinaryOrder Order { get; }
         public EndPoint LocalAddress { get; }
         public EndPoint RemoteAddress { get; }
@@ -54,7 +56,7 @@ namespace Letter.Kcp
         public PipeScheduler Scheduler => this.udpSession.Scheduler;
         public MemoryPool<byte> MemoryPool => this.udpSession.MemoryPool;
         
-        private Kcplib kcplib;
+        private KcpImpl kcplib;
         private IKcpThread thread;
         private IUdpSession udpSession;
         private IKcpClosable closable;
@@ -195,15 +197,17 @@ namespace Letter.Kcp
             }
 
             this.isClosed = true;
-            this.Pipeline.OnTransportInactive(this);
+
             this.thread.Unregister(this);
+            this.Pipeline.OnTransportInactive(this);
             
             this.kcplib.Dispose();
             this.kcplib = null;
+
             this.readerMemory.Dispose();
             this.writerMemory.Dispose();
 
-            this.closable.Close(this.Conv);
+            this.closable.Close(this.CurrentConv);
             
             return Task.CompletedTask;
         }

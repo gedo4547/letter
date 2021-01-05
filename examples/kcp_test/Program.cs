@@ -40,7 +40,11 @@ namespace kcp_test
 
             while (true)
             {
-                System.Threading.Thread.Sleep(1);
+                string str = System.Console.ReadLine();
+                if(str == "s")
+                {
+                    break;
+                }
             }
             
            
