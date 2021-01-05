@@ -8,7 +8,7 @@ namespace Letter.Kcp
 {
     class KcpClientChannel : AKcpChannel<KcpClientOptions>, IKcpClientChannel
     {
-        public KcpClientChannel(KcpClientOptions options, IUdpChannel channel, Action<IFilterPipeline<IKcpSession>> handler) 
+        public KcpClientChannel(KcpClientOptions options, IKcpChannel channel, Action<IFilterPipeline<IKcpSession>> handler) 
             : base(options, channel, handler)
         {
         }

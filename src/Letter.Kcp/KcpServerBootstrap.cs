@@ -6,9 +6,12 @@ namespace Letter.Kcp
 {
     sealed class KcpServerBootstrap : AKcpBootstrap<KcpServerOptions, IKcpServerChannel>, IKcpServerBootstrap
     {
-        protected override Task<IKcpServerChannel> ChannelFactoryAsync(KcpServerOptions options, Action<IFilterPipeline<IKcpSession>> handler)
+        protected override async Task<IKcpServerChannel> ChannelFactoryAsync(KcpServerOptions options, Action<IFilterPipeline<IKcpSession>> handler)
         {
-            return null;
+            var channel = (KcpChannel)await this.kcpBootstrap.CreateAsync();
+            var serverChannel = new KcpServerChannel(options, channel, handler);
+
+            return serverChannel;
         }
     }
 }

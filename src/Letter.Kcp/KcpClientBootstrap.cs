@@ -8,10 +8,10 @@ namespace Letter.Kcp
     {
         protected override async Task<IKcpClientChannel> ChannelFactoryAsync(KcpClientOptions options, Action<IFilterPipeline<IKcpSession>> handler)
         {
-            KcpClientChannel channel = (KcpClientChannel)(await this.kcpBootstrap.CreateAsync());
-
-
-            return null;
+            KcpChannel channel = (KcpChannel)(await this.kcpBootstrap.CreateAsync());
+            KcpClientChannel clientChannel = new KcpClientChannel(options, channel, handler);
+        
+            return clientChannel;
         }
     }
 }
