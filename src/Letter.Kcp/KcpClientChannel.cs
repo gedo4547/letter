@@ -2,7 +2,6 @@
 using System.Net;
 using System.Threading.Tasks;
 using Letter.IO;
-using Letter.Udp;
 
 namespace Letter.Kcp
 {
@@ -13,9 +12,9 @@ namespace Letter.Kcp
         {
         }
 
-        public Task StartAsync(EndPoint address)
+        public async Task StartAsync(EndPoint address)
         {
-            throw new NotImplementedException();
+            await base.channel.BindAsync(new IPEndPoint(IPAddress.IPv6Any, 0));
         }
 
         public Task BindAsync(EndPoint address)

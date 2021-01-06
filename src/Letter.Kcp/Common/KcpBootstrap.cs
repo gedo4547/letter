@@ -13,8 +13,8 @@ namespace Letter.Kcp
             this.udpBootstrap.ConfigurationGlobalOptions(this.OnConfigurationOptions);
         }
 
-        private IUdpBootstrap udpBootstrap;
         private IKcpThread thread;
+        private IUdpBootstrap udpBootstrap;
 
         private void OnConfigurationOptions(UdpOptions options)
         {
@@ -39,6 +39,11 @@ namespace Letter.Kcp
         
         public override async Task BuildAsync()
         {
+            if (this.thread == null)
+            {
+                throw new Exception("The KCP thread must be configured");
+            }
+
             await base.BuildAsync();
             await this.udpBootstrap.BuildAsync();
         }
