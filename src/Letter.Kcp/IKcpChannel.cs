@@ -1,12 +1,13 @@
-﻿using System.Net;
+using System.Net;
 using System.Threading.Tasks;
 using Letter.IO;
 
 namespace Letter.Kcp
 {
-    public interface IKcpChannel<TOptions> : IChannel<IKcpSession, TOptions>
-        where TOptions : IOptions
+    public interface IKcpChannel : IChannel<IKcpSession, KcpOptions>
     {
+        bool Connect(uint conv, EndPoint remoteAddress);
+        
         Task BindAsync(EndPoint address);
     }
 }

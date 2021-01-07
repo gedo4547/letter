@@ -122,9 +122,7 @@ namespace Letter.Kcp
 
             this.session = null;
 
-
             this.sessions.Clear();
-           
         }
     }
 }

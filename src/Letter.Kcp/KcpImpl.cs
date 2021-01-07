@@ -4,8 +4,7 @@ namespace Letter.Kcp
 {
     sealed class KcpImpl : System.Net.Sockets.Kcp.Kcp
     {
-        public KcpImpl(uint conv_, IKcpCallback callback, IRentable rentable = null)
-            : base(conv_, callback, rentable)
+        public KcpImpl(uint conv_, IKcpCallback callback, IRentable rentable) : base(conv_, callback, rentable)
         {
         }
 
