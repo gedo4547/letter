@@ -54,6 +54,7 @@ namespace Letter.Kcp
             this.WriterAdvance(length);
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public Memory<byte> GetReadableMemory()
         {
             int length = this.writedLength;
