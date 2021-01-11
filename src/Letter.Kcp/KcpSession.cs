@@ -47,7 +47,6 @@ namespace Letter.Kcp
         public uint CurrentConv 
         {
             get { return this.kcplib.CurrentConv; }
-            set { this.kcplib.CurrentConv = value; }
         }
         public BinaryOrder Order { get; }
         public EndPoint LocalAddress { get; }
@@ -207,7 +206,7 @@ namespace Letter.Kcp
             this.readerMemory.Dispose();
             this.writerMemory.Dispose();
 
-            this.closable.Close(this.CurrentConv);
+            this.closable.Close(this);
             
             return Task.CompletedTask;
         }

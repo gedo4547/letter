@@ -6,7 +6,7 @@ namespace Letter.Kcp
 {
     public interface IKcpSession : ISession
     {
-        uint CurrentConv { get; set; }
+        uint CurrentConv { get; }
         
         EndPoint RemoteAddress { get; }
         

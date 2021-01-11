@@ -1,7 +1,7 @@
 namespace Letter.Kcp
 {
-    interface IKcpClosable
+    public interface IKcpClosable
     {
-        void Close(uint conv);
+        void Close(IKcpSession session);
     }
 }

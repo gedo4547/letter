@@ -11,7 +11,6 @@ namespace Letter.Kcp
         public uint CurrentConv
         {
             get { return base.conv; }
-            set { base.conv = value; }
         }
     }
 }
