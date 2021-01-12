@@ -43,7 +43,7 @@ namespace tcp_client
             
             for (int i = 0; i < 5000; i++)
             {
-                var c_channel = await client_bootstrap.CreateAsync();
+                var c_channel = await client_bootstrap.CreateChannelAsync();
                 await c_channel.StartAsync(address);
             }
             

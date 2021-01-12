@@ -62,10 +62,10 @@ namespace tcp_test1
 
             await client_bootstrap.BuildAsync();
             
-            var s_channel = await server_bootstrap.CreateAsync();
+            var s_channel = await server_bootstrap.CreateChannelAsync();
             await s_channel.StartAsync(address);
 
-            var c_channel = await client_bootstrap.CreateAsync();
+            var c_channel = await client_bootstrap.CreateChannelAsync();
             await c_channel.StartAsync(address);
 
 

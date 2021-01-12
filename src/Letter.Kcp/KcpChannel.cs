@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Buffers.Binary;
-using System.Collections.Generic;
 using System.IO.Pipelines;
 using System.Net;
 using System.Threading.Tasks;
@@ -31,9 +29,12 @@ namespace Letter.Kcp
         private bool isInvalid = false;
         private AKcpController controller;
 
-        public bool IsActivate => !isInvalid;
+        public bool IsActivate 
+        {
+            get  { return !(isStop || isInvalid); }
+        }
 
-        public void ConfigurationSelfController(AKcpController controller)
+        public TController BindSelfController<TController>(TController controller) where TController : AKcpController
         {
             if (controller == null)
             {
@@ -41,6 +42,9 @@ namespace Letter.Kcp
             }
 
             this.controller = controller;
+            this.controller.SetCreator(this);
+
+            return controller;
         }
 
         public async Task BindAsync(EndPoint address)
@@ -66,6 +70,7 @@ namespace Letter.Kcp
         public void OnTransportException(IUdpSession session, Exception ex)
         {
             this.isInvalid = true;
+
             this.controller.OnUdpException(session, ex);
         }
 

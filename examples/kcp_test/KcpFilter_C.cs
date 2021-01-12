@@ -13,10 +13,10 @@ namespace kcp_test
         {
             base.OnTransportActive(session);
 
-            for (int i = 0; i < 10; i++)
+            for (int i = 0; i < 1; i++)
             {
                 byte[] bytes = System.Text.Encoding.UTF8.GetBytes("nihao" + i.ToString());
-                session.Send(bytes);
+                //session.SafeSendAsync(bytes);
             }
         }
     }

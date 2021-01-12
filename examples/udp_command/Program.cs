@@ -20,10 +20,10 @@ namespace udp_text
             });
             await bootstrap.BuildAsync();
             
-            IUdpChannel s_channel = await bootstrap.CreateAsync();
+            IUdpChannel s_channel = await bootstrap.CreateChannelAsync();
             await s_channel.StartAsync(s_p);
             
-            IUdpChannel c_channel = await bootstrap.CreateAsync();
+            IUdpChannel c_channel = await bootstrap.CreateChannelAsync();
             await c_channel.StartAsync(c_p);
             int count = 0;
             while (true)

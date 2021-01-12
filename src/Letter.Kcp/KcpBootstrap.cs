@@ -50,7 +50,7 @@ namespace Letter.Kcp
         
         protected override async Task<IKcpChannel> ChannelFactoryAsync(KcpOptions options, Action<IFilterPipeline<IKcpSession>> handler)
         {
-            var channel = await this.udpBootstrap.CreateAsync();
+            var channel = await this.udpBootstrap.CreateChannelAsync();
             return new KcpChannel(options, channel, this.thread, handler); 
         }
 

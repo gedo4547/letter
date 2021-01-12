@@ -43,7 +43,7 @@ namespace Letter.IO
             return Task.CompletedTask;
         }
 
-        public Task<TChannel> CreateAsync()
+        public Task<TChannel> CreateChannelAsync()
         {
             return this.ChannelFactoryAsync(this.options, this.filterPipelineHandler);
         }

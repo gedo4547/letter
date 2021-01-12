@@ -1,4 +1,5 @@
 using System;
+using System.Buffers;
 using System.Buffers.Binary;
 using System.ComponentModel;
 using System.IO.Pipelines;
@@ -40,12 +41,12 @@ namespace Letter.Kcp
             }
         }
 
-        protected IBinaryOrderOperators KcpBinaryOrderOperators
+        protected IBinaryOrderOperators OrderOperators
         {
             get  { return this.binaryOrderOperators; }
         }
 
-        public void Close(IKcpSession session) => this.OnKcpSessionClosed(session);
+        public abstract void OnSessionClosed(IKcpSession session);
 
         protected IKcpSession Create(uint conv, EndPoint remoteAddress)
         {
@@ -54,7 +55,24 @@ namespace Letter.Kcp
             return this.creator.Create(conv, remoteAddress, this);
         }
 
-        protected abstract void OnKcpSessionClosed(IKcpSession session);
+
+        protected void SendKcpMessageTo(IKcpSession session, ref ReadOnlySequence<byte> buffer)
+        {
+            var kcpSession = session as KcpSession;
+            kcpSession.InputKcpMessage(ref buffer);
+        }
+
+        protected void SendUdpMessageTo(IKcpSession session, ref ReadOnlySequence<byte> buffer)
+        {
+            var kcpSession = session as KcpSession;
+            kcpSession.InputUdpMessage(ref buffer);
+        }
+
+        protected void SendExceptionTo(IKcpSession session, Exception ex)
+        {
+            var kcpSession = session as KcpSession;
+            kcpSession.OnUdpMessageException(ex);
+        }
 
         public abstract void OnUdpException(IUdpSession session, Exception ex);
         public abstract void OnUdpInput(IUdpSession session, ref WrappedReader reader, WrappedArgs args);
@@ -62,11 +80,7 @@ namespace Letter.Kcp
 
         public virtual void Dispose()
         {
-            if (this.creator != null)
-            {
-                this.creator = null;
-            }
-
+            this.creator = null;
             this.binaryOrderOperators = null;
         }
     }

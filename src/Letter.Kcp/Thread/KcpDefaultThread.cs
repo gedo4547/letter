@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading;
+using System.Collections.Concurrent;
 
 namespace Letter.Kcp
 {
@@ -9,6 +10,9 @@ namespace Letter.Kcp
         private volatile bool isStop = false;
         
         private Thread thread;
+
+        //System.Collections.Concurrent.<string> ts = new System.Collections.Concurrent.ConcurrentBag<string>();
+
         private HashSet<IKcpRunnable> runnables = new HashSet<IKcpRunnable>();
         
         public void Start()
@@ -20,6 +24,8 @@ namespace Letter.Kcp
 
         public void Register(IKcpRunnable runnable)
         {
+            
+            Console.WriteLine("     Register   ");
             if (runnable == null)
             {
                 throw new ArgumentNullException(nameof(runnable));
@@ -30,6 +36,7 @@ namespace Letter.Kcp
 
         public void Unregister(IKcpRunnable runnable)
         {
+            Logger.Error("     Unregister   ");
             if (thread == null)
             {
                 throw new ArgumentNullException(nameof(runnable));
@@ -44,10 +51,18 @@ namespace Letter.Kcp
             {
                 Thread.Sleep(1);
                 DateTime nowTime = TimeHelpr.GetNowTime();
-                foreach (var item in runnables)
+                try
                 {
-                    item.Update(ref nowTime);
+                    foreach (var item in runnables)
+                    {
+                        item.Update(ref nowTime);
+                    }
                 }
+                catch (Exception ex)
+                {
+                    Logger.Error(ex.ToString());
+                }
+             
             }
         }
         

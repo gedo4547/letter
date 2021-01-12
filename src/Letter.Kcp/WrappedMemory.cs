@@ -1,11 +1,10 @@
 using System;
 using System.Buffers;
-using System.IO.Pipelines;
 using System.Runtime.CompilerServices;
 
 namespace Letter.Kcp
 {
-    sealed class WrappedMemory : IWrappedWriter, IDisposable
+    sealed class WrappedMemory : IWrappedMemory, IDisposable
     {
         public WrappedMemory()
         {

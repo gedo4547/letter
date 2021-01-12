@@ -31,7 +31,7 @@ namespace tcp_server
             }
             await server_bootstrap.BuildAsync();
             
-            var s_channel = await server_bootstrap.CreateAsync();
+            var s_channel = await server_bootstrap.CreateChannelAsync();
             await s_channel.StartAsync(address);
 
 

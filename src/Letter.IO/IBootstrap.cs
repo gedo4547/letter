@@ -13,6 +13,6 @@ namespace Letter.IO
 
         Task BuildAsync();
 
-        Task<TChannel> CreateAsync();
+        Task<TChannel> CreateChannelAsync();
     }
 }

@@ -6,7 +6,7 @@ namespace Letter.Kcp
 {
     public interface IKcpChannel : IChannel<IKcpSession, KcpOptions>
     {
-        void ConfigurationSelfController(AKcpController controller);
+        TController BindSelfController<TController>(TController controller) where TController : AKcpController;
 
         Task BindAsync(EndPoint address);
     }

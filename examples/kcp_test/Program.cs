@@ -20,23 +20,26 @@ namespace kcp_test
             bootstrap.ConfigurationGlobalOptions(options => { });
             await bootstrap.BuildAsync();
             
-            //var s_channel = await bootstrap.CreateAsync();
-            //s_channel.ConfigurationSelfFilter((pipeline) =>
-            //{
-            //    pipeline.Add(new KcpFilter_S("server"));
-            //});
-            //await s_channel.BindAsync(s_address);
-            //s_channel.Connect(1, c_address);
+            //server
+            var s_channel = await bootstrap.CreateChannelAsync();
+            s_channel.ConfigurationSelfFilter((pipeline) =>
+            {
+                pipeline.Add(new KcpFilter_S("server"));
+            });
+            var s_controller = s_channel.BindSelfController(new KcpController());
+            await s_channel.BindAsync(s_address);
+
+            //client
+            var c_channel = await bootstrap.CreateChannelAsync();
+            c_channel.ConfigurationSelfFilter((pipeline) =>
+            {
+                pipeline.Add(new KcpFilter_C("client"));
+            });
+            var c_controller = c_channel.BindSelfController(new KcpController());
+            await c_channel.BindAsync(c_address);
             
-            
-            //var c_channel = await bootstrap.CreateAsync();
-            //c_channel.ConfigurationSelfFilter((pipeline) =>
-            //{
-            //    pipeline.Add(new KcpFilter_C("client"));
-            //});
-            //await c_channel.BindAsync(c_address);
-            //c_channel.Connect(1, s_address);
-            
+            s_controller.Connect(1, c_address);
+            c_controller.Connect(1, s_address);
 
             while (true)
             {
@@ -46,8 +49,6 @@ namespace kcp_test
                     break;
                 }
             }
-            
-           
             
             thread.Stop();
         }

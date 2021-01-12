@@ -10,6 +10,8 @@ namespace Letter.Kcp
         
         EndPoint RemoteAddress { get; }
         
-        void Send(object o);
+        void SafeSendAsync(object o);
+
+        void UnsafeSendAsync(EndPoint remoteAddress, object o);
     }
 }

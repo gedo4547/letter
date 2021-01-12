@@ -76,12 +76,12 @@ namespace Letter.Kcp
             
             this.kcplib.Update(nowTime);
 
-            this.ReceiveKcpMessage();
+            this.ReadKcpMessage();
             
             this.nextTime = this.kcplib.Check(nowTime);
         }
         
-        public void ReceiveMessage(ref ReadOnlySequence<byte> buffer)
+        public void InputKcpMessage(ref ReadOnlySequence<byte> buffer)
         {
             if (this.isClosed)
             {
@@ -98,7 +98,14 @@ namespace Letter.Kcp
             this.nextTime = TimeHelpr.GetNowTime();
         }
 
-        private void ReceiveKcpMessage()
+        public void InputUdpMessage(ref ReadOnlySequence<byte> buffer)
+        {
+            var reader = new WrappedReader(buffer, this.Order, this.readerFlushDelegate);
+            this.Pipeline.OnTransportRead(this, ref reader);
+            reader.Flush();
+        }
+
+        private void ReadKcpMessage()
         {
             while (true)
             {
@@ -126,7 +133,7 @@ namespace Letter.Kcp
             }
         }
 
-        public void Send(object o)
+        public void SafeSendAsync(object o)
         {
             lock (sync)
             {
@@ -146,6 +153,17 @@ namespace Letter.Kcp
                     this.DeliverException(e);
                 }
             }
+        }
+
+        public void UnsafeSendAsync(EndPoint remoteAddress, object o)
+        {
+            if(this.isClosed)
+            {
+                return;
+            }
+
+            this.udpSession.Write(remoteAddress, o);
+            this.udpSession.FlushAsync().NoAwait();
         }
 
         private void OnWriterComplete(IWrappedWriter writer)
@@ -206,7 +224,7 @@ namespace Letter.Kcp
             this.readerMemory.Dispose();
             this.writerMemory.Dispose();
 
-            this.closable.Close(this);
+            this.closable.OnSessionClosed(this);
             
             return Task.CompletedTask;
         }
