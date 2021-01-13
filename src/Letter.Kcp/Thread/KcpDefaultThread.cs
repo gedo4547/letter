@@ -11,8 +11,6 @@ namespace Letter.Kcp
         
         private Thread thread;
 
-        //System.Collections.Concurrent.<string> ts = new System.Collections.Concurrent.ConcurrentBag<string>();
-
         private HashSet<IKcpRunnable> runnables = new HashSet<IKcpRunnable>();
         
         public void Start()
@@ -53,9 +51,10 @@ namespace Letter.Kcp
                 DateTime nowTime = TimeHelpr.GetNowTime();
                 try
                 {
-                    foreach (var item in runnables)
+                    var enumerator = this.runnables.GetEnumerator();
+                    while(enumerator.MoveNext())
                     {
-                        item.Update(ref nowTime);
+                        enumerator.Current.Update(ref nowTime);
                     }
                 }
                 catch (Exception ex)
@@ -68,6 +67,7 @@ namespace Letter.Kcp
         
         public void Stop()
         {
+            Console.WriteLine("Stop");
             this.isStop = true;
             this.runnables.Clear();
         }

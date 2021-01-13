@@ -4,7 +4,7 @@ using System.Buffers.Binary;
 using System.ComponentModel;
 using System.IO.Pipelines;
 using System.Net;
-
+using System.Runtime.CompilerServices;
 using Letter.IO;
 using Letter.Udp;
 
@@ -35,7 +35,9 @@ namespace Letter.Kcp
             get 
             {
                 if (this.creator == null)
+                {
                     return false;
+                }
 
                 return this.creator.IsActivate;
             }
@@ -43,6 +45,7 @@ namespace Letter.Kcp
 
         protected IBinaryOrderOperators OrderOperators
         {
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
             get  { return this.binaryOrderOperators; }
         }
 
@@ -50,27 +53,44 @@ namespace Letter.Kcp
 
         protected IKcpSession Create(uint conv, EndPoint remoteAddress)
         {
-            if(this.creator == null)
+            if (this.creator == null)
+            {
                 throw new Exception("Controller is not initialized correctly");
+            }
+
             return this.creator.Create(conv, remoteAddress, this);
         }
-
 
         protected void SendKcpMessageTo(IKcpSession session, ref ReadOnlySequence<byte> buffer)
         {
             var kcpSession = session as KcpSession;
+            if (kcpSession == null)
+            {
+                throw new Exception("Unknown session type");
+            }
+
             kcpSession.InputKcpMessage(ref buffer);
         }
 
         protected void SendUdpMessageTo(IKcpSession session, ref ReadOnlySequence<byte> buffer)
         {
             var kcpSession = session as KcpSession;
+            if (kcpSession == null)
+            {
+                throw new Exception("Unknown session type");
+            }
+
             kcpSession.InputUdpMessage(ref buffer);
         }
 
         protected void SendExceptionTo(IKcpSession session, Exception ex)
         {
             var kcpSession = session as KcpSession;
+            if (kcpSession == null)
+            {
+                throw new Exception("Unknown session type");
+            }
+
             kcpSession.OnUdpMessageException(ex);
         }
 
