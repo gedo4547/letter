@@ -16,7 +16,7 @@ namespace kcp_test
             for (int i = 0; i < 1; i++)
             {
                 byte[] bytes = System.Text.Encoding.UTF8.GetBytes("nihao" + i.ToString());
-                //session.SafeSendAsync(bytes);
+                session.SafeSendAsync(bytes);
             }
         }
     }

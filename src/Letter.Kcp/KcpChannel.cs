@@ -8,22 +8,25 @@ using Letter.Udp;
 
 namespace Letter.Kcp
 {
-    sealed class KcpChannel : AChannel<IKcpSession, KcpOptions>, IKcpChannel, IFilter<IUdpSession>, IKcpSessionCreator
+    delegate void RunnableUnitDelegate(ref DateTime time);
+
+    sealed class KcpChannel : AChannel<IKcpSession, KcpOptions>, IKcpChannel, IFilter<IUdpSession>, IKcpSessionCreator, IKcpRunnable, IChannelUpdateer
     {
-        public KcpChannel(KcpOptions options, IUdpChannel channel, IKcpThread thread, Action<IFilterPipeline<IKcpSession>> handler)
+        public KcpChannel(KcpOptions options, IUdpChannel channel, IKcpScheduler scheduler, Action<IFilterPipeline<IKcpSession>> handler)
         {
             base.ConfigurationSelfOptions(options);
             base.ConfigurationSelfFilter(handler);
             
-            this.thread = thread;
+            this.scheduler = scheduler;
             this.channel = channel;
             this.channel.ConfigurationSelfFilter((pipeline) => { pipeline.Add(this); });
+            this.scheduler.Register(this);
         }
 
         private IUdpChannel channel;
         private IUdpSession session;
         
-        private IKcpThread thread;
+        private IKcpScheduler scheduler;
         
         private bool isStop = false;
         private bool isInvalid = false;
@@ -61,7 +64,7 @@ namespace Letter.Kcp
 
             var localAddress = this.session.LocalAddress;
             var pipeline = base.CreateFilterPipeline();
-            return new KcpSession(conv, remoteAddress, localAddress, options, session, thread, pipeline, closable);
+            return new KcpSession(conv, remoteAddress, localAddress, options, session, this, pipeline, closable);
         }
 
         public void OnTransportActive(IUdpSession session) => this.session = session;
@@ -88,10 +91,43 @@ namespace Letter.Kcp
             this.controller.OnUdpOutput(session, ref writer, args);
         }
 
+        private object sync = new object();
+        private RunnableUnitDelegate runnableUnits;
+
+        public void Register(RunnableUnitDelegate runnableUnit)
+        {
+            lock (sync)
+            {
+                this.runnableUnits += runnableUnit;
+            }
+        }
+
+        public void Unregister(RunnableUnitDelegate runnableUnit)
+        {
+            lock (sync)
+            {
+                this.runnableUnits -= runnableUnit;
+            }
+        }
+
+        public void Update(ref DateTime nowTime)
+        {
+            if (this.runnableUnits != null)
+            {
+                this.runnableUnits(ref nowTime);
+            }
+        }
+
         public override async Task StopAsync()
         {
-            this.isStop = true;
+            if (this.isStop)
+            {
+                return;
+            }
 
+            this.isStop = true;
+            this.runnableUnits = null;
+            this.scheduler.Unregister(this);
             await base.StopAsync();
 
             if(this.channel != null)
@@ -103,5 +139,7 @@ namespace Letter.Kcp
             this.session = null;
             this.controller.Dispose();
         }
+
+        
     }
 }

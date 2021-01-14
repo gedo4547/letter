@@ -11,9 +11,9 @@ using Letter.Udp;
 
 namespace Letter.Kcp
 {
-    sealed class KcpSession : IKcpSession, IKcpCallback, IRentable, IKcpRunnable
+    sealed class KcpSession : IKcpSession, IKcpCallback, IRentable
     {
-        public KcpSession(uint conv, EndPoint remoteAddress, EndPoint localAddress, KcpOptions options, IUdpSession udpSession, IKcpThread thread, FilterPipeline<IKcpSession> pipeline, IKcpClosable closable)
+        public KcpSession(uint conv, EndPoint remoteAddress, EndPoint localAddress, KcpOptions options, IUdpSession udpSession, IChannelUpdateer updateer, FilterPipeline<IKcpSession> pipeline, IKcpClosable closable)
         {
             this.Id = IdGeneratorHelper.GetNextId();
             
@@ -22,7 +22,7 @@ namespace Letter.Kcp
 
             this.Order = options.Order;
             this.udpSession = udpSession;
-            this.thread = thread;
+            this.updateer = updateer;
             this.Pipeline = pipeline;
             this.closable = closable;
 
@@ -38,8 +38,9 @@ namespace Letter.Kcp
             this.writerFlushDelegate = this.OnWriterComplete;
             
             this.nextTime = TimeHelpr.GetNowTime().AddMilliseconds(options.interval);
-            this.thread.Register(this);
-            
+            this.runnableUnitDelegate = this.Update;
+            this.updateer.Register(this.runnableUnitDelegate);
+
             this.Pipeline.OnTransportActive(this);
         }
         
@@ -56,7 +57,7 @@ namespace Letter.Kcp
         public MemoryPool<byte> MemoryPool => this.udpSession.MemoryPool;
         
         private KcpImpl kcplib;
-        private IKcpThread thread;
+        private IChannelUpdateer updateer;
         private IUdpSession udpSession;
         private IKcpClosable closable;
         
@@ -64,12 +65,13 @@ namespace Letter.Kcp
         private WrappedMemory writerMemory;
         private ReaderFlushDelegate readerFlushDelegate;
         private WriterFlushDelegate writerFlushDelegate;
+        private RunnableUnitDelegate runnableUnitDelegate;
         
         private DateTime nextTime;
         private volatile bool isClosed = false;
         private object sync = new object();
        
-        public void Update(ref DateTime nowTime)
+        private void Update(ref DateTime nowTime)
         {
             if (this.isClosed) return;
             if (nowTime < this.nextTime) return;
@@ -215,7 +217,7 @@ namespace Letter.Kcp
 
             this.isClosed = true;
 
-            this.thread.Unregister(this);
+            this.updateer.Unregister(this.runnableUnitDelegate);
             this.Pipeline.OnTransportInactive(this);
             
             this.kcplib.Dispose();

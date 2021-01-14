@@ -12,8 +12,7 @@ namespace kcp_test
         
         static async Task Main(string[] args)
         {
-            KcpDefaultThread thread = new KcpDefaultThread();
-            thread.Start();
+            KcpDefaultScheduler thread = new KcpDefaultScheduler();
             
             var bootstrap = KcpFactory.Bootstrap();
             bootstrap.ConfigurationGlobalThread(thread);

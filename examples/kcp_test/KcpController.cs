@@ -39,16 +39,17 @@ namespace kcp_test
 
         public override void OnUdpInput(IUdpSession session, ref WrappedReader reader, WrappedArgs args)
         {
-            var buffer = reader.ReadBuffer((int)reader.Length);
             //消息类型
-            var messageTypeSpan = buffer.Slice(0, 4).First.Span;
-            var messageType = OrderOperators.ReadInt32(messageTypeSpan);
+            var messageType = reader.ReadInt32();
+
+            var buffer = reader.ReadBuffer((int)reader.Length);
+            
             //频道号
-            var convSpan = buffer.Slice(4, 4).First.Span;
+            var convSpan = buffer.Slice(buffer.Start, 4).First.Span;
             var conv = OrderOperators.ReadUInt32(convSpan);
-
+            
             if (!this.sessions.ContainsKey(conv)) return;
-
+            Logger.Info(">>>>>>>>>>>>conv>"+conv+"  messageType>"+messageType);
             buffer = buffer.Slice(4);
             var kcpSession = this.sessions[conv];
             if(messageType == k_message)

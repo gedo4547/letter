@@ -13,7 +13,7 @@ namespace Letter.Kcp
             this.udpBootstrap.ConfigurationGlobalOptions(this.OnConfigurationOptions);
         }
 
-        private IKcpThread thread;
+        private IKcpScheduler scheduler;
         private IUdpBootstrap udpBootstrap;
 
         private void OnConfigurationOptions(UdpOptions options)
@@ -27,19 +27,19 @@ namespace Letter.Kcp
             options.MemoryPoolOptions = this.options.MemoryPoolOptions;
         }
 
-        public void ConfigurationGlobalThread(IKcpThread thread)
+        public void ConfigurationGlobalThread(IKcpScheduler scheduler)
         {
-            if (thread == null)
+            if (scheduler == null)
             {
-                throw new ArgumentNullException(nameof(thread));
+                throw new ArgumentNullException(nameof(scheduler));
             }
             
-            this.thread = thread;
+            this.scheduler = scheduler;
         }
         
         public override async Task BuildAsync()
         {
-            if (this.thread == null)
+            if (this.scheduler == null)
             {
                 throw new Exception("The KCP thread must be configured");
             }
@@ -51,7 +51,7 @@ namespace Letter.Kcp
         protected override async Task<IKcpChannel> ChannelFactoryAsync(KcpOptions options, Action<IFilterPipeline<IKcpSession>> handler)
         {
             var channel = await this.udpBootstrap.CreateChannelAsync();
-            return new KcpChannel(options, channel, this.thread, handler); 
+            return new KcpChannel(options, channel, this.scheduler, handler); 
         }
 
         public override async ValueTask DisposeAsync()

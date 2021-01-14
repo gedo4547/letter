@@ -1,29 +1,31 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading;
-using System.Collections.Concurrent;
 
 namespace Letter.Kcp
 {
-    public sealed class KcpDefaultThread : IKcpThread
+    public sealed class KcpDefaultScheduler : IKcpScheduler
     {
-        private volatile bool isStop = false;
-        
-        private Thread thread;
-
-        private HashSet<IKcpRunnable> runnables = new HashSet<IKcpRunnable>();
-        
-        public void Start()
+        public KcpDefaultScheduler()
         {
             thread = new Thread(this.Update);
             thread.IsBackground = true;
             thread.Start();
         }
 
+
+        private volatile bool isStop = false;
+        
+        private Thread thread;
+
+        private HashSet<IKcpRunnable> runnables = new HashSet<IKcpRunnable>();
+
         public void Register(IKcpRunnable runnable)
         {
-            
-            Console.WriteLine("     Register   ");
+            if (this.isStop)
+            {
+                throw new Exception("");
+            }
             if (runnable == null)
             {
                 throw new ArgumentNullException(nameof(runnable));
@@ -61,7 +63,6 @@ namespace Letter.Kcp
                 {
                     Logger.Error(ex.ToString());
                 }
-             
             }
         }
         
