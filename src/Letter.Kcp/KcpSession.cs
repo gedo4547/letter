@@ -16,7 +16,7 @@ namespace Letter.Kcp
         public KcpSession(uint conv, EndPoint remoteAddress, EndPoint localAddress, KcpOptions options, IUdpSession udpSession, IChannelUpdateer updateer, FilterPipeline<IKcpSession> pipeline, IKcpClosable closable)
         {
             this.Id = IdGeneratorHelper.GetNextId();
-            
+            this.CurrentConv = conv;
             this.LocalAddress = localAddress;
             this.RemoteAddress = remoteAddress;
 
@@ -45,10 +45,7 @@ namespace Letter.Kcp
         }
         
         public string Id { get; }
-        public uint CurrentConv 
-        {
-            get { return this.kcplib.CurrentConv; }
-        }
+        public uint CurrentConv {get;}
         public BinaryOrder Order { get; }
         public EndPoint LocalAddress { get; }
         public EndPoint RemoteAddress { get; }

@@ -50,7 +50,6 @@ namespace kcp_test
             
             if (!this.sessions.ContainsKey(conv)) return;
             Logger.Info(">>>>>>>>>>>>conv>"+conv+"  messageType>"+messageType);
-            buffer = buffer.Slice(4);
             var kcpSession = this.sessions[conv];
             if(messageType == k_message)
             {

@@ -13,6 +13,7 @@ namespace kcp_test
         static async Task Main(string[] args)
         {
             KcpDefaultScheduler thread = new KcpDefaultScheduler();
+            KcpHelpr.KcpGlobalBinaryOrder = System.Buffers.Binary.BinaryOrder.BigEndian;
             
             var bootstrap = KcpFactory.Bootstrap();
             bootstrap.ConfigurationGlobalThread(thread);
