@@ -6,17 +6,20 @@ namespace Letter.Kcp
 {
     sealed class WrappedMemory : IWrappedMemory, IDisposable
     {
-        public WrappedMemory()
-        {
-        }
-
-        public WrappedMemory(IMemoryOwner<byte> memoryOwner)
+        public WrappedMemory(IMemoryOwner<byte> memoryOwner, MemoryFlag flag) : this(flag)
         {
             this.memoryOwner = memoryOwner;
         }
 
+        public WrappedMemory(MemoryFlag flag)
+        {
+            this.Flag = flag;
+        }
+
         private int writedLength = 0;
         private IMemoryOwner<byte> memoryOwner;
+
+        public MemoryFlag Flag { get; }
 
         public void SettingMemory(IMemoryOwner<byte> memoryOwner, int writedLength)
         {

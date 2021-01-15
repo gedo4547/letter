@@ -26,7 +26,7 @@ namespace kcp_test
             }
 
             var session = base.Create(conv, remoteAddress);
-            this.sessions.Add(session.CurrentConv, session);
+            this.sessions.Add(session.Conv, session);
         }
 
         public override void OnUdpException(IUdpSession session, Exception ex)
@@ -81,12 +81,12 @@ namespace kcp_test
 
         public override void OnSessionClosed(IKcpSession session)
         {
-            if(!this.sessions.ContainsKey(session.CurrentConv))
+            if(!this.sessions.ContainsKey(session.Conv))
             {
                 return;
             }
 
-            this.sessions.Remove(session.CurrentConv);
+            this.sessions.Remove(session.Conv);
         }
 
         public override void Dispose()

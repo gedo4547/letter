@@ -16,7 +16,7 @@ namespace Letter.Kcp
         public KcpSession(uint conv, EndPoint remoteAddress, EndPoint localAddress, KcpOptions options, IUdpSession udpSession, IChannelUpdateer updateer, FilterPipeline<IKcpSession> pipeline, IKcpClosable closable)
         {
             this.Id = IdGeneratorHelper.GetNextId();
-            this.CurrentConv = conv;
+            this.Conv = conv;
             this.LocalAddress = localAddress;
             this.RemoteAddress = remoteAddress;
 
@@ -32,8 +32,8 @@ namespace Letter.Kcp
             this.kcplib.SetWndSize(options.WndSize);
             this.kcplib.Interval(options.interval);
 
-            this.readerMemory = new WrappedMemory(this.MemoryPool.Rent());
-            this.writerMemory = new WrappedMemory(this.MemoryPool.Rent());
+            this.readerMemory = new WrappedMemory(this.MemoryPool.Rent(), MemoryFlag.Kcp);
+            this.writerMemory = new WrappedMemory(this.MemoryPool.Rent(), MemoryFlag.Kcp);
             this.readerFlushDelegate = (pos, endPos) => { };
             this.writerFlushDelegate = this.OnWriterComplete;
             
@@ -45,7 +45,7 @@ namespace Letter.Kcp
         }
         
         public string Id { get; }
-        public uint CurrentConv {get;}
+        public uint Conv {get;}
         public BinaryOrder Order { get; }
         public EndPoint LocalAddress { get; }
         public EndPoint RemoteAddress { get; }
@@ -179,7 +179,7 @@ namespace Letter.Kcp
         }
 
 
-        private WrappedMemory sndMemory = new WrappedMemory();
+        private WrappedMemory sndMemory = new WrappedMemory(MemoryFlag.Kcp);
         public void Output(IMemoryOwner<byte> buffer, int avalidLength)
         {
             if (avalidLength < 1) return;
