@@ -29,10 +29,7 @@ namespace Letter.Udp
             this.sndPipeline = new DgramPipeline(this.MemoryPool, scheduler, OnSndPipelineRead);
 
             this.readerFlushCallback = (startPos, endPos) => { };
-            this.writerFlushCallback = (writer) =>
-            {
-                this.SndPipeWriter.WriterAdvance();
-            };
+            this.writerFlushCallback = (writer) => { };
         }
         
         public string Id { get; }
@@ -207,6 +204,7 @@ namespace Letter.Udp
 
         public ValueTask FlushAsync()
         {
+            this.SndPipeWriter.WriterAdvance();
             this.SndPipeWriter.FlushAsync();
             return default;
         }

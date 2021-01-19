@@ -49,6 +49,11 @@ namespace System.IO.Pipelines
         
         public MemorySegment GetSegment()
         {
+            if (this.awaitWriteSegment != null)
+            {
+                return this.awaitWriteSegment as MemorySegment;
+            }
+
             MemorySegment segment;
             if (!this.segmentStack.TryPop(out segment))
             {

@@ -54,8 +54,8 @@ namespace Letter.Kcp
         public EndPoint LocalAddress { get; }
         public EndPoint RemoteAddress { get; }
         public FilterPipeline<IKcpSession> Pipeline { get; }
-        public PipeScheduler Scheduler => this.udpSession.Scheduler;
-        public MemoryPool<byte> MemoryPool => this.udpSession.MemoryPool;
+        public PipeScheduler Scheduler { get { return this.udpSession.Scheduler; } }
+        public MemoryPool<byte> MemoryPool { get { return this.udpSession.MemoryPool; } }
         
         private KcpImpl kcplib;
         private IEventSubscriber subscriber;

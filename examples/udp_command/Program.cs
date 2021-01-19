@@ -26,23 +26,28 @@ namespace udp_text
             IUdpChannel c_channel = await bootstrap.CreateChannelAsync();
             await c_channel.StartAsync(c_p);
             int count = 0;
+            byte[] com = System.Text.Encoding.UTF8.GetBytes("send::::::::");
             while (true)
             {
                 string str = Console.ReadLine();
                 if (str == "send")
                 {
+                    byte[] countBytes = System.Text.Encoding.UTF8.GetBytes(count.ToString());
+                    M.session.Write(Program.s_p, com);
+                    M.session.Write(Program.s_p, countBytes);
+                    await M.session.FlushAsync();
                     count++;
-                    for (int i = 1; i <= 100; i++)
-                    {
-                        for (int j = 1; j <= 5; j++)
-                        {
-                            string com = $"{count}____{i}______{j}";
-                            var bytes = System.Text.Encoding.UTF8.GetBytes(com);
-                            M.session.Write(Program.s_p, bytes);
-                        }
+                    //for (int i = 1; i <= 100; i++)
+                    //{
+                    //    for (int j = 1; j <= 5; j++)
+                    //    {
+                    //        string com = $"{count}____{i}______{j}";
+                    //        var bytes = System.Text.Encoding.UTF8.GetBytes(com);
+                    //        M.session.Write(Program.s_p, bytes);
+                    //    }
 
-                        await M.session.FlushAsync();
-                    }
+                    //    await M.session.FlushAsync();
+                    //}
                 }
                 else if(str == "c")
                 {
