@@ -29,6 +29,16 @@ namespace kcp_test
             this.sessions.Add(session.Conv, session);
         }
 
+        public override void OnUdpActive(IUdpSession session)
+        {
+            
+        }
+
+        public override void OnUdpInactive(IUdpSession session)
+        {
+            
+        }
+
         public override void OnUdpException(IUdpSession session, Exception ex)
         {
             foreach (var item in this.sessions)
@@ -95,5 +105,7 @@ namespace kcp_test
 
             this.sessions.Clear();
         }
+
+        
     }
 }

@@ -2,7 +2,7 @@ using System;
 
 namespace Letter.Kcp
 {
-    interface IChannelUpdateer
+    interface IEventSubscriber
     {
         void Register(RunnableUnitDelegate runnableUnit);
 

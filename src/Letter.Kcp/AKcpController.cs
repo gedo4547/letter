@@ -5,6 +5,7 @@ using System.ComponentModel;
 using System.IO.Pipelines;
 using System.Net;
 using System.Runtime.CompilerServices;
+
 using Letter.IO;
 using Letter.Udp;
 
@@ -18,11 +19,11 @@ namespace Letter.Kcp
             this.binaryOrderOperators = BinaryOrderOperatorsFactory.GetOperators(order);
         }
 
-        private IKcpSessionCreator creator;
+        private IKcpSessionBuilder creator;
         private IBinaryOrderOperators binaryOrderOperators;
 
         [EditorBrowsable(EditorBrowsableState.Never)]
-        internal void SetCreator(IKcpSessionCreator creator)
+        internal void SetCreator(IKcpSessionBuilder creator)
         {
             if(this.creator != null)
                 throw new Exception("Invalid assignment");
@@ -58,7 +59,7 @@ namespace Letter.Kcp
                 throw new Exception("Controller is not initialized correctly");
             }
 
-            return this.creator.Create(conv, remoteAddress, this);
+            return this.creator.Build(conv, remoteAddress, this);
         }
 
         protected void SendKcpMessageTo(IKcpSession session, ref ReadOnlySequence<byte> buffer)
@@ -94,6 +95,8 @@ namespace Letter.Kcp
             kcpSession.OnUdpMessageException(ex);
         }
 
+        public abstract void OnUdpActive(IUdpSession session);
+        public abstract void OnUdpInactive(IUdpSession session);
         public abstract void OnUdpException(IUdpSession session, Exception ex);
         public abstract void OnUdpInput(IUdpSession session, ref WrappedReader reader, WrappedArgs args);
         public abstract void OnUdpOutput(IUdpSession session, ref WrappedWriter writer, WrappedArgs args);

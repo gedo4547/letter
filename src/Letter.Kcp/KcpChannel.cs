@@ -10,7 +10,7 @@ namespace Letter.Kcp
 {
     delegate void RunnableUnitDelegate(ref DateTime time);
 
-    sealed class KcpChannel : AChannel<IKcpSession, KcpOptions>, IKcpChannel, IFilter<IUdpSession>, IKcpSessionCreator, IKcpRunnable, IChannelUpdateer
+    sealed class KcpChannel : AChannel<IKcpSession, KcpOptions>, IKcpChannel, IFilter<IUdpSession>, IKcpSessionBuilder, IKcpRunnable, IEventSubscriber
     {
         public KcpChannel(KcpOptions options, IUdpChannel channel, IKcpScheduler scheduler, Action<IFilterPipeline<IKcpSession>> handler)
         {
@@ -55,20 +55,33 @@ namespace Letter.Kcp
             await this.channel.StartAsync(address);
         }
 
-        public IKcpSession Create(uint conv, EndPoint remoteAddress, IKcpClosable closable)
+        IKcpSession IKcpSessionBuilder.Build(uint conv, EndPoint remoteAddress, IKcpClosable closable)
         {
             if (this.isStop)
+            {
                 throw new Exception("The channel has stopped working");
+            }
+                
             if (this.isInvalid)
+            {
                 throw new Exception("Channel failure, call the StopAsync method to release the channel");
+            }
 
             var localAddress = this.session.LocalAddress;
             var pipeline = base.CreateFilterPipeline();
             return new KcpSession(conv, remoteAddress, localAddress, options, session, this, pipeline, closable);
         }
 
-        public void OnTransportActive(IUdpSession session) => this.session = session;
-        public void OnTransportInactive(IUdpSession session) => this.session = null;
+        public void OnTransportActive(IUdpSession session)
+        {
+            this.session = session;
+            this.controller.OnUdpActive(session);
+        }
+        public void OnTransportInactive(IUdpSession session)
+        {
+            this.session = null;
+            this.controller.OnUdpInactive(session);
+        }
 
         public void OnTransportException(IUdpSession session, Exception ex)
         {
@@ -139,7 +152,5 @@ namespace Letter.Kcp
             this.session = null;
             this.controller.Dispose();
         }
-
-        
     }
 }

@@ -21,6 +21,8 @@ namespace Letter.Kcp
 
         public MemoryFlag Flag { get; }
 
+        public object Token { get; set; }
+
         public void SettingMemory(IMemoryOwner<byte> memoryOwner, int writedLength)
         {
             this.writedLength = writedLength;

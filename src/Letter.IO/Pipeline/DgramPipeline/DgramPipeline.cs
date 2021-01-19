@@ -8,16 +8,13 @@ namespace System.IO.Pipelines
     {
         private const int FALSE = 0;
         private const int TRUE = 1;
-        
-        private const int INIT_SEGMENT_POOL_SIZE = 8;
 
         public DgramPipeline(MemoryPool<byte> memoryPool, PipeScheduler scheduler, Action rcvCallback)
         {
             this.scheduler = scheduler;
             this.memoryPool = memoryPool;
             this.memoryBlockSize = this.memoryPool.MaxBufferSize;
-            //this.segmentStack = new ConcurrentBufferStack<MemorySegment>(INIT_SEGMENT_POOL_SIZE);
-            this.segmentStack1 = new ConcurrentStack<MemorySegment>();
+            this.segmentStack = new ConcurrentStack<MemorySegment>();
 
             this.rcvCallback = (o) => { rcvCallback(); };
             this.Reader = new DgramPipelineReader(this);
@@ -29,9 +26,7 @@ namespace System.IO.Pipelines
         
         private PipeScheduler scheduler;
         private MemoryPool<byte> memoryPool;
-        // private ConcurrentBufferStack<MemorySegment> segmentStack;
-
-        private ConcurrentStack<MemorySegment> segmentStack1;
+        private ConcurrentStack<MemorySegment> segmentStack;
 
 
         private Action<object> rcvCallback;
@@ -55,9 +50,9 @@ namespace System.IO.Pipelines
         public MemorySegment GetSegment()
         {
             MemorySegment segment;
-            if (!this.segmentStack1.TryPop(out segment))
+            if (!this.segmentStack.TryPop(out segment))
             {
-                segment = new MemorySegment(this.segmentStack1);
+                segment = new MemorySegment(this.segmentStack);
                 segment.SetMemoryBlock(this.memoryPool.Rent());
 
 #if DEBUG
@@ -181,7 +176,7 @@ namespace System.IO.Pipelines
             
             this.memoryPool = null;
             
-            while (this.segmentStack1.TryPop(out var item))
+            while (this.segmentStack.TryPop(out var item))
             {
                 item.Dispose();
 #if DEBUG
@@ -189,7 +184,7 @@ namespace System.IO.Pipelines
 #endif
             }
             
-            this.segmentStack1.Clear();
+            this.segmentStack.Clear();
 
 
 #if DEBUG

@@ -13,7 +13,7 @@ namespace Letter.Kcp
 {
     sealed class KcpSession : IKcpSession, IKcpCallback, IRentable
     {
-        public KcpSession(uint conv, EndPoint remoteAddress, EndPoint localAddress, KcpOptions options, IUdpSession udpSession, IChannelUpdateer updateer, FilterPipeline<IKcpSession> pipeline, IKcpClosable closable)
+        public KcpSession(uint conv, EndPoint remoteAddress, EndPoint localAddress, KcpOptions options, IUdpSession udpSession, IEventSubscriber subscriber, FilterPipeline<IKcpSession> pipeline, IKcpClosable closable)
         {
             this.Id = IdGeneratorHelper.GetNextId();
             this.Conv = conv;
@@ -22,7 +22,7 @@ namespace Letter.Kcp
 
             this.Order = options.Order;
             this.udpSession = udpSession;
-            this.updateer = updateer;
+            this.subscriber = subscriber;
             this.Pipeline = pipeline;
             this.closable = closable;
 
@@ -32,14 +32,18 @@ namespace Letter.Kcp
             this.kcplib.SetWndSize(options.WndSize);
             this.kcplib.Interval(options.interval);
 
-            this.readerMemory = new WrappedMemory(this.MemoryPool.Rent(), MemoryFlag.Kcp);
-            this.writerMemory = new WrappedMemory(this.MemoryPool.Rent(), MemoryFlag.Kcp);
+            this.readerKcpMemory = new WrappedMemory(this.MemoryPool.Rent(), MemoryFlag.Kcp);
+            this.writerKcpMemory = new WrappedMemory(this.MemoryPool.Rent(), MemoryFlag.Kcp);
+
+            this.readerUdpMemory = new WrappedMemory(this.MemoryPool.Rent(), MemoryFlag.Udp);
+            this.writerUdpMemory = new WrappedMemory(this.MemoryPool.Rent(), MemoryFlag.Udp);
+
             this.readerFlushDelegate = (pos, endPos) => { };
             this.writerFlushDelegate = this.OnWriterComplete;
             
             this.nextTime = TimeHelpr.GetNowTime().AddMilliseconds(options.interval);
             this.runnableUnitDelegate = this.Update;
-            this.updateer.Register(this.runnableUnitDelegate);
+            this.subscriber.Register(this.runnableUnitDelegate);
 
             this.Pipeline.OnTransportActive(this);
         }
@@ -54,12 +58,16 @@ namespace Letter.Kcp
         public MemoryPool<byte> MemoryPool => this.udpSession.MemoryPool;
         
         private KcpImpl kcplib;
-        private IChannelUpdateer updateer;
+        private IEventSubscriber subscriber;
         private IUdpSession udpSession;
         private IKcpClosable closable;
         
-        private WrappedMemory readerMemory;
-        private WrappedMemory writerMemory;
+        private WrappedMemory readerKcpMemory;
+        private WrappedMemory writerKcpMemory;
+
+        private WrappedMemory readerUdpMemory;
+        private WrappedMemory writerUdpMemory;
+
         private ReaderFlushDelegate readerFlushDelegate;
         private WriterFlushDelegate writerFlushDelegate;
         private RunnableUnitDelegate runnableUnitDelegate;
@@ -90,6 +98,7 @@ namespace Letter.Kcp
             var errorCode = this.kcplib.Input(buffer.First.ToMemory().Span);
             if (errorCode !=  0)
             {
+                this.DeliverException(new KcpException(errorCode));
                 this.CloseAsync().NoAwait();
                 return;
             }
@@ -111,15 +120,15 @@ namespace Letter.Kcp
                 int size = this.kcplib.PeekSize();
                 if (size <= 0) return;
                 
-                int count = this.kcplib.Recv(this.readerMemory.GetWritableSpan(size));
-                this.readerMemory.WriterAdvance(count);
+                int count = this.kcplib.Recv(this.readerKcpMemory.GetWritableSpan(size));
+                this.readerKcpMemory.WriterAdvance(count);
                 
                 if (size != count) return;
                 if (count <= 0) return;
 
                 try
                 {
-                    var sequence = readerMemory.GetReadableMemory().ToSequence();
+                    var sequence = readerKcpMemory.GetReadableMemory().ToSequence();
                     var reader = new WrappedReader(sequence, this.Order, this.readerFlushDelegate);
                     this.Pipeline.OnTransportRead(this, ref reader);
                     reader.Flush();
@@ -143,7 +152,7 @@ namespace Letter.Kcp
 
                 try
                 {
-                    var writer = new WrappedWriter(this.writerMemory, this.Order, this.writerFlushDelegate);
+                    var writer = new WrappedWriter(this.writerKcpMemory, this.Order, this.writerFlushDelegate);
                     this.Pipeline.OnTransportWrite(this, ref writer, o);
                     writer.Flush();
                 }
@@ -156,28 +165,48 @@ namespace Letter.Kcp
 
         public void UnsafeSendAsync(EndPoint remoteAddress, object o)
         {
-            if(this.isClosed)
+            lock (this.sync)
             {
-                return;
-            }
+                if (this.isClosed)
+                {
+                    return;
+                }
 
-            this.udpSession.Write(remoteAddress, o);
-            this.udpSession.FlushAsync().NoAwait();
+                try
+                {
+                    this.writerUdpMemory.Token = remoteAddress;
+                    var writer = new WrappedWriter(this.writerUdpMemory, this.Order, this.writerFlushDelegate);
+                    this.Pipeline.OnTransportWrite(this, ref writer, o);
+                    writer.Flush();
+                }
+                catch (Exception e)
+                {
+                    this.DeliverException(e);
+                }
+            }
         }
 
         private void OnWriterComplete(IWrappedWriter writer)
         {
             WrappedMemory memory = writer as WrappedMemory;
-            var readableMemory = memory.GetReadableMemory();
-            if (readableMemory.Length < 1)
+            if (memory.Flag == MemoryFlag.Kcp)
             {
-                return;
+                var readableMemory = memory.GetReadableMemory();
+                if (readableMemory.Length < 1)
+                {
+                    return;
+                }
+
+                this.kcplib.Send(readableMemory.Span);
+                this.nextTime = TimeHelpr.GetNowTime();
             }
-
-            this.kcplib.Send(readableMemory.Span);
-            this.nextTime = TimeHelpr.GetNowTime();
+            else if(memory.Flag == MemoryFlag.Udp)
+            {
+                var remoteAddress = memory.Token as EndPoint;
+                this.udpSession.Write(remoteAddress, memory);
+                this.udpSession.FlushAsync().NoAwait();
+            }
         }
-
 
         private WrappedMemory sndMemory = new WrappedMemory(MemoryFlag.Kcp);
         public void Output(IMemoryOwner<byte> buffer, int avalidLength)
@@ -214,14 +243,14 @@ namespace Letter.Kcp
 
             this.isClosed = true;
 
-            this.updateer.Unregister(this.runnableUnitDelegate);
+            this.subscriber.Unregister(this.runnableUnitDelegate);
             this.Pipeline.OnTransportInactive(this);
             
             this.kcplib.Dispose();
             this.kcplib = null;
 
-            this.readerMemory.Dispose();
-            this.writerMemory.Dispose();
+            this.readerKcpMemory.Dispose();
+            this.writerKcpMemory.Dispose();
 
             this.closable.OnSessionClosed(this);
             

@@ -8,6 +8,8 @@ namespace Letter.Kcp
     {
         MemoryFlag Flag { get; }
 
+        object Token { get; set; }
+
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         Memory<byte> GetReadableMemory();
     }
