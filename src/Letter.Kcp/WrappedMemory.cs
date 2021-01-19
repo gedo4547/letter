@@ -62,8 +62,14 @@ namespace Letter.Kcp
         public Memory<byte> GetReadableMemory()
         {
             int length = this.writedLength;
-            this.writedLength = 0;
+            this.Clear();
+
             return this.memoryOwner.Memory.Slice(0, length);
+        }
+
+        public void Clear()
+        {
+            this.writedLength = 0;
         }
 
         public void Dispose()

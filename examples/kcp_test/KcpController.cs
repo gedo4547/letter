@@ -2,6 +2,7 @@
 using System.IO.Pipelines;
 using System.Net;
 using System.Collections.Generic;
+using System.Buffers.Binary;
 
 using Letter.IO;
 using Letter.Kcp;
@@ -47,46 +48,71 @@ namespace kcp_test
             }
         }
 
-        public override void OnUdpInput(IUdpSession session, ref WrappedReader reader, WrappedArgs args)
+        public override void OnUdpMessageInput(IUdpSession session, ref WrappedReader reader, WrappedArgs args)
         {
-            //消息类型
-            var messageType = reader.ReadInt32();
-
+            System.Text.StringBuilder sb = new System.Text.StringBuilder();
             var buffer = reader.ReadBuffer((int)reader.Length);
-            
-            //频道号
-            var convSpan = buffer.Slice(buffer.Start, 4).First.Span;
-            var conv = OrderOperators.ReadUInt32(convSpan);
-            
-            if (!this.sessions.ContainsKey(conv)) return;
-            Logger.Info(">>>>>>>>>>>>conv>"+conv+"  messageType>"+messageType);
-            var kcpSession = this.sessions[conv];
-            if(messageType == k_message)
+            sb.Append("读取频道号：");
+            foreach (var item in buffer.First.Span)
             {
-                base.SendKcpMessageTo(kcpSession, ref buffer);
+                sb.Append(item + ",");
             }
-            else if(messageType == c_message)
-            {
-                base.SendUdpMessageTo(kcpSession, ref buffer);
-            }
+            sb.AppendLine();
+            Logger.Info(sb.ToString());
+
+
+            ////消息类型
+            //var messageType = reader.ReadInt32();
+
+            //var buffer = reader.ReadBuffer((int)reader.Length);
+            
+            ////频道号
+            //var convSpan = buffer.Slice(buffer.Start, 4).First.Span;
+
+         
+
+            ////var conv = KcpHelpr.GetOperators().ReadUInt32(convSpan);
+
+            //var l_op = BinaryOrderOperatorsFactory.GetOperators(BinaryOrder.LittleEndian);
+            //var b_op = BinaryOrderOperatorsFactory.GetOperators(BinaryOrder.BigEndian);
+
+            //var conv = l_op.ReadUInt32(convSpan);
+            //Logger.Info("111111111111111>>>>>>>>>>>>conv>"+conv+"  messageType>"+messageType);
+            //conv = l_op.ReadUInt32(convSpan);
+            //Logger.Info("222222222222222>>>>>>>>>>>>conv>" + conv + "  messageType>" + messageType);
+
+
+            //return;
+            //if (!this.sessions.ContainsKey(conv)) return;
+            
+            //var kcpSession = this.sessions[conv];
+            //if(messageType == k_message)
+            //{
+            //    base.SendKcpMessageTo(kcpSession, ref buffer);
+            //}
+            //else if(messageType == c_message)
+            //{
+            //    base.SendUdpMessageTo(kcpSession, ref buffer);
+            //}
         }
 
-        public override void OnUdpOutput(IUdpSession session, ref WrappedWriter writer, WrappedArgs args)
+        public override void OnUdpMessageOutput(IUdpSession session, ref WrappedWriter writer, WrappedArgs args)
         {
-            switch(args.Value)
+            
+            IWrappedMemory memory = args.Value as IWrappedMemory;
+            Logger.Info("udp message>>>"+memory.Flag);
+            if(memory.Flag == MemoryFlag.Kcp)
+            {
+                //kcp协议
+                writer.Write(k_message);
+            }
+            else if(memory.Flag == MemoryFlag.Udp)
             {
                 //普通udp协议
-                case byte[] udpPack:
-                    writer.Write(c_message);
-                    writer.Write(udpPack);
-                    break;
-
-                //kcp协议
-                case IWrappedMemory wrappedMemory:
-                    writer.Write(k_message);
-                    writer.Write(wrappedMemory.GetReadableMemory());
-                    break;
+                writer.Write(c_message);
             }
+
+            writer.Write(memory.GetReadableMemory());
         }
 
         public override void OnSessionClosed(IKcpSession session)

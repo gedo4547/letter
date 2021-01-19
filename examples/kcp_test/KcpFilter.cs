@@ -38,15 +38,11 @@ namespace kcp_test
 
         public void OnTransportWrite(IKcpSession session, ref WrappedWriter writer, WrappedArgs args)
         {
-            var memory = args.Value as IWrappedMemory;
-            if (memory.Flag == MemoryFlag.Udp)
-            {
-                writer.Write(session.Conv);
-            }
-
             byte[] bytes = args.Value as byte[];
             
             writer.Write(bytes);
+
+            Logger.Info("写入》》》》");
         }
     }
 }

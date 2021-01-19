@@ -105,7 +105,7 @@ namespace Letter.Udp
                     segment = this.RcvPipeWriter.GetSegment();
                     var memory = segment.GetWritableMemory(this.memoryBlockSize);
                     var socketResult = await this.socket.ReceiveAsync(address, memory);
-                    
+                    Logger.Info("udp socket receive:"+socketResult.bytesTransferred);
                     if (socketResult.error != SocketError.Success)
                     {
                         if (!SocketErrorHelper.IsSocketDisabledError(socketResult.error))
@@ -232,7 +232,7 @@ namespace Letter.Udp
                         EndPoint address = (EndPoint) segment.Token;
                         ReadOnlySequence<byte> sequence = new ReadOnlySequence<byte>(memory);
                         SocketResult socketResult = await this.socket.SendAsync(address, sequence);
-                        
+                        Logger.Info("udp socket send："+socketResult.bytesTransferred);
                         if (socketResult.error != SocketError.Success)
                         {
                             if (!SocketErrorHelper.IsSocketDisabledError(socketResult.error))

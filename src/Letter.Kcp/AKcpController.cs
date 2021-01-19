@@ -15,8 +15,8 @@ namespace Letter.Kcp
     {
         public AKcpController()
         {
-            var order = KcpHelpr.KcpGlobalBinaryOrder;
-            this.binaryOrderOperators = BinaryOrderOperatorsFactory.GetOperators(order);
+            var order = KcpHelpr.GetKcpBinaryOrder();
+            this.binaryOrderOperators = KcpHelpr.GetOperators();
         }
 
         private IKcpSessionBuilder creator;
@@ -98,8 +98,8 @@ namespace Letter.Kcp
         public abstract void OnUdpActive(IUdpSession session);
         public abstract void OnUdpInactive(IUdpSession session);
         public abstract void OnUdpException(IUdpSession session, Exception ex);
-        public abstract void OnUdpInput(IUdpSession session, ref WrappedReader reader, WrappedArgs args);
-        public abstract void OnUdpOutput(IUdpSession session, ref WrappedWriter writer, WrappedArgs args);
+        public abstract void OnUdpMessageInput(IUdpSession session, ref WrappedReader reader, WrappedArgs args);
+        public abstract void OnUdpMessageOutput(IUdpSession session, ref WrappedWriter writer, WrappedArgs args);
 
         public virtual void Dispose()
         {

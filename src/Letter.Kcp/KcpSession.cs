@@ -108,7 +108,8 @@ namespace Letter.Kcp
 
         public void InputUdpMessage(ref ReadOnlySequence<byte> buffer)
         {
-            var reader = new WrappedReader(buffer, this.Order, this.readerFlushDelegate);
+            var udpBuffer = buffer.Slice(buffer.GetPosition(4));
+            var reader = new WrappedReader(udpBuffer, this.Order, this.readerFlushDelegate);
             this.Pipeline.OnTransportRead(this, ref reader);
             reader.Flush();
         }
@@ -174,8 +175,27 @@ namespace Letter.Kcp
 
                 try
                 {
+                    this.writerUdpMemory.Clear();
                     this.writerUdpMemory.Token = remoteAddress;
+
+                    var span = this.writerUdpMemory.GetWritableSpan(4);
+                    KcpHelpr.GetOperators().WriteUInt32(span, this.Conv);
+
+                    System.Text.StringBuilder sb = new System.Text.StringBuilder();
+
+                    sb.Append("写入频道号：");
+                    foreach (var item in span)
+                    {
+                        sb.Append(item + ",");
+                    }
+                    sb.AppendLine();
+                    Logger.Info(sb.ToString());
+
+
+                    writerUdpMemory.WriterAdvance(4);
+
                     var writer = new WrappedWriter(this.writerUdpMemory, this.Order, this.writerFlushDelegate);
+
                     this.Pipeline.OnTransportWrite(this, ref writer, o);
                     writer.Flush();
                 }
@@ -189,6 +209,8 @@ namespace Letter.Kcp
         private void OnWriterComplete(IWrappedWriter writer)
         {
             WrappedMemory memory = writer as WrappedMemory;
+
+            Logger.Info(">>>>>>>>>>>>>>"+memory.Flag);
             if (memory.Flag == MemoryFlag.Kcp)
             {
                 var readableMemory = memory.GetReadableMemory();

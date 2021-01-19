@@ -5,16 +5,22 @@ namespace Letter.Kcp
 {
     public static class KcpHelpr
     {
-        public static BinaryOrder KcpGlobalBinaryOrder
+        private static IBinaryOrderOperators orderOperators = BinaryOrderOperatorsFactory.GetOperators(GetKcpBinaryOrder());
+
+        public static void SettingKcpBinaryOrder(BinaryOrder order)
         {
-            get
-            {
-                return Kcplib.IsLittleEndian ? BinaryOrder.LittleEndian : BinaryOrder.BigEndian;
-            }
-            set
-            {
-                Kcplib.IsLittleEndian = (value == BinaryOrder.LittleEndian);
-            }
+            Kcplib.IsLittleEndian = (order == BinaryOrder.LittleEndian);
+            orderOperators = BinaryOrderOperatorsFactory.GetOperators(order);
+        }
+
+        public static BinaryOrder GetKcpBinaryOrder()
+        {
+            return Kcplib.IsLittleEndian ? BinaryOrder.LittleEndian : BinaryOrder.BigEndian;
+        }
+
+        public static IBinaryOrderOperators GetOperators()
+        {
+            return orderOperators;
         }
     }
 }

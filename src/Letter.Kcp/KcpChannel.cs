@@ -92,16 +92,17 @@ namespace Letter.Kcp
 
         public void OnTransportRead(IUdpSession session, ref WrappedReader reader, WrappedArgs args)
         {
+            Logger.Info("channel rcv:::"+reader.Length);
             if(this.isInvalid || this.isStop) return;
 
-            this.controller.OnUdpInput(session, ref reader, args);
+            this.controller.OnUdpMessageInput(session, ref reader, args);
         }
 
         public void OnTransportWrite(IUdpSession session, ref WrappedWriter writer, WrappedArgs args)
         {
             if(this.isInvalid || this.isStop) return;
 
-            this.controller.OnUdpOutput(session, ref writer, args);
+            this.controller.OnUdpMessageOutput(session, ref writer, args);
         }
 
         private object sync = new object();

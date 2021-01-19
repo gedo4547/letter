@@ -6,14 +6,14 @@ namespace kcp_test
 {
     class Program
     {
-        private static EndPoint s_address = new IPEndPoint(IPAddress.Loopback, 20001);
+        public static EndPoint s_address = new IPEndPoint(IPAddress.Loopback, 20001);
         private static EndPoint c_address = new IPEndPoint(IPAddress.Loopback, 20002);
         
         
         static async Task Main(string[] args)
         {
             KcpDefaultScheduler thread = new KcpDefaultScheduler();
-            KcpHelpr.KcpGlobalBinaryOrder = System.Buffers.Binary.BinaryOrder.BigEndian;
+            KcpHelpr.SettingKcpBinaryOrder(System.Buffers.Binary.BinaryOrder.BigEndian);
             
             var bootstrap = KcpFactory.Bootstrap();
             bootstrap.ConfigurationGlobalThread(thread);
