@@ -41,8 +41,6 @@ namespace kcp_test
             byte[] bytes = args.Value as byte[];
             
             writer.Write(bytes);
-
-            Logger.Info("写入》》》》");
         }
     }
 }

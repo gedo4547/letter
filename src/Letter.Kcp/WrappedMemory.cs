@@ -17,7 +17,7 @@ namespace Letter.Kcp
         }
 
         private int writedLength = 0;
-        private IMemoryOwner<byte> memoryOwner;
+        public IMemoryOwner<byte> memoryOwner;
 
         public MemoryFlag Flag { get; }
 
@@ -34,7 +34,7 @@ namespace Letter.Kcp
         {
             if (this.memoryOwner.Memory.Length < length)
                 throw new ArgumentOutOfRangeException();
-            return this.memoryOwner.Memory.Slice(0, length);
+            return this.memoryOwner.Memory.Slice(this.writedLength, length);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

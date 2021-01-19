@@ -13,14 +13,19 @@ namespace kcp_test
         {
             base.OnTransportActive(session);
 
-            // for (int i = 0; i < 1; i++)
-            // {
-            //     byte[] bytes = System.Text.Encoding.UTF8.GetBytes("nihao" + i.ToString());
-            //     session.SafeSendAsync(bytes);
-            // }
+            int count = 10;
+            for (int i = 0; i < count; i++)
+            {
+                byte[] bytes = System.Text.Encoding.UTF8.GetBytes("kcp>>>>>>>>>>nihao_" + i.ToString());
+                session.SafeSendAsync(bytes);
+            }
 
-            byte[] udpBytes = System.Text.Encoding.UTF8.GetBytes("udp>>>>>>>>>>>nihao");
-            session.UnsafeSendAsync(Program.s_address, udpBytes);
+            for (int i = 0; i < count; i++)
+            {
+                byte[] bytes = System.Text.Encoding.UTF8.GetBytes("udp>>>>>>>>>>nihao_" + i.ToString());
+                session.UnsafeSendAsync(Program.s_address, bytes);
+            }
+           
         }
     }
 }

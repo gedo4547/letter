@@ -92,7 +92,6 @@ namespace Letter.Kcp
 
         public void OnTransportRead(IUdpSession session, ref WrappedReader reader, WrappedArgs args)
         {
-            Logger.Info("channel rcv:::"+reader.Length);
             if(this.isInvalid || this.isStop) return;
 
             this.controller.OnUdpMessageInput(session, ref reader, args);

@@ -50,57 +50,29 @@ namespace kcp_test
 
         public override void OnUdpMessageInput(IUdpSession session, ref WrappedReader reader, WrappedArgs args)
         {
-            System.Text.StringBuilder sb = new System.Text.StringBuilder();
+            //消息类型
+            var messageType = reader.ReadInt32();
             var buffer = reader.ReadBuffer((int)reader.Length);
-            sb.Append("读取频道号：");
-            foreach (var item in buffer.First.Span)
+            //频道号
+            var convSpan = buffer.Slice(buffer.Start, 4).First.Span;
+            var conv = KcpHelpr.GetOperators().ReadUInt32(convSpan);
+            if (!this.sessions.ContainsKey(conv)) return;
+            
+            var kcpSession = this.sessions[conv];
+            if(messageType == k_message)
             {
-                sb.Append(item + ",");
+               base.SendKcpMessageTo(kcpSession, ref buffer);
             }
-            sb.AppendLine();
-            Logger.Info(sb.ToString());
-
-
-            ////消息类型
-            //var messageType = reader.ReadInt32();
-
-            //var buffer = reader.ReadBuffer((int)reader.Length);
-            
-            ////频道号
-            //var convSpan = buffer.Slice(buffer.Start, 4).First.Span;
-
-         
-
-            ////var conv = KcpHelpr.GetOperators().ReadUInt32(convSpan);
-
-            //var l_op = BinaryOrderOperatorsFactory.GetOperators(BinaryOrder.LittleEndian);
-            //var b_op = BinaryOrderOperatorsFactory.GetOperators(BinaryOrder.BigEndian);
-
-            //var conv = l_op.ReadUInt32(convSpan);
-            //Logger.Info("111111111111111>>>>>>>>>>>>conv>"+conv+"  messageType>"+messageType);
-            //conv = l_op.ReadUInt32(convSpan);
-            //Logger.Info("222222222222222>>>>>>>>>>>>conv>" + conv + "  messageType>" + messageType);
-
-
-            //return;
-            //if (!this.sessions.ContainsKey(conv)) return;
-            
-            //var kcpSession = this.sessions[conv];
-            //if(messageType == k_message)
-            //{
-            //    base.SendKcpMessageTo(kcpSession, ref buffer);
-            //}
-            //else if(messageType == c_message)
-            //{
-            //    base.SendUdpMessageTo(kcpSession, ref buffer);
-            //}
+            else if(messageType == c_message)
+            {
+               base.SendUdpMessageTo(kcpSession, ref buffer);
+            }
         }
 
         public override void OnUdpMessageOutput(IUdpSession session, ref WrappedWriter writer, WrappedArgs args)
         {
             
             IWrappedMemory memory = args.Value as IWrappedMemory;
-            Logger.Info("udp message>>>"+memory.Flag);
             if(memory.Flag == MemoryFlag.Kcp)
             {
                 //kcp协议
