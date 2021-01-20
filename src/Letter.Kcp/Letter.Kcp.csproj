@@ -29,10 +29,6 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <PackageReference Include="Kcp" Version="2.1.0" />
-    </ItemGroup>
-
-    <ItemGroup>
       <ProjectReference Include="..\Letter.Udp\Letter.Udp.csproj" />
     </ItemGroup>
 

@@ -2,7 +2,6 @@
 using System.IO.Pipelines;
 using System.Net;
 using System.Collections.Generic;
-using System.Buffers.Binary;
 
 using Letter.IO;
 using Letter.Kcp;

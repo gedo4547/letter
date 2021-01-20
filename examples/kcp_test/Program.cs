@@ -37,10 +37,14 @@ namespace kcp_test
             });
             var c_controller = c_channel.BindSelfController(new KcpController());
             await c_channel.BindAsync(c_address);
-            
-            s_controller.Connect(1, c_address);
-            c_controller.Connect(1, s_address);
 
+            for (int i = 0; i < 1000; i++)
+            {
+                s_controller.Connect((uint)i, c_address);
+                c_controller.Connect((uint)i, s_address);
+            }
+
+            byte[] bytes = System.Text.Encoding.UTF8.GetBytes("你好");
             while (true)
             {
                 string str = System.Console.ReadLine();
@@ -48,6 +52,18 @@ namespace kcp_test
                 {
                     break;
                 }
+
+                if (str == "")
+                {
+                    var sessions = M.sessions;
+                    for (int i = 0; i < sessions.Count; i++)
+                    {
+                        var session = sessions[i];
+                        //session.UnsafeSendAsync(s_address, bytes);
+                        session.SafeSendAsync(bytes);
+                    }
+                }
+
             }
             
             thread.Stop();

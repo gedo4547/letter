@@ -32,10 +32,14 @@ namespace udp_text
                 string str = Console.ReadLine();
                 if (str == "send")
                 {
-                    byte[] countBytes = System.Text.Encoding.UTF8.GetBytes(count.ToString());
-                    M.session.Write(Program.s_p, com);
-                    M.session.Write(Program.s_p, countBytes);
-                    await M.session.FlushAsync();
+                    for (int i = 0; i < 1000; i++)
+                    {
+                        byte[] countBytes = System.Text.Encoding.UTF8.GetBytes($"{count}___{i}");
+                        M.session.Write(Program.s_p, com);
+                        M.session.Write(Program.s_p, countBytes);
+                        await M.session.FlushAsync();
+                    }
+                    
                     count++;
                     //for (int i = 1; i <= 100; i++)
                     //{
