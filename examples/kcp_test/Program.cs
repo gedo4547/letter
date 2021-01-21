@@ -12,6 +12,7 @@ namespace kcp_test
         
         static async Task Main(string[] args)
         {
+            //System.Array.Copy
             KcpDefaultScheduler thread = new KcpDefaultScheduler();
             KcpHelpr.SettingKcpBinaryOrder(System.Buffers.Binary.BinaryOrder.BigEndian);
             

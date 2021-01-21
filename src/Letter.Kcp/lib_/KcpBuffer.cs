@@ -5,7 +5,7 @@ using System.Text;
 
 namespace KcpProject
 {
-    class ByteBuffer : ICloneable
+    class KcpBuffer : ICloneable
     {
         //字节缓存区
         private byte[] buf;
@@ -21,7 +21,7 @@ namespace KcpProject
         private int capacity;
 
         //对象池
-        private static List<ByteBuffer> pool = new List<ByteBuffer>();
+        private static List<KcpBuffer> pool = new List<KcpBuffer>();
         private static int poolMaxCount = 200;
 
         //此对象是否池化
@@ -31,7 +31,7 @@ namespace KcpProject
         /// 构造方法
         /// </summary>
         /// <param name="capacity">初始容量</param>
-        private ByteBuffer(int capacity)
+        private KcpBuffer(int capacity)
         {
             this.buf = new byte[capacity];
             this.capacity = capacity;
@@ -43,7 +43,7 @@ namespace KcpProject
         /// 构造方法
         /// </summary>
         /// <param name="bytes">初始字节数组</param>
-        private ByteBuffer(byte[] bytes)
+        private KcpBuffer(byte[] bytes)
         {
             this.buf = new byte[bytes.Length];
             Array.Copy(bytes, 0, buf, 0, buf.Length);
@@ -61,18 +61,18 @@ namespace KcpProject
         /// 当为true时，从池中获取的对象的实际capacity值。
         /// </param>
         /// <returns>ByteBuffer对象</returns>
-        public static ByteBuffer Allocate(int capacity, bool fromPool = false)
+        public static KcpBuffer Allocate(int capacity, bool fromPool = false)
         {
             if (!fromPool)
             {
-                return new ByteBuffer(capacity);
+                return new KcpBuffer(capacity);
             }
             lock (pool)
             {
-                ByteBuffer bbuf;
+                KcpBuffer bbuf;
                 if (pool.Count == 0)
                 {
-                    bbuf = new ByteBuffer(capacity)
+                    bbuf = new KcpBuffer(capacity)
                     {
                         isPool = true
                     };
@@ -97,18 +97,18 @@ namespace KcpProject
         /// true表示获取一个池化的ByteBuffer对象，池化的对象必须在调用Dispose后才会推入池中，此方法为线程安全的。
         /// </param>
         /// <returns>ByteBuffer对象</returns>
-        public static ByteBuffer Allocate(byte[] bytes, bool fromPool = false)
+        public static KcpBuffer Allocate(byte[] bytes, bool fromPool = false)
         {
             if (!fromPool)
             {
-                return new ByteBuffer(bytes);
+                return new KcpBuffer(bytes);
             }
             lock (pool)
             {
-                ByteBuffer bbuf;
+                KcpBuffer bbuf;
                 if (pool.Count == 0)
                 {
-                    bbuf = new ByteBuffer(bytes)
+                    bbuf = new KcpBuffer(bytes)
                     {
                         isPool = true
                     };
@@ -264,7 +264,7 @@ namespace KcpProject
         /// 将一个ByteBuffer的有效字节区写入此缓存区中
         /// </summary>
         /// <param name="buffer">待写入的字节缓存区</param>
-        public void Write(ByteBuffer buffer)
+        public void Write(KcpBuffer buffer)
         {
             if (buffer == null) return;
             if (buffer.ReadableBytes <= 0) return;
@@ -1110,22 +1110,22 @@ namespace KcpProject
         /// 复制一个对象，具有与原对象相同的数据，不改变原对象的数据，不包括已读数据
         /// </summary>
         /// <returns></returns>
-        public ByteBuffer Copy()
+        public KcpBuffer Copy()
         {
             if (buf == null)
             {
-                return new ByteBuffer(16);
+                return new KcpBuffer(16);
             }
             if (readIndex < writeIndex)
             {
                 byte[] newbytes = new byte[writeIndex - readIndex];
                 Array.Copy(buf, readIndex, newbytes, 0, newbytes.Length);
-                ByteBuffer buffer = new ByteBuffer(newbytes.Length);
+                KcpBuffer buffer = new KcpBuffer(newbytes.Length);
                 buffer.WriteBytes(newbytes);
                 buffer.isPool = this.isPool;
                 return buffer;
             }
-            return new ByteBuffer(16);
+            return new KcpBuffer(16);
         }
 
         /// <summary>
@@ -1136,9 +1136,9 @@ namespace KcpProject
         {
             if (buf == null)
             {
-                return new ByteBuffer(16);
+                return new KcpBuffer(16);
             }
-            ByteBuffer newBuf = new ByteBuffer(buf)
+            KcpBuffer newBuf = new KcpBuffer(buf)
             {
                 capacity = this.capacity,
                 readIndex = this.readIndex,
