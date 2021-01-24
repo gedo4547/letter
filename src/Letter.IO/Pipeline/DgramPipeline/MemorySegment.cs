@@ -36,7 +36,7 @@ namespace System.IO.Pipelines
             base.WriterAdvance(length);
         }
 
-        internal override void Reset()
+        public override void Reset()
         {
             base.Reset();
             

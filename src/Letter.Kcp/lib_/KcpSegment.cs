@@ -1,29 +1,35 @@
 ﻿using System;
+using System.Buffers;
 using System.Collections.Generic;
-using System.Text;
 
 namespace KcpProject
 {
     // KCP Segment Definition
-    struct KcpSegment
+    class KcpSegment
     {
-        internal UInt32 conv;
-        internal UInt32 cmd;
-        internal UInt32 frg;
-        internal UInt32 wnd;
-        internal UInt32 ts;
-        internal UInt32 sn;
-        internal UInt32 una;
-        internal UInt32 rto;
-        internal UInt32 xmit;
-        internal UInt32 resendts;
-        internal UInt32 fastack;
-        internal UInt32 acked;
+        internal UInt32 conv = 0;
+        internal UInt32 cmd = 0;
+        internal UInt32 frg = 0;
+        internal UInt32 wnd = 0;
+        internal UInt32 ts = 0;
+        internal UInt32 sn = 0;
+        internal UInt32 una = 0;
+        internal UInt32 rto = 0;
+        internal UInt32 xmit = 0;
+        internal UInt32 resendts = 0;
+        internal UInt32 fastack = 0;
+        internal UInt32 acked = 0;
+        
         internal KcpBuffer data;
 
         private bool isLittleEndian;
 
         private static Stack<KcpSegment> msSegmentPool = new Stack<KcpSegment>(32);
+
+        public static KcpSegment Get(int size, bool isLittleEndian, KcpBuffer buffer)
+        {
+            return new KcpSegment(size, isLittleEndian, buffer);
+        }
 
         public static KcpSegment Get(int size, bool isLittleEndian)
         {
@@ -48,23 +54,17 @@ namespace KcpProject
             }
         }
 
+
+        private KcpSegment(int size, bool isLittleEndian, KcpBuffer buffer)
+        {
+            this.isLittleEndian = isLittleEndian;
+            this.data = buffer;
+        }
+
         private KcpSegment(int size, bool isLittleEndian)
         {
             this.isLittleEndian = isLittleEndian;
             data = KcpBuffer.Allocate(size, true);
-
-            this.conv = 0;
-            this.cmd = 0;
-            this.frg = 0;
-            this.wnd = 0;
-            this.ts = 0;
-            this.sn = 0;
-            this.una = 0;
-            this.rto = 0;
-            this.xmit = 0;
-            this.resendts = 0;
-            this.fastack = 0;
-            this.acked = 0;
         }
 
         // encode a segment into buffer

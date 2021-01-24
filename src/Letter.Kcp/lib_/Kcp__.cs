@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Buffers;
 using System.Collections.Generic;
 
 namespace KcpProject
@@ -57,6 +58,8 @@ namespace KcpProject
 
         List<ackItem> acklist = new List<ackItem>(16);
 
+        private KcpSegmentAllocator segmentAllocator;
+
         byte[] buffer;
         Int32 reserved;
         Action<byte[], int> output; // buffer, size
@@ -77,9 +80,10 @@ namespace KcpProject
 
         // create a new kcp control object, 'conv' must equal in two endpoint
         // from the same connection.
-        public Kcp(UInt32 conv_, bool isLittleEndian, Action<byte[], int> output_)
+        public Kcp(UInt32 conv_, bool isLittleEndian, MemoryPool<byte> memoryPool, Action<byte[], int> output_)
         {
             this.isLittleEndian = isLittleEndian;
+            this.segmentAllocator = new KcpSegmentAllocator(memoryPool, isLittleEndian);
 
             conv = conv_;
             snd_wnd = IKCP_WND_SND;

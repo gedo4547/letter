@@ -103,7 +103,7 @@ namespace System.IO.Pipelines
         }
 
 
-        internal virtual void Reset()
+        public virtual void Reset()
         {
             this.writedLength = 0;
             this.readedLength = 0;
