@@ -921,24 +921,24 @@ namespace KcpProject
         /// </summary>
         /// <param name="value">待写入的数据</param>
         /// <param name="type">待写入的数据类型</param>
-        private void WriteValue(int value, DataType type)
-        {
-            switch (type)
-            {
-                case DataType.BYTE:
-                    this.WriteByte(value);
-                    break;
-                case DataType.SHORT:
-                    this.WriteShort((short)value);
-                    break;
-                case DataType.LONG:
-                    this.WriteLong((long)value);
-                    break;
-                default:
-                    this.WriteInt(value);
-                    break;
-            }
-        }
+        // private void WriteValue(int value, DataType type)
+        // {
+        //     switch (type)
+        //     {
+        //         case DataType.BYTE:
+        //             this.WriteByte(value);
+        //             break;
+        //         case DataType.SHORT:
+        //             this.WriteShort((short)value);
+        //             break;
+        //         case DataType.LONG:
+        //             this.WriteLong((long)value);
+        //             break;
+        //         default:
+        //             this.WriteInt(value);
+        //             break;
+        //     }
+        // }
 
         /// <summary>
         /// 读取一个值，值类型根据type决定，int或short或byte
@@ -1035,43 +1035,43 @@ namespace KcpProject
         /// </summary>
         /// <param name="content">待写入的字符串</param>
         /// <param name="lenType">写入的字符串长度类型</param>
-        public void WriteUTF8String(string content, DataType lenType)
-        {
-            byte[] bytes = System.Text.Encoding.UTF8.GetBytes(content);
-            int max;
-            if (lenType == DataType.BYTE)
-            {
-                WriteByte(bytes.Length);
-                max = byte.MaxValue;
-            }
-            else if (lenType == DataType.SHORT)
-            {
-                WriteShort((short)bytes.Length);
-                max = short.MaxValue;
-            }
-            else
-            {
-                WriteInt(bytes.Length);
-                max = int.MaxValue;
-            }
-            if (bytes.Length > max)
-            {
-                WriteBytes(bytes, 0, max);
-            }
-            else
-            {
-                WriteBytes(bytes, 0, bytes.Length);
-            }
-        }
+        // public void WriteUTF8String(string content, DataType lenType)
+        // {
+        //     byte[] bytes = System.Text.Encoding.UTF8.GetBytes(content);
+        //     int max;
+        //     if (lenType == DataType.BYTE)
+        //     {
+        //         WriteByte(bytes.Length);
+        //         max = byte.MaxValue;
+        //     }
+        //     else if (lenType == DataType.SHORT)
+        //     {
+        //         WriteShort((short)bytes.Length);
+        //         max = short.MaxValue;
+        //     }
+        //     else
+        //     {
+        //         WriteInt(bytes.Length);
+        //         max = int.MaxValue;
+        //     }
+        //     if (bytes.Length > max)
+        //     {
+        //         WriteBytes(bytes, 0, max);
+        //     }
+        //     else
+        //     {
+        //         WriteBytes(bytes, 0, bytes.Length);
+        //     }
+        // }
 
         /// <summary>
         /// 写入以short表示的字符串字节长度和字符串字节数据
         /// </summary>
         /// <param name="content"></param>
-        public void WriteUTF(string content)
-        {
-            this.WriteUTF8String(content, DataType.SHORT);
-        }
+        // public void WriteUTF(string content)
+        // {
+        //     this.WriteUTF8String(content, DataType.SHORT);
+        // }
 
         /// <summary>
         /// 读取一个UTF-8字符串，UTF-8字符串无高低字节序问题
