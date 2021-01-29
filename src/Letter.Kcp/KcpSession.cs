@@ -28,8 +28,8 @@ namespace Letter.Kcp
 
             this.kcplib = new KcpImpl(conv, this, this);
             this.kcplib.SetMtu(options.Mtu);
-            this.kcplib.SetNoDelay(options.NoDelay);
-            this.kcplib.SetWndSize(options.WndSize);
+            // this.kcplib.SetNoDelay(options.NoDelay);
+            // this.kcplib.SetWndSize(options.WndSize);
             this.kcplib.Interval(options.interval);
 
             this.readerKcpMemory = new WrappedMemory(this.MemoryPool.Rent(), MemoryFlag.Kcp);
@@ -193,6 +193,8 @@ namespace Letter.Kcp
             }
         }
 
+
+        int num = 0;
         private void OnWriterComplete(IWrappedWriter writer)
         {
             WrappedMemory memory = writer as WrappedMemory;
@@ -204,8 +206,15 @@ namespace Letter.Kcp
                 {
                     return;
                 }
+                System.Threading.Interlocked.Increment(ref this.num);
+                Console.WriteLine("kcp.send>>"+num);
+                int error = this.kcplib.Send(readableMemory.Span);
+                if(error != 0)
+                {
+                    // Logger.Error("kcp异常》》"+error);
+                    return;
+                }
 
-                this.kcplib.Send(readableMemory.Span);
                 this.nextTime = TimeHelpr.GetNowTime();
             }
             else if(memory.Flag == MemoryFlag.Udp)
@@ -216,9 +225,13 @@ namespace Letter.Kcp
             }
         }
 
+        int num1 = 0;
         private WrappedMemory sndMemory = new WrappedMemory(MemoryFlag.Kcp);
         public void Output(IMemoryOwner<byte> buffer, int avalidLength)
         {
+            System.Threading.Interlocked.Increment(ref num1);
+
+            Console.WriteLine("kcp发送>>>" + avalidLength+"             num::"+num1);
             if (avalidLength < 1) return;
             
             this.sndMemory.SettingMemory(buffer, avalidLength);

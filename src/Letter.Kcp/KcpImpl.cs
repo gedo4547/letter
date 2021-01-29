@@ -2,7 +2,7 @@ using System.Net.Sockets.Kcp;
 
 namespace Letter.Kcp
 {
-    sealed class KcpImpl : System.Net.Sockets.Kcp.Kcp
+    sealed class KcpImpl : Kcp<KcpSegment>
     {
         public KcpImpl(uint conv_, IKcpCallback callback, IRentable rentable) : base(conv_, callback, rentable)
         {

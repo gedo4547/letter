@@ -41,6 +41,7 @@ namespace kcp_test
 
         public override void OnUdpException(IUdpSession session, Exception ex)
         {
+            Console.WriteLine("error>>>>>>>>>>>>>>>>"+ex.ToString());
             foreach (var item in this.sessions)
             {
                 base.SendExceptionTo(item.Value, ex);
