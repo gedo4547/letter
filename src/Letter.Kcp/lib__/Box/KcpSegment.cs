@@ -59,5 +59,22 @@ namespace Letter.Kcp.lib__
             return offset - offset_;
         }
 
+        internal void Reset()
+        {
+            conv = 0;
+            cmd = 0;
+            frg = 0;
+            wnd = 0;
+            ts = 0;
+            sn = 0;
+            una = 0;
+            rto = 0;
+            xmit = 0;
+            resendts = 0;
+            fastack = 0;
+            acked = 0;
+            
+            this.data.Reset();
+        }
     }
 }

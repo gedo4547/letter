@@ -34,6 +34,7 @@ namespace Letter.Kcp.lib__
                 return;
             }
 
+            // segment.Reset();
             this.bufferStack.Push(segment);
         }
 

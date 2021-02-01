@@ -12,6 +12,7 @@ namespace Letter.Kcp.lib__
         }
 
         private MemoryPool<byte> memoryPool;
+        
         private Stack<KcpMemoryBlock> memoryBlockStack = new Stack<KcpMemoryBlock>();
 
         public KcpMemoryBlock Get()
@@ -21,7 +22,7 @@ namespace Letter.Kcp.lib__
                 return this.memoryBlockStack.Pop();
             }
             
-            var memoryBlock = new KcpMemoryBlock(this.memoryBlockStack);
+            var memoryBlock = new KcpMemoryBlock(this);
             memoryBlock.SetMemoryBlock(memoryPool.Rent());
 
             return memoryBlock;
@@ -39,7 +40,13 @@ namespace Letter.Kcp.lib__
 
         public void Dispose()
         {
-            throw new NotImplementedException();
+            while(this.memoryBlockStack.Count > 0)
+            {
+                var item = this.memoryBlockStack.Pop();
+                item.Dispose();
+            }
+            
+            this.memoryBlockStack.Clear();
         }
     }
 }

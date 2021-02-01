@@ -1,0 +1,96 @@
+{
+  "runtimeTarget": {
+    "name": ".NETCoreApp,Version=v5.0",
+    "signature": ""
+  },
+  "compilationOptions": {},
+  "targets": {
+    ".NETCoreApp,Version=v5.0": {
+      "kcplib_test/1.0.0": {
+        "dependencies": {
+          "Letter.Kcp": "0.0.0.1"
+        },
+        "runtime": {
+          "kcplib_test.dll": {}
+        }
+      },
+      "Kcp/2.2.0": {
+        "runtime": {
+          "lib/net5.0/Kcp.dll": {
+            "assemblyVersion": "2.2.0.0",
+            "fileVersion": "2.2.0.0"
+          }
+        }
+      },
+      "System.IO.Pipelines/5.0.1": {
+        "runtime": {
+          "lib/netcoreapp3.0/System.IO.Pipelines.dll": {
+            "assemblyVersion": "5.0.0.1",
+            "fileVersion": "5.0.120.57516"
+          }
+        }
+      },
+      "Letter.IO/0.0.0.1": {
+        "dependencies": {
+          "System.IO.Pipelines": "5.0.1"
+        },
+        "runtime": {
+          "Letter.IO.dll": {}
+        }
+      },
+      "Letter.Kcp/0.0.0.1": {
+        "dependencies": {
+          "Kcp": "2.2.0",
+          "Letter.Udp": "0.0.0.1"
+        },
+        "runtime": {
+          "Letter.Kcp.dll": {}
+        }
+      },
+      "Letter.Udp/0.0.0.1": {
+        "dependencies": {
+          "Letter.IO": "0.0.0.1"
+        },
+        "runtime": {
+          "Letter.Udp.dll": {}
+        }
+      }
+    }
+  },
+  "libraries": {
+    "kcplib_test/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "Kcp/2.2.0": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-B6VVraztigTNn0v79zj1iyW4ukvmZNrz0HX18Aqh15If4IHR9pUT5eDZCAdE87pPSy3Th4scJE23lhsM79ahZw==",
+      "path": "kcp/2.2.0",
+      "hashPath": "kcp.2.2.0.nupkg.sha512"
+    },
+    "System.IO.Pipelines/5.0.1": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-qEePWsaq9LoEEIqhbGe6D5J8c9IqQOUuTzzV6wn1POlfdLkJliZY3OlB0j0f17uMWlqZYjH7txj+2YbyrIA8Yg==",
+      "path": "system.io.pipelines/5.0.1",
+      "hashPath": "system.io.pipelines.5.0.1.nupkg.sha512"
+    },
+    "Letter.IO/0.0.0.1": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "Letter.Kcp/0.0.0.1": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "Letter.Udp/0.0.0.1": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    }
+  }
+}

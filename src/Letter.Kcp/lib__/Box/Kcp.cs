@@ -4,7 +4,7 @@ using System.Buffers;
 
 namespace Letter.Kcp.lib__
 {
-    public sealed class Kcp
+    public sealed class Kcp : IDisposable
     {
          public const int IKCP_RTO_NDL = 30;  // no delay min rto
         public const int IKCP_RTO_MIN = 100; // normal min rto
@@ -462,7 +462,7 @@ namespace Letter.Kcp.lib__
                 }
                 else
                 {
-                     offset += KcpHelper.ReadUInt32_BE(buffer.Slice(offset), ref conv_);
+                    offset += KcpHelper.ReadUInt32_BE(buffer.Slice(offset), ref conv_);
 
                     if (conv != conv_) return -1;
 
@@ -1004,6 +1004,27 @@ namespace Letter.Kcp.lib__
         public void SetStreamMode(bool enabled)
         {
             stream = enabled ? 1 : 0;
+        }
+
+        public void Dispose()
+        {
+            foreach (var item in this.snd_queue)
+                this.segmentAllotter.Put(item);
+            foreach (var item  in this.rcv_queue)
+                this.segmentAllotter.Put(item);
+            foreach (var item in snd_buf)
+                this.segmentAllotter.Put(item);
+            foreach (var item in rcv_buf)
+                this.segmentAllotter.Put(item);
+            
+            this.snd_queue.Clear();
+            this.rcv_queue.Clear();
+            this.snd_buf.Clear();
+            this.rcv_buf.Clear();
+            
+            this.acklist.Clear();
+            
+            this.segmentAllotter.Dispose();
         }
     }
     

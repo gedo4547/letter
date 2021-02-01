@@ -1,6 +1,4 @@
-using System;
 using System.IO.Pipelines;
-using System.Collections.Generic;
 using System.Buffers;
 using System.Runtime.CompilerServices;
 
@@ -8,14 +6,13 @@ namespace Letter.Kcp.lib__
 {
     sealed class KcpMemoryBlock : ASegment
     {
-        public KcpMemoryBlock(Stack<KcpMemoryBlock> memoryBlockStack)
+        public KcpMemoryBlock(KcpMemoryBlockAllotter allotter)
         {
-            this.memoryBlockStack = memoryBlockStack;
+            this.allotter = allotter;
         }
 
-        private Stack<KcpMemoryBlock> memoryBlockStack;
-
         private IMemoryOwner<byte> memoryOwner;
+        private KcpMemoryBlockAllotter allotter;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void SetMemoryBlock(IMemoryOwner<byte> memoryOwner)
@@ -26,7 +23,7 @@ namespace Letter.Kcp.lib__
 
         public override void Reset()
         {
-            this.memoryBlockStack.Push(this);
+            this.allotter.Put(this);
 
             base.Reset();
         }
@@ -34,7 +31,6 @@ namespace Letter.Kcp.lib__
         public override void Dispose()
         {
             this.memoryOwner.Dispose();
-            
 
             base.Dispose();
         }
