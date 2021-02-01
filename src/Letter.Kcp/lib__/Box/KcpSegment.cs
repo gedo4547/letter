@@ -3,7 +3,7 @@ using System.Buffers;
 
 namespace Letter.Kcp.lib__
 {
-    class KcpSegment
+    class KcpSegment : IDisposable
     {
         public KcpSegment(bool useLittleEndian, KcpBuffer buffer)
         {
@@ -75,6 +75,14 @@ namespace Letter.Kcp.lib__
             acked = 0;
             
             this.data.Reset();
+        }
+
+        public void Dispose()
+        {
+            if (this.data != null)
+            {
+                this.data = null;
+            }
         }
     }
 }

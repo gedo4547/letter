@@ -27,7 +27,7 @@ namespace kcplib_test
             {
                 // System.Threading.Thread.Sleep(1);
                 Console.ReadLine();
-                for (int i = 0; i < 1000; i++)
+                for (int i = 0; i < 1; i++)
                 {
                     Interlocked.Increment(ref num);
                     unit1.Send(System.Text.Encoding.UTF8.GetBytes($"nihao {num}"));

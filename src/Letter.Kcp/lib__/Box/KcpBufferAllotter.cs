@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace Letter.Kcp.lib__
 {
-    sealed class KcpBufferAllotter : IAllotter<KcpBuffer>
+    sealed class KcpBufferAllotter : IKcpAllotter<KcpBuffer>
     {
         public KcpBufferAllotter(MemoryPool<byte> memoryPool)
         {
@@ -36,7 +36,13 @@ namespace Letter.Kcp.lib__
 
         public void Dispose()
         {
-            throw new NotImplementedException();
+            foreach (KcpBuffer buffer in this.bufferStack)
+            {
+                buffer.Dispose();
+            }
+            
+            this.bufferStack.Clear();
+            this.memoryAllotter.Dispose();
         }
     }
 }

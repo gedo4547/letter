@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace Letter.Kcp.lib__
 {
-    class KcpSegmentAllotter : IAllotter<KcpSegment>
+    class KcpSegmentAllotter : IKcpAllotter<KcpSegment>
     {
         public KcpSegmentAllotter(MemoryPool<byte> memoryPool, bool useLittleEndian)
         {
@@ -15,14 +15,15 @@ namespace Letter.Kcp.lib__
         private bool useLittleEndian;
         private KcpBufferAllotter bufferAllotter;
 
-        private Stack<KcpSegment> bufferStack = new Stack<KcpSegment>();
+        private Stack<KcpSegment> segmentStack = new Stack<KcpSegment>();
 
         public KcpSegment Get()
         {
-            if(this.bufferStack.Count > 0)
+            if(this.segmentStack.Count > 0)
             {
-                return this.bufferStack.Pop();
+                return this.segmentStack.Pop();
             }
+            
             KcpBuffer buffer = this.bufferAllotter.Get();
             return new KcpSegment(this.useLittleEndian, buffer);
         }
@@ -34,13 +35,23 @@ namespace Letter.Kcp.lib__
                 return;
             }
 
-            // segment.Reset();
-            this.bufferStack.Push(segment);
+            segment.Reset();
+            this.segmentStack.Push(segment);
         }
 
         public void Dispose()
         {
+            while (this.segmentStack.Count > 0)
+            {
+                KcpSegment segment = this.segmentStack.Pop();
+                KcpBuffer buffer = segment.data;
+                //将buffer放回bufferAllotter，统一管理
+                this.bufferAllotter.Put(buffer);
+                segment.Dispose();
+            }
+            this.segmentStack.Clear();
             
+            this.bufferAllotter.Dispose();
         }
     }
 }

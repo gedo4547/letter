@@ -2,7 +2,7 @@ using System;
 
 namespace Letter.Kcp.lib__
 {
-    interface IAllotter<T> : IDisposable
+    interface IKcpAllotter<T> : IDisposable
     {
         T Get();
 

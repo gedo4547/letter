@@ -6,13 +6,7 @@ namespace Letter.Kcp.lib__
 {
     sealed class KcpMemoryBlock : ASegment
     {
-        public KcpMemoryBlock(KcpMemoryBlockAllotter allotter)
-        {
-            this.allotter = allotter;
-        }
-
         private IMemoryOwner<byte> memoryOwner;
-        private KcpMemoryBlockAllotter allotter;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void SetMemoryBlock(IMemoryOwner<byte> memoryOwner)
@@ -23,8 +17,6 @@ namespace Letter.Kcp.lib__
 
         public override void Reset()
         {
-            this.allotter.Put(this);
-
             base.Reset();
         }
 

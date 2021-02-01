@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace Letter.Kcp.lib__
 {
-    sealed class KcpMemoryBlockAllotter : IAllotter<KcpMemoryBlock>
+    sealed class KcpMemoryBlockAllotter : IKcpAllotter<KcpMemoryBlock>
     {
         public KcpMemoryBlockAllotter(MemoryPool<byte> memoryPool)
         {
@@ -22,7 +22,7 @@ namespace Letter.Kcp.lib__
                 return this.memoryBlockStack.Pop();
             }
             
-            var memoryBlock = new KcpMemoryBlock(this);
+            var memoryBlock = new KcpMemoryBlock();
             memoryBlock.SetMemoryBlock(memoryPool.Rent());
 
             return memoryBlock;

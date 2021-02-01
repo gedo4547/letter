@@ -1012,9 +1012,9 @@ namespace Letter.Kcp.lib__
                 this.segmentAllotter.Put(item);
             foreach (var item  in this.rcv_queue)
                 this.segmentAllotter.Put(item);
-            foreach (var item in snd_buf)
+            foreach (var item in this.snd_buf)
                 this.segmentAllotter.Put(item);
-            foreach (var item in rcv_buf)
+            foreach (var item in this.rcv_buf)
                 this.segmentAllotter.Put(item);
             
             this.snd_queue.Clear();

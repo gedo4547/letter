@@ -23,6 +23,7 @@ namespace Letter.Kcp.lib__
 
         public int ReadableLength
         {
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
             get{ return (int)this.ReadableBuffer.Length; }
         }
 
@@ -92,34 +93,42 @@ namespace Letter.Kcp.lib__
 
         public void Reset()
         {
-            if(this.head == null)
+            if (this.TryClear(this.head))
             {
-                throw new Exception("KcpBuffer.Reset error");
+                this.head.Reset();
+                this.head.SetNext(null);
+                this.tail = this.head;
             }
-
-            KcpMemoryBlock memoryBlock = this.head;
-            while(true)
-            {
-                if(memoryBlock == null)
-                {
-                    break;
-                }
-
-                var childMemoryBlock = memoryBlock.Next as KcpMemoryBlock;
-                this.memoryBlockAllotter.Put(childMemoryBlock);
-
-                memoryBlock.Reset();
-
-                memoryBlock = childMemoryBlock;
-            }
-            
-            this.head.SetNext(null);
-            this.tail = this.head;
         }
 
         public void Dispose()
         {
-            
+            this.TryClear(this.head);
+        }
+
+        private bool TryClear(KcpMemoryBlock startBlock)
+        {
+            if (startBlock == null)
+            {
+                return false;
+            }
+
+            KcpMemoryBlock block = startBlock;
+            while (true)
+            {
+                KcpMemoryBlock child = block.Next as KcpMemoryBlock;
+                
+                block.Reset();
+                block.SetNext(null);
+                
+                this.memoryBlockAllotter.Put(block);
+                block = child;
+                
+                if (block == null)
+                {
+                    return true;
+                }
+            }
         }
     }
 }
