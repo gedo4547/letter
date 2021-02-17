@@ -1,116 +1,99 @@
-using System;
-using System.Net.Sockets.Kcp;
-using System.Runtime.CompilerServices;
+using System.Collections.Generic;
 
-namespace Letter.Kcp.lib
+namespace System.Net.Sockets
 {
-    sealed class KcpSegment : IKcpSegment
+    // KCP Segment Definition
+    class KcpSegment 
     {
-        private Memory<byte> memory;
-
-        public byte cmd
+        public KcpSegment(bool useLittleEndian, KcpBuffer buffer)
         {
-            [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            get;
-            [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            set;
+            this.data = buffer;
+            this.useLittleEndian = useLittleEndian;
         }
 
-        public uint conv
-        {
-            [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            get;
-            [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            set;
-        }
+        private bool useLittleEndian;
         
-        public Span<byte> data
-        {
-            [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            get { return memory.Span; }
-        }
-
-        public uint fastack
-        {
-            [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            get;
-            [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            set;
-        }
-
-        public byte frg
-        {
-            [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            get;
-            [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            set;
-        }
-
-        public uint len
-        {
-            [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            get;
-        }
-
-        public uint resendts
-        {
-            [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            get;
-            [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            set;
-        }
-
-        public uint rto
-        {
-            [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            get;
-            [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            set;
-        }
-
-        public uint sn
-        {
-            [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            get;
-            [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            set;
-        }
-
-        public uint ts
-        {
-            [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            get;
-            [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            set;
-        }
-
-        public uint una
-        {
-            [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            get;
-            [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            set;
-        }
-
-        public ushort wnd
-        {
-            [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            get;
-            [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            set;
-        }
-
-        public uint xmit
-        {
-            [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            get;
-            [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            set;
-        }
+        internal UInt32 conv = 0;
+        internal UInt32 cmd = 0;
+        internal UInt32 frg = 0;
+        internal UInt32 wnd = 0;
+        internal UInt32 ts = 0;
+        internal UInt32 sn = 0;
+        internal UInt32 una = 0;
+        internal UInt32 rto = 0;
+        internal UInt32 xmit = 0;
+        internal UInt32 resendts = 0;
+        internal UInt32 fastack = 0;
+        internal UInt32 acked = 0;
+        internal KcpBuffer data;
         
-        public int Encode(Span<byte> buffer)
+        
+
+        private static Stack<KcpSegment> msSegmentPool = new Stack<KcpSegment>(32);
+
+        public static KcpSegment Get(int size)
         {
-            throw new NotImplementedException();
+            lock (msSegmentPool)
+            {
+                if (msSegmentPool.Count > 0)
+                {
+                    var seg = msSegmentPool.Pop();
+                    seg.data = KcpBuffer.Allocate(size, true);
+                    return seg;
+                }
+            }
+            return new KcpSegment(size);
+        }
+
+        public static void Put(KcpSegment seg)
+        {
+            seg.reset();
+            lock (msSegmentPool) {
+                msSegmentPool.Push(seg);
+            }
+        }
+
+        private KcpSegment(int size)
+        {
+            data = KcpBuffer.Allocate(size, true);
+        }
+
+        // encode a segment into buffer
+        internal int encode(byte[] ptr, int offset)
+        {
+
+            var offset_ = offset;
+
+            // offset += ikcp_encode32u(ptr, offset, conv);
+            // offset += ikcp_encode8u(ptr, offset, (byte)cmd);
+            // offset += ikcp_encode8u(ptr, offset, (byte)frg);
+            // offset += ikcp_encode16u(ptr, offset, (UInt16)wnd);
+            // offset += ikcp_encode32u(ptr, offset, ts);
+            // offset += ikcp_encode32u(ptr, offset, sn);
+            // offset += ikcp_encode32u(ptr, offset, una);
+            // offset += ikcp_encode32u(ptr, offset, (UInt32)data.ReadableBytes);
+
+            return offset - offset_;
+        }
+
+        internal void reset()
+        {
+            conv = 0;
+            cmd = 0;
+            frg = 0;
+            wnd = 0;
+            ts = 0;
+            sn = 0;
+            una = 0;
+            rto = 0;
+            xmit = 0;
+            resendts = 0;
+            fastack = 0;
+            acked = 0;
+
+            data.Clear();
+            data.Dispose();
+            data = null;
         }
     }
 }

@@ -32,8 +32,4 @@
       <ProjectReference Include="..\Letter.Udp\Letter.Udp.csproj" />
     </ItemGroup>
 
-    <ItemGroup>
-      <PackageReference Include="Kcp" Version="2.2.0" />
-    </ItemGroup>
-
 </Project>

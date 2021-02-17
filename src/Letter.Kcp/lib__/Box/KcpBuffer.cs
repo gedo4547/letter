@@ -39,6 +39,14 @@ namespace Letter.Kcp.lib__
             this.WriteBytes(new ReadOnlySpan<byte>(bytes, offset, count));
         }
 
+        public void WriteBytes(in ReadOnlySequence<byte> sequence)
+        {
+            foreach (var item in sequence)
+            {
+                this.WriteBytes(item.Span);
+            }
+        }
+
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void WriteBytes(in ReadOnlySpan<byte> span)
         {

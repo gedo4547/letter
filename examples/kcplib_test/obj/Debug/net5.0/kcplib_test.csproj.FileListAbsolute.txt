@@ -22,3 +22,5 @@
 /Users/guanyedong/Projects/letter-github/examples/kcplib_test/obj/Debug/net5.0/ref/kcplib_test.dll
 /Users/guanyedong/Projects/letter-github/examples/kcplib_test/obj/Debug/net5.0/kcplib_test.pdb
 /Users/guanyedong/Projects/letter-github/examples/kcplib_test/obj/Debug/net5.0/kcplib_test.genruntimeconfig.cache
+/Users/guanyedong/Projects/letter-github/examples/kcplib_test/bin/Debug/net5.0/common.dll
+/Users/guanyedong/Projects/letter-github/examples/kcplib_test/bin/Debug/net5.0/common.pdb

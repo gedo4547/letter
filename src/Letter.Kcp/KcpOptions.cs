@@ -17,9 +17,9 @@ namespace Letter.Kcp
         
         public NoDelayConfig NoDelay { get; set; } = new NoDelayConfig(1, 10, 2, 1);
         public WndSizeConfig WndSize { get; set; } = new WndSizeConfig(256, 256);
-        public int Mtu { get; set; } = 512;
-
-        public int interval = 10;
+        public int? Mtu { get; set; }
+        public bool? StreamMode { get; set; }
+        public int? ReservedSize { get; set; }
     }
     
     public class NoDelayConfig

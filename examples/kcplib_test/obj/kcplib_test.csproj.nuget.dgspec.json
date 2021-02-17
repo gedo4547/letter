@@ -4,6 +4,64 @@
     "/Users/guanyedong/Projects/letter-github/examples/kcplib_test/kcplib_test.csproj": {}
   },
   "projects": {
+    "/Users/guanyedong/Projects/letter-github/examples/common/common.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "/Users/guanyedong/Projects/letter-github/examples/common/common.csproj",
+        "projectName": "common",
+        "projectPath": "/Users/guanyedong/Projects/letter-github/examples/common/common.csproj",
+        "packagesPath": "/Users/guanyedong/.nuget/packages/",
+        "outputPath": "/Users/guanyedong/Projects/letter-github/examples/common/obj/",
+        "projectStyle": "PackageReference",
+        "fallbackFolders": [
+          "/usr/local/share/dotnet/sdk/NuGetFallbackFolder"
+        ],
+        "configFilePaths": [
+          "/Users/guanyedong/.nuget/NuGet/NuGet.Config"
+        ],
+        "originalTargetFrameworks": [
+          "netstandard2.0"
+        ],
+        "sources": {
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "netstandard2.0": {
+            "targetAlias": "netstandard2.0",
+            "projectReferences": {}
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        }
+      },
+      "frameworks": {
+        "netstandard2.0": {
+          "targetAlias": "netstandard2.0",
+          "dependencies": {
+            "NETStandard.Library": {
+              "suppressParent": "All",
+              "target": "Package",
+              "version": "[2.0.3, )",
+              "autoReferenced": true
+            }
+          },
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/5.0.102/RuntimeIdentifierGraph.json"
+        }
+      }
+    },
     "/Users/guanyedong/Projects/letter-github/examples/kcplib_test/kcplib_test.csproj": {
       "version": "1.0.0",
       "restore": {
@@ -29,6 +87,9 @@
           "net5.0": {
             "targetAlias": "net5.0",
             "projectReferences": {
+              "/Users/guanyedong/Projects/letter-github/examples/common/common.csproj": {
+                "projectPath": "/Users/guanyedong/Projects/letter-github/examples/common/common.csproj"
+              },
               "/Users/guanyedong/Projects/letter-github/src/Letter.Kcp/Letter.Kcp.csproj": {
                 "projectPath": "/Users/guanyedong/Projects/letter-github/src/Letter.Kcp/Letter.Kcp.csproj"
               }
@@ -206,12 +267,6 @@
       "frameworks": {
         "net5.0": {
           "targetAlias": "net5.0",
-          "dependencies": {
-            "Kcp": {
-              "target": "Package",
-              "version": "[2.2.0, )"
-            }
-          },
           "imports": [
             "net461",
             "net462",
@@ -232,10 +287,6 @@
         "netstandard2.0": {
           "targetAlias": "netstandard2.0",
           "dependencies": {
-            "Kcp": {
-              "target": "Package",
-              "version": "[2.2.0, )"
-            },
             "NETStandard.Library": {
               "suppressParent": "All",
               "target": "Package",

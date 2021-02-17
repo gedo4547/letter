@@ -4,7 +4,7 @@ using System.Buffers;
 
 namespace Letter.Kcp.lib__
 {
-    public sealed class Kcp : IDisposable
+    sealed class Kcp : IDisposable
     {
          public const int IKCP_RTO_NDL = 30;  // no delay min rto
         public const int IKCP_RTO_MIN = 100; // normal min rto
@@ -129,7 +129,8 @@ namespace Letter.Kcp.lib__
 
         public int Recv(byte[] buffer)
         {
-            return Recv(buffer, 0, buffer.Length);
+            // return Recv(buffer, 0, buffer.Length);
+            return default;
         }
 
         // Receive data from kcp state machine
@@ -139,14 +140,14 @@ namespace Letter.Kcp.lib__
         // Return -1 when there is no readable data.
         //
         // Return -2 if len(buffer) is smaller than kcp.PeekSize().
-        public int Recv(byte[] buffer, int index, int length)
+        public int Recv(KcpBuffer buffer)
         {
             var peekSize = PeekSize();
             if (peekSize < 0)
                 return -1;
 
-            if (peekSize > length)
-                return -2;
+            // if (peekSize > length)
+            //     return -2;
 
             var fast_recover = false;
             if (rcv_queue.Count >= rcv_wnd)
@@ -154,13 +155,14 @@ namespace Letter.Kcp.lib__
 
             // merge fragment.
             var count = 0;
-            var n = index;
+            var n = 0;
             foreach (var seg in rcv_queue)
             {
                 // copy fragment data into buffer.
                 var readableBuffer = seg.data.ReadableBuffer;
                 var readableLength = (int)readableBuffer.Length;
-                readableBuffer.CopyTo(buffer.AsSpan(n, readableLength));
+                buffer.WriteBytes(readableBuffer);
+                // readableBuffer.CopyTo(buffer.AsSpan(n, readableLength));
 
                 n += readableLength;
 
@@ -205,7 +207,7 @@ namespace Letter.Kcp.lib__
                 probe |= IKCP_ASK_TELL;
             }
 
-            return n - index;
+            return n;
         }
 
         public int Send(byte[] buffer)
@@ -620,22 +622,22 @@ namespace Letter.Kcp.lib__
 
             var writeIndex = reserved;
 
-            Action<int> makeSpace = (space) =>
+            void makeSpace(int space)
             {
                 if (writeIndex + space > mtu)
                 {
                     output(buffer, writeIndex);
                     writeIndex = reserved;
                 }
-            };
+            }
 
-            Action flushBuffer = () =>
+            void flushBuffer()
             {
                 if (writeIndex > reserved)
                 {
                     output(buffer, writeIndex);
                 }
-            };
+            }
 
             // flush acknowledges
             for (var i = 0; i < acklist.Count; i++)

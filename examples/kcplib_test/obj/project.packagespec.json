@@ -18,6 +18,9 @@
     "frameworks": {
       "netcoreapp5.0": {
         "projectReferences": {
+          "/Users/guanyedong/Projects/letter-github/examples/common/common.csproj": {
+            "projectPath": "/Users/guanyedong/Projects/letter-github/examples/common/common.csproj"
+          },
           "/Users/guanyedong/Projects/letter-github/src/Letter.Kcp/Letter.Kcp.csproj": {
             "projectPath": "/Users/guanyedong/Projects/letter-github/src/Letter.Kcp/Letter.Kcp.csproj"
           }

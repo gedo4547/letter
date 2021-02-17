@@ -3,6 +3,7 @@ using System.Buffers;
 using System.Collections.Concurrent;
 using System.Threading;
 using Letter.Kcp.lib__;
+using KcpProject;
 
 
 namespace kcplib_test
@@ -11,17 +12,23 @@ namespace kcplib_test
     {
         public KcpUnit()
         {
-            this.kcp = new Kcp(1, true, SlabMemoryPoolFactory.Create(new MemoryPoolOptions(512, 16)), OnOutEvent);
+            this.kcp = new KcpProject.KCP(1, this.OnOutEvent);
+            // this.kcp = new Kcp(1, true, SlabMemoryPoolFactory.Create(new MemoryPoolOptions(512, 16)), OnOutEvent);
             this.kcp.NoDelay(1, 10, 2, 1);
-            this.kcp.SetStreamMode(true);
-            
+            this.kcp.SetStreamMode(false);
+        
+            // this.kcp.Flush(false);
             this.n_time = KcpHelper.currentMS();
 
-            Thread thread = new Thread(OnUpdate);
-            thread.Start();
+            // Thread thread = new Thread(OnUpdate);
+            // thread.Start();
         }
         
-        private Kcp kcp;
+
+
+        private KCP kcp;
+
+        // private Kcp kcp;
         private ConcurrentQueue<Memory<byte>> recv_queue = new ConcurrentQueue<Memory<byte>>();
         private ConcurrentQueue<byte[]> send_queue = new ConcurrentQueue<byte[]>();
 
@@ -29,16 +36,26 @@ namespace kcplib_test
 
         public Action<Memory<byte>> onRcvEvent;
         public Action<Memory<byte>> onSndEvent;
-        
-        public void Recv(Memory<byte> bytes)
-        {
-            System.Random re = new Random();
-            int num = re.Next(0, 99);
-            if (num < 50)
-            {
-                return;
-            }
 
+        public void Debug()
+        {
+            System.Text.StringBuilder sb = new System.Text.StringBuilder();
+            sb.AppendLine("等待发送的包：：" + send_queue.Count);
+            sb.AppendLine("已经收到的包：："+recv_queue.Count);
+
+            Console.WriteLine();
+        }
+        
+        public void Recv(Memory<byte> memory)
+        {
+            // System.Random re = new Random();
+            // int num = re.Next(0, 99);
+            // if (num < 50)
+            // {
+            //     return;
+            // }
+            byte[] bytes = new byte[memory.Length];
+            memory.CopyTo(bytes);
             recv_queue.Enqueue(bytes);
             this.n_time = KcpHelper.currentMS();
         }
@@ -49,8 +66,9 @@ namespace kcplib_test
             this.n_time = KcpHelper.currentMS();
         }
         
-        
-        private void OnUpdate(object obj)
+        byte[] buffer = new byte[1400];
+
+        public void OnUpdate(object obj)
         {
             while(true)
             {
@@ -58,8 +76,11 @@ namespace kcplib_test
 
                 if(KcpHelper.currentMS() >= this.n_time)
                 {
-                    while (this.recv_queue.TryDequeue(out var item))
+                    while (this.recv_queue.Count > 0)
                     {
+                       
+
+                        this.recv_queue.TryDequeue(out var item);
                         // Console.WriteLine("xxxxxxxxxxxx>>"+item.Length);
                         var seg = item.GetBinaryArray();
                         kcp.Input(seg.Array, 0, seg.Count, true, false);
@@ -69,9 +90,9 @@ namespace kcplib_test
                             continue;
                         }
                         // Console.WriteLine(">>>>>>"+length);
-                        byte[] bytes = new byte[length];
-                        var bytesLength = this.kcp.Recv(bytes, 0, length);
-                        Memory<byte> memory = new Memory<byte>(bytes, 0, bytesLength);
+                        
+                        var bytesLength = this.kcp.Recv(buffer, 0, length);
+                        Memory<byte> memory = new Memory<byte>(buffer, 0, bytesLength);
 
                         if(this.onRcvEvent != null)
                         {
@@ -79,8 +100,15 @@ namespace kcplib_test
                         }
                     }
 
-                    while(this.send_queue.TryDequeue(out var item))
+                    while(this.send_queue.Count > 0)
                     {
+                        if(this.kcp.WaitSnd > this.kcp.SndWnd * 2)
+                        {
+                            break;
+                        }
+
+                        this.send_queue.TryDequeue(out var item);
+
                         this.kcp.Send(item);
                     }
                     

@@ -1,0 +1,10 @@
+{
+  "version": 2,
+  "dgSpecHash": "pZyfpK3W11BO8Icy9cVqcV3kLVMxYshduno5mR+vDHfIbt7mgiqIQ3+2lJAtQzGELLkzQFyrKIJWVQkqBECUOw==",
+  "success": true,
+  "projectFilePath": "/Users/guanyedong/Projects/letter-github/examples/kcp_lab_test/kcp_lab_test.csproj",
+  "expectedPackageFiles": [
+    "/Users/guanyedong/.nuget/packages/system.io.pipelines/5.0.1/system.io.pipelines.5.0.1.nupkg.sha512"
+  ],
+  "logs": []
+}

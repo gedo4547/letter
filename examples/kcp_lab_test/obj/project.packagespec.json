@@ -1,0 +1,53 @@
+﻿{
+  "version": "1.0.0",
+  "restore": {
+    "projectUniqueName": "/Users/guanyedong/Projects/letter-github/examples/kcp_lab_test/kcp_lab_test.csproj",
+    "projectName": "kcp_lab_test",
+    "projectPath": "/Users/guanyedong/Projects/letter-github/examples/kcp_lab_test/kcp_lab_test.csproj",
+    "outputPath": "/Users/guanyedong/Projects/letter-github/examples/kcp_lab_test/obj/",
+    "projectStyle": "PackageReference",
+    "fallbackFolders": [
+      "/usr/local/share/dotnet/sdk/NuGetFallbackFolder"
+    ],
+    "originalTargetFrameworks": [
+      "net50"
+    ],
+    "sources": {
+      "https://api.nuget.org/v3/index.json": {}
+    },
+    "frameworks": {
+      "netcoreapp5.0": {
+        "projectReferences": {
+          "/Users/guanyedong/Projects/letter-github/src/Letter.Kcp/Letter.Kcp.csproj": {
+            "projectPath": "/Users/guanyedong/Projects/letter-github/src/Letter.Kcp/Letter.Kcp.csproj"
+          }
+        }
+      }
+    },
+    "warningProperties": {
+      "warnAsError": [
+        "NU1605"
+      ]
+    }
+  },
+  "frameworks": {
+    "netcoreapp5.0": {
+      "imports": [
+        "net461",
+        "net462",
+        "net47",
+        "net471",
+        "net472",
+        "net48"
+      ],
+      "assetTargetFallback": true,
+      "warn": true,
+      "frameworkReferences": {
+        "Microsoft.NETCore.App": {
+          "privateAssets": "all"
+        }
+      },
+      "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/5.0.102/RuntimeIdentifierGraph.json"
+    }
+  }
+}
