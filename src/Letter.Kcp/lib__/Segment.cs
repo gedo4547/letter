@@ -24,6 +24,7 @@ namespace KcpProject
 
             public static Segment Get(int size)
             {
+                //Logger.Debug("Segment.Get");
                 lock (msSegmentPool)
                 {
                     if (msSegmentPool.Count > 0)

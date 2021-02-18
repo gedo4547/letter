@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Buffers;
 using System.Diagnostics;
 using System.Threading;
-using Letter.Kcp.lib__;
 
 namespace kcplib_test
 {

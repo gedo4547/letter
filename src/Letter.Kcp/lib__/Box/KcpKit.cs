@@ -4,6 +4,7 @@ using System.Buffers;
 namespace Letter.Kcp.lib__
 {
     public delegate void RefAction(ref ReadOnlySequence<byte> sequence);
+
     public sealed class KcpKit : IDisposable
     {
         public KcpKit(uint conv, bool littleEndian, MemoryPool<byte> memoryPool)
@@ -12,23 +13,25 @@ namespace Letter.Kcp.lib__
 
             this._allotter = new KcpMemoryBlockAllotter(memoryPool);
             this.buffer = new KcpBuffer(this._allotter);
-            // this.mRecvBuffer = KcpBuffer.Allocate(1024 * 32);
-            // this.mRecvBuffer.Clear();
         }
         
         private Kcp mKCP;
         private UInt32 mNextUpdateTime = 0;
-        // private KcpBuffer mRecvBuffer;
 
         private KcpBuffer buffer;
         private KcpMemoryBlockAllotter _allotter;
 
         public RefAction onRcv;
         public RefAction onSnd;
-        
-        public bool WriteDelay { get; set; }
+
+        public bool WriteDelay { get; set; } = false;
         
         public bool AckNoDelay { get; set; }
+
+        public void SetNextTime(uint time)
+        {
+            this.mNextUpdateTime = time;
+        }
 
         public void SettingNoDelay(int nodelay_, int interval_, int resend_, int nc_)
         {
@@ -78,6 +81,14 @@ namespace Letter.Kcp.lib__
             return 0;
         }
 
+        /// <summary>
+        /// 接收
+        /// </summary>
+        /// <param name="data"></param>
+        /// <param name="index"></param>
+        /// <param name="length"></param>
+        /// <param name="regular">普通包(非向前纠正的包)</param>
+        /// <returns></returns>
         public int Recv(byte[] data, int index, int length, bool regular = true)
         {
             var inputN = mKCP.Input(data, index, length, regular, AckNoDelay);
@@ -94,10 +105,6 @@ namespace Letter.Kcp.lib__
                 if (size <= 0) break;
 
                 mKCP.Recv(this.buffer);
-                // mRecvBuffer.EnsureWritableBytes(size);
-
-                // var n = mKCP.Recv(mRecvBuffer.RawBuffer, mRecvBuffer.WriterIndex, size);
-                // if (n > 0) mRecvBuffer.WriterIndex += n;
             }
 
             // 有数据待接收
@@ -115,12 +122,14 @@ namespace Letter.Kcp.lib__
 
         private void OnOutEvent(byte[] buffer, int length)
         {
-            if (this.onSnd != null)
+            //Console.WriteLine("kcp send>>>" + length + ">>>>>>>>>>>>>>" + (this.onSnd == null));
+            if (this.onSnd == null)
             {
-                var sequence = new ReadOnlySequence<byte>(buffer, 0, length);
-
-                this.onSnd(ref sequence);
+                return;
             }
+
+            var sequence = new ReadOnlySequence<byte>(buffer, 0, length);
+            this.onSnd(ref sequence);
         }
 
         public void Update()

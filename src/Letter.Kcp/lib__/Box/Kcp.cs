@@ -657,6 +657,7 @@ namespace Letter.Kcp.lib__
             if (ackOnly)
             {
                 flushBuffer();
+                this.segmentAllotter.Put(seg);
                 return interval;
             }
 
@@ -850,7 +851,7 @@ namespace Letter.Kcp.lib__
                     incr = mss;
                 }
             }
-
+            this.segmentAllotter.Put(seg);
             return (UInt32)minrto;
         }
 
@@ -874,7 +875,7 @@ namespace Letter.Kcp.lib__
                 ts_flush = current;
                 slap = 0;
             }
-
+            //Console.WriteLine("slap>>>>" + slap);
             if (slap >= 0)
             {
                 ts_flush += interval;

@@ -133,6 +133,7 @@ namespace Letter.IO.Kcplib
 
             public static Segment Get(int size)
             {
+                Logger.Debug("Kcp.Segment.Get");
                 lock (msSegmentPool)
                 {
                     if (msSegmentPool.Count > 0)
@@ -1006,7 +1007,7 @@ namespace Letter.IO.Kcplib
                 ts_flush = current;
                 slap = 0;
             }
-
+            Console.WriteLine("slap>>>>" + slap);
             if (slap >= 0)
             {
                 ts_flush += interval;

@@ -667,7 +667,7 @@ namespace KcpProject
         // flush pending data
         public UInt32 Flush(bool ackOnly)
         {
-            var seg = Segment.Get(32);
+            Segment seg = Segment.Get(32);
             seg.conv = conv;
             seg.cmd = IKCP_CMD_ACK;
             seg.wnd = (UInt32)wnd_unused();
@@ -924,6 +924,7 @@ namespace KcpProject
                 slap = 0;
             }
 
+            //Console.WriteLine("slap>>>>" + slap);
             if (slap >= 0)
             {
                 ts_flush += interval;

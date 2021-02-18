@@ -20,8 +20,8 @@ namespace kcplib_test
             // this.kcp.Flush(false);
             this.n_time = KcpHelper.currentMS();
 
-            // Thread thread = new Thread(OnUpdate);
-            // thread.Start();
+            Thread thread = new Thread(OnUpdate);
+            thread.Start();
         }
         
 
@@ -72,7 +72,7 @@ namespace kcplib_test
         {
             while(true)
             {
-                Thread.Sleep(0);
+                Thread.Sleep(1);
 
                 if(KcpHelper.currentMS() >= this.n_time)
                 {

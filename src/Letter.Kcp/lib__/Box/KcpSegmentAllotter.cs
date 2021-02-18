@@ -19,7 +19,7 @@ namespace Letter.Kcp.lib__
 
         public KcpSegment Get()
         {
-            if(this.segmentStack.Count > 0)
+            if (this.segmentStack.Count > 0)
             {
                 return this.segmentStack.Pop();
             }

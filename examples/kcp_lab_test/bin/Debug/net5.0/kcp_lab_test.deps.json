@@ -6,13 +6,13 @@
   "compilationOptions": {},
   "targets": {
     ".NETCoreApp,Version=v5.0": {
-      "kcplib_test/1.0.0": {
+      "kcp_lab_test/1.0.0": {
         "dependencies": {
           "Letter.Kcp": "0.0.0.1",
           "common": "1.0.0"
         },
         "runtime": {
-          "kcplib_test.dll": {}
+          "kcp_lab_test.dll": {}
         }
       },
       "System.IO.Pipelines/5.0.1": {
@@ -55,7 +55,7 @@
     }
   },
   "libraries": {
-    "kcplib_test/1.0.0": {
+    "kcp_lab_test/1.0.0": {
       "type": "project",
       "serviceable": false,
       "sha512": ""

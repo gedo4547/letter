@@ -1,4 +1,6 @@
+using System;
 using System.Buffers;
+using System.Collections.Concurrent;
 using Letter.Kcp.lib__;
 
 namespace kcp_lab_test
@@ -9,10 +11,20 @@ namespace kcp_lab_test
         {
             this._kcpKit = new KcpKit(1, true, memoryPool);
             this._kcpKit.SettingNoDelay(1, 10, 2, 1);
+            this._kcpKit.WriteDelay = false;
             this._kcpKit.SettingStreamMode(false);
+
+            System.Threading.Thread thread = new System.Threading.Thread(()=> 
+            {
+                this.Update();
+            });
+            thread.Start();
         }
 
         private KcpKit _kcpKit;
+
+        private ConcurrentQueue<Memory<byte>> recv_queue = new ConcurrentQueue<Memory<byte>>();
+        private ConcurrentQueue<Memory<byte>> send_queue = new ConcurrentQueue<Memory<byte>>();
 
         public void SetRcvEvent(RefAction rcv)
         {
@@ -24,19 +36,53 @@ namespace kcp_lab_test
             this._kcpKit.onSnd += snd;
         }
 
-        public int Recv(byte[] data, int index, int length, bool regular = true)
+        public void Recv(Memory<byte> data)
         {
-            return this._kcpKit.Recv(data, index, length, regular);
+            this.recv_queue.Enqueue(data);
+            this._kcpKit.SetNextTime(KcpHelper.currentMS());
         }
 
-        public int Send(byte[] data, int index, int length)
+        int num;
+        public void Send(Memory<byte> data)
         {
-            return this._kcpKit.Send(data, index, length);
+            num++;
+            Console.WriteLine("Send>>"+num);
+            this.send_queue.Enqueue(data);
+            this._kcpKit.SetNextTime(KcpHelper.currentMS());
         }
 
         public void Update()
         {
-            this._kcpKit.Update();
+            while (true)
+            {
+                System.Threading.Thread.Sleep(1);
+
+                while (this.recv_queue.Count > 0)
+                {
+                    this.recv_queue.TryPeek(out var item);
+                    var seg = item.GetBinaryArray();
+                    var length = this._kcpKit.Recv(seg.Array, 0, seg.Count);
+                    if (length < 0)
+                    {
+                        this.recv_queue.TryDequeue(out _);
+                    }
+                }
+
+                while (this.send_queue.Count > 0)
+                {
+                    this.send_queue.TryPeek(out var item);
+                    var seg = item.GetBinaryArray();
+                    //Console.WriteLine(">>>>>>>>");
+                    var length = this._kcpKit.Send(seg.Array, 0, seg.Count);
+                    if (length != 0)
+                    {
+                        this.send_queue.TryDequeue(out _);
+                    }
+                }
+
+                this._kcpKit.Update();
+            }
+            
         }
     }
 }
