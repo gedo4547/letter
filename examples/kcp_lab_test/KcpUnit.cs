@@ -1,7 +1,7 @@
 using System;
 using System.Buffers;
 using System.Collections.Concurrent;
-using Letter.Kcp.lib__;
+using System.Net;
 
 namespace kcp_lab_test
 {
@@ -11,8 +11,8 @@ namespace kcp_lab_test
         {
             this._kcpKit = new KcpKit(1, true, memoryPool);
             this._kcpKit.SettingNoDelay(1, 10, 2, 1);
-            this._kcpKit.WriteDelay = false;
-            this._kcpKit.SettingStreamMode(false);
+            this._kcpKit.WriteDelay = true;
+            this._kcpKit.SettingStreamMode(true);
 
             System.Threading.Thread thread = new System.Threading.Thread(()=> 
             {
@@ -72,7 +72,7 @@ namespace kcp_lab_test
                     if (this._kcpKit.TryRcv(seg.Array, 0, seg.Count))
                     {
                         this.recv_queue.TryDequeue(out _);
-                        this._kcpKit.SetNextTime(KcpHelper.currentMS());
+                        this._kcpKit.MarkTime();
                     }
                     else
                     {
@@ -89,7 +89,7 @@ namespace kcp_lab_test
                     if (this._kcpKit.TrySnd(seg.Array, 0, seg.Count))
                     {
                         this.send_queue.TryDequeue(out _);
-                        this._kcpKit.SetNextTime(KcpHelper.currentMS());
+                        this._kcpKit.MarkTime();
                     }
                     else
                     {

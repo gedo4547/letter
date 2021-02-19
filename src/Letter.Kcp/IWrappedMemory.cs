@@ -10,10 +10,9 @@ namespace Letter.Kcp
 
         object Token { get; set; }
 
+        bool Regular { get; set; }
+
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         Memory<byte> GetReadableMemory();
     }
-
-
-   
 }

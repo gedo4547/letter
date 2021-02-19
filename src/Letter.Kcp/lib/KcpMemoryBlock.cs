@@ -2,7 +2,7 @@ using System.IO.Pipelines;
 using System.Buffers;
 using System.Runtime.CompilerServices;
 
-namespace Letter.Kcp.lib__
+namespace System.Net
 {
     sealed class KcpMemoryBlock : ASegment
     {

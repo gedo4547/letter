@@ -2,7 +2,7 @@ using System;
 using System.Buffers;
 using System.Collections.Generic;
 
-namespace Letter.Kcp.lib__
+namespace System.Net
 {
     sealed class KcpBufferAllotter : IKcpAllotter<KcpBuffer>
     {

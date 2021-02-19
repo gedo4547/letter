@@ -2,7 +2,7 @@ using System;
 using System.Buffers;
 using System.Runtime.CompilerServices;
 
-namespace Letter.Kcp.lib__
+namespace System.Net
 {
     sealed class KcpBuffer : IDisposable
     {

@@ -1,6 +1,6 @@
 using System;
 
-namespace Letter.Kcp.lib__
+namespace System.Net
 {
     interface IKcpAllotter<T> : IDisposable
     {

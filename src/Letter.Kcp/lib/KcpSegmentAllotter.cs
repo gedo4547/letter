@@ -2,17 +2,17 @@ using System;
 using System.Buffers;
 using System.Collections.Generic;
 
-namespace Letter.Kcp.lib__
+namespace System.Net
 {
     class KcpSegmentAllotter : IKcpAllotter<KcpSegment>
     {
-        public KcpSegmentAllotter(MemoryPool<byte> memoryPool, bool useLittleEndian)
+        public KcpSegmentAllotter(MemoryPool<byte> memoryPool, bool littleEndian)
         {
-            this.useLittleEndian = useLittleEndian;
+            this.littleEndian = littleEndian;
             this.bufferAllotter = new KcpBufferAllotter(memoryPool);
         }
 
-        private bool useLittleEndian;
+        private bool littleEndian;
         private KcpBufferAllotter bufferAllotter;
 
         private Stack<KcpSegment> segmentStack = new Stack<KcpSegment>();
@@ -25,7 +25,7 @@ namespace Letter.Kcp.lib__
             }
             
             KcpBuffer buffer = this.bufferAllotter.Get();
-            return new KcpSegment(this.useLittleEndian, buffer);
+            return new KcpSegment(this.littleEndian, buffer);
         }
 
         public void Put(KcpSegment segment)

@@ -23,6 +23,8 @@ namespace Letter.Kcp
 
         public object Token { get; set; }
 
+        public bool Regular { get; set; }
+
         public void SettingMemory(IMemoryOwner<byte> memoryOwner, int writedLength)
         {
             this.writedLength = writedLength;

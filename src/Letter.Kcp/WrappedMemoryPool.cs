@@ -1,6 +1,8 @@
 using System;
 using System.Buffers;
 using System.Collections.Generic;
+using System.Collections.Concurrent;
+
 
 namespace Letter.Kcp
 {
@@ -14,13 +16,13 @@ namespace Letter.Kcp
 
         private MemoryFlag flag;
         private MemoryPool<byte> memoryPool;
-        private Stack<WrappedMemory> stack = new Stack<WrappedMemory>();
+        private ConcurrentStack<WrappedMemory> stack = new ConcurrentStack<WrappedMemory>();
 
         public WrappedMemory Pop()
         {
-            if(stack.Count > 0)
+            if (this.stack.TryPop(out var item))
             {
-                return this.stack.Pop();
+                return item;
             }
 
             return new WrappedMemory(this.memoryPool.Rent(), this.flag);

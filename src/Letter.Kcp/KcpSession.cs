@@ -4,13 +4,10 @@ using System.Buffers.Binary;
 using System.IO.Pipelines;
 using System.Net;
 using System.Threading.Tasks;
-using System.Collections.Generic;
+using System.Collections.Concurrent;
 
 using Letter.IO;
-//using Letter.IO.Kcplib;
-
 using Letter.Udp;
-using Letter.Kcp.lib__;
 
 namespace Letter.Kcp
 {
@@ -29,36 +26,20 @@ namespace Letter.Kcp
             this.Pipeline = pipeline;
             this.closable = closable;
 
-            //this.kcpKit = new KcpKit(conv);
-
-            if(options.Mtu != null)
-                this.kcpKit.SettingMtu(options.Mtu.Value);
-
-            this.kcpKit.SettingWndSize(
-                options.WndSize.sndwnd, 
-                options.WndSize.rcvwnd);
-
-            this.kcpKit.SettingNoDelay(
-                options.NoDelay.nodelay_, 
-                options.NoDelay.interval_, 
-                options.NoDelay.resend_, 
-                options.NoDelay.nc_);
-
-            if(options.StreamMode != null)
-                this.kcpKit.SettingStreamMode(options.StreamMode.Value);
-
-            if(options.ReservedSize != null)
-                this.kcpKit.SettingReserveBytes(options.ReservedSize.Value);
+            var littleEndian = this.Order == BinaryOrder.LittleEndian;
+            this.kcpKit = new KcpKit(conv, littleEndian, this.MemoryPool);
+            this.kcpKit.SettingMtu(options.Mtu);
+            this.kcpKit.SettingNoDelay(options.NoDelay);
+            this.kcpKit.SettingWndSize(options.WndSize);
+            this.kcpKit.SettingStreamMode(options.StreamMode);
+            this.kcpKit.SettingReservedSize(options.ReservedSize);
 
             this.kcpKit.onRcv += this.OnKcpRcvEvent;
             this.kcpKit.onSnd += this.OnKcpSndEvent;
 
+            this.kcpOperators = BinaryOrderOperatorsFactory.GetOperators(this.Order);
             this.rcvPool = new WrappedMemoryPool(this.MemoryPool, MemoryFlag.Kcp);
             this.sndPool = new WrappedMemoryPool(this.MemoryPool, MemoryFlag.Kcp);
-
-
-            this.readerKcpMemory = new WrappedMemory(this.MemoryPool.Rent(), MemoryFlag.Kcp);
-            this.writerKcpMemory = new WrappedMemory(this.MemoryPool.Rent(), MemoryFlag.Kcp);
 
             this.readerUdpMemory = new WrappedMemory(this.MemoryPool.Rent(), MemoryFlag.Udp);
             this.writerUdpMemory = new WrappedMemory(this.MemoryPool.Rent(), MemoryFlag.Udp);
@@ -71,8 +52,6 @@ namespace Letter.Kcp
 
             this.Pipeline.OnTransportActive(this);
         }
-
-        
 
         public string Id { get; }
         public uint Conv {get;}
@@ -88,9 +67,7 @@ namespace Letter.Kcp
         private IEventSubscriber subscriber;
         private IUdpSession udpSession;
         private IKcpClosable closable;
-        
-        private WrappedMemory readerKcpMemory;
-        private WrappedMemory writerKcpMemory;
+        private IBinaryOrderOperators kcpOperators;
 
         private WrappedMemory readerUdpMemory;
         private WrappedMemory writerUdpMemory;
@@ -99,7 +76,6 @@ namespace Letter.Kcp
         private WriterFlushDelegate writerFlushDelegate;
         private RunnableUnitDelegate runnableUnitDelegate;
         
-        private DateTime nextTime;
         private volatile bool isClosed = false;
 
         private object rcv_sync = new object();
@@ -108,62 +84,65 @@ namespace Letter.Kcp
 
         private WrappedMemoryPool rcvPool;
         private WrappedMemoryPool sndPool;
-        private Queue<WrappedMemory> rcvQueue = new Queue<WrappedMemory>();
-        private Queue<WrappedMemory> sndQueue = new Queue<WrappedMemory>();
+        private ConcurrentQueue<WrappedMemory> rcvQueue = new ConcurrentQueue<WrappedMemory>();
+        private ConcurrentQueue<WrappedMemory> sndQueue = new ConcurrentQueue<WrappedMemory>();
        
-        private void Update(ref DateTime nowTime)
+        private void Update()
         {
             if (this.isClosed) return;
 
-            lock(this.rcv_sync)
+            while (this.rcvQueue.Count > 0)
             {
-                while(this.rcvQueue.Count > 0)
+                this.rcvQueue.TryPeek(out var item);
+                var seg = item.GetReadableMemory().GetBinaryArray();
+                if (!this.kcpKit.TryRcv(seg.Array, seg.Offset, seg.Count, item.Regular))
                 {
-                    var item = this.rcvQueue.Peek();
-                    var seg = item.GetReadableMemory().GetBinaryArray();
-                    var opencode = 0;// this.kcpKit.Recv(seg.Array, seg.Offset, seg.Count);
-
-                    if(opencode < 0) break;
-
-                    this.rcvQueue.Dequeue();
+                    break;
+                }
+                else
+                {
+                    this.rcvQueue.TryDequeue(out _);
                     this.sndPool.Push(item);
+                    this.kcpKit.MarkTime();
                 }
             }
-            
-            lock(this.snd_sync)
+
+            lock (this.snd_sync)
             {
                 while(this.sndQueue.Count > 0)
                 {
-                    var item = this.sndQueue.Peek();
+                    this.sndQueue.TryPeek(out var item);
                     var seg = item.GetReadableMemory().GetBinaryArray();
-                    var opencode = 0;//this.kcpKit.Send(seg.Array, seg.Offset, seg.Count);
 
-                    if(opencode == 0) break;
-
-                    this.sndQueue.Dequeue();
-                    this.sndPool.Push(item);
+                    if (!this.kcpKit.TrySnd(seg.Array, seg.Offset, seg.Count))
+                    {
+                        break;
+                    }
+                    else
+                    {
+                        this.sndQueue.TryDequeue(out _);
+                        this.sndPool.Push(item);
+                        this.kcpKit.MarkTime();
+                    }
                 }
             }
-            
 
             this.kcpKit.Update();
         }
         
-        public void InputKcpMessage(ref ReadOnlySequence<byte> buffer)
+        public void InputKcpMessage(ref ReadOnlySequence<byte> buffer, bool regular = true)
         {
             if (this.isClosed)
             {
                 return;
             }
 
-            lock(this.rcv_sync)
-            {
-                var memory = this.rcvPool.Pop();
-                var writableMemory = memory.GetWritableMemory((int)buffer.Length);
-                buffer.CopyTo(writableMemory.Span);
-                memory.WriterAdvance((int)buffer.Length);
-                this.rcvQueue.Enqueue(memory);
-            }
+            var memory = this.rcvPool.Pop();
+            var writableMemory = memory.GetWritableMemory((int)buffer.Length);
+            buffer.CopyTo(writableMemory.Span);
+            memory.WriterAdvance((int)buffer.Length);
+            memory.Regular = regular;
+            this.rcvQueue.Enqueue(memory);
         }
 
         public void InputUdpMessage(ref ReadOnlySequence<byte> buffer)
@@ -188,8 +167,6 @@ namespace Letter.Kcp
                 return;
             }
         }
-
-        
 
         public void SafeSendAsync(object o)
         {
@@ -310,8 +287,8 @@ namespace Letter.Kcp
             this.subscriber.Unregister(this.runnableUnitDelegate);
             this.Pipeline.OnTransportInactive(this);
             
-            this.readerKcpMemory.Dispose();
-            this.writerKcpMemory.Dispose();
+            //this.readerKcpMemory.Dispose();
+            //this.writerKcpMemory.Dispose();
 
             this.closable.OnSessionClosed(this);
             

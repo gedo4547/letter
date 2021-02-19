@@ -13,7 +13,6 @@ namespace Letter.Kcp
             thread.Start();
         }
 
-
         private volatile bool isStop = false;
         
         private Thread thread;
@@ -50,13 +49,13 @@ namespace Letter.Kcp
             while (!this.isStop)
             {
                 Thread.Sleep(1);
-                DateTime nowTime = TimeHelpr.GetNowTime();
+
                 try
                 {
                     var enumerator = this.runnables.GetEnumerator();
                     while(enumerator.MoveNext())
                     {
-                        enumerator.Current.Update(ref nowTime);
+                        enumerator.Current.Update();
                     }
                 }
                 catch (Exception ex)

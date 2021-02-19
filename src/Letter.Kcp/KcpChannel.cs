@@ -8,7 +8,7 @@ using Letter.Udp;
 
 namespace Letter.Kcp
 {
-    delegate void RunnableUnitDelegate(ref DateTime time);
+    delegate void RunnableUnitDelegate();
 
     sealed class KcpChannel : AChannel<IKcpSession, KcpOptions>, IKcpChannel, IFilter<IUdpSession>, IKcpSessionBuilder, IKcpRunnable, IEventSubscriber
     {
@@ -123,11 +123,11 @@ namespace Letter.Kcp
             }
         }
 
-        public void Update(ref DateTime nowTime)
+        public void Update()
         {
             if (this.runnableUnits != null)
             {
-                this.runnableUnits(ref nowTime);
+                this.runnableUnits();
             }
         }
 

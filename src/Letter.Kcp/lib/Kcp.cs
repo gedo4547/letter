@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Buffers;
 
-namespace Letter.Kcp.lib__
+namespace System.Net
 {
     sealed class Kcp : IDisposable
     {
@@ -75,15 +75,15 @@ namespace Letter.Kcp.lib__
         // internal time.
         public UInt32 CurrentMS { get { return KcpHelper.currentMS(); } }
 
-        private bool useLittleEndian;
+        private bool littleEndian;
         private KcpSegmentAllotter segmentAllotter;
 
         // create a new kcp control object, 'conv' must equal in two endpoint
         // from the same connection.
         public Kcp(UInt32 conv_, bool littleEndian, MemoryPool<byte> memoryPool, Action<byte[], int> output_)
         {
-            this.useLittleEndian = littleEndian;
-            this.segmentAllotter = new KcpSegmentAllotter(memoryPool, this.useLittleEndian);
+            this.littleEndian = littleEndian;
+            this.segmentAllotter = new KcpSegmentAllotter(memoryPool, this.littleEndian);
 
 
             conv = conv_;
@@ -448,7 +448,7 @@ namespace Letter.Kcp.lib__
 
                 if (size - (offset - index) < IKCP_OVERHEAD) break;
                 var buffer = new ReadOnlySequence<byte>(data);
-                if(useLittleEndian)
+                if(littleEndian)
                 {
                     offset += KcpHelper.ReadUInt32_LE(buffer.Slice(offset), ref conv_);
 

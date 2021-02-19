@@ -1,7 +1,7 @@
 using System;
 using System.Buffers;
 
-namespace Letter.Kcp.lib__
+namespace System.Net
 {
     class KcpSegment : IDisposable
     {

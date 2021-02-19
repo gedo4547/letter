@@ -1,7 +1,7 @@
 using System;
 using System.Buffers;
 
-namespace Letter.Kcp.lib__
+namespace System.Net
 {
     public delegate void RefAction(ref ReadOnlySequence<byte> sequence);
 
@@ -28,9 +28,9 @@ namespace Letter.Kcp.lib__
         
         public bool AckNoDelay { get; set; }
 
-        public void SetNextTime(uint time)
+        public void MarkTime()
         {
-            this.mNextUpdateTime = time;
+            this.mNextUpdateTime = KcpHelper.currentMS();
         }
 
         public void SettingNoDelay(int nodelay_, int interval_, int resend_, int nc_)
@@ -94,14 +94,6 @@ namespace Letter.Kcp.lib__
             return 0;
         }
 
-        /// <summary>
-        /// 接收
-        /// </summary>
-        /// <param name="data"></param>
-        /// <param name="index"></param>
-        /// <param name="length"></param>
-        /// <param name="regular">普通包(非向前纠正的包)</param>
-        /// <returns></returns>
         private int Recv(byte[] data, int index, int length, bool regular = true)
         {
             var inputN = mKCP.Input(data, index, length, regular, AckNoDelay);
@@ -135,7 +127,6 @@ namespace Letter.Kcp.lib__
 
         private void OnOutEvent(byte[] buffer, int length)
         {
-            //Console.WriteLine("kcp send>>>" + length + ">>>>>>>>>>>>>>" + (this.onSnd == null));
             if (this.onSnd == null)
             {
                 return;
