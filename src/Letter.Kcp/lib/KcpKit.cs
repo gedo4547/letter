@@ -1,30 +1,37 @@
 using System;
 using System.Buffers;
 
-namespace System.Net.Sockets
+namespace Letter.Kcp.lib__
 {
-    internal class KcpKit : IDisposable
+    public delegate void RefAction(ref ReadOnlySequence<byte> sequence);
+
+    public sealed class KcpKit : IDisposable
     {
-        internal delegate void RefAction(ref ReadOnlySequence<byte> sequence);
-
-        public KcpKit(uint conv)
+        public KcpKit(uint conv, bool littleEndian, MemoryPool<byte> memoryPool)
         {
-            this.mKCP = new Kcp(conv, this.OnOutEvent);
+            this.mKCP = new Kcp(conv, littleEndian, memoryPool, this.OnOutEvent);
 
-            this.mRecvBuffer = KcpBuffer.Allocate(1024 * 32);
-            this.mRecvBuffer.Clear();
+            this._allotter = new KcpMemoryBlockAllotter(memoryPool);
+            this.buffer = new KcpBuffer(this._allotter);
         }
         
         private Kcp mKCP;
         private UInt32 mNextUpdateTime = 0;
-        private KcpBuffer mRecvBuffer;
+
+        private KcpBuffer buffer;
+        private KcpMemoryBlockAllotter _allotter;
 
         public RefAction onRcv;
         public RefAction onSnd;
-        
-        public bool WriteDelay { get; set; }
+
+        public bool WriteDelay { get; set; } = false;
         
         public bool AckNoDelay { get; set; }
+
+        public void SetNextTime(uint time)
+        {
+            this.mNextUpdateTime = time;
+        }
 
         public void SettingNoDelay(int nodelay_, int interval_, int resend_, int nc_)
         {
@@ -50,11 +57,24 @@ namespace System.Net.Sockets
         {
             return this.mKCP.ReserveBytes(reservedSize);
         }
+
+        public bool TryRcv(byte[] data, int index, int length, bool regular = true)
+        {
+            var transfer = this.Recv(data, index, length, regular);
+            return transfer == 0;
+        }
+
+        public bool TrySnd(byte[] data, int index, int length)
+        {
+            var transfer =  this.Send(data, index, length);
+            return transfer > 0;
+        }
         
-        public int Send(byte[] data, int index, int length)
+        private int Send(byte[] data, int index, int length)
         {
             var waitsnd = mKCP.WaitSnd;
-            if (waitsnd < mKCP.SndWnd && waitsnd < mKCP.RmtWnd) {
+            if (waitsnd < mKCP.SndWnd && waitsnd < mKCP.RmtWnd) 
+            {
 
                 var sendBytes = 0;
                 do {
@@ -74,7 +94,15 @@ namespace System.Net.Sockets
             return 0;
         }
 
-        public int Recv(byte[] data, int index, int length, bool regular = true)
+        /// <summary>
+        /// 接收
+        /// </summary>
+        /// <param name="data"></param>
+        /// <param name="index"></param>
+        /// <param name="length"></param>
+        /// <param name="regular">普通包(非向前纠正的包)</param>
+        /// <returns></returns>
+        private int Recv(byte[] data, int index, int length, bool regular = true)
         {
             var inputN = mKCP.Input(data, index, length, regular, AckNoDelay);
             if (inputN < 0) 
@@ -82,31 +110,24 @@ namespace System.Net.Sockets
                 return inputN;
             }
             
-            mRecvBuffer.Clear();
+            this.buffer.Reset();
 
             // 读完所有完整的消息
             for (;;) {
                 var size = mKCP.PeekSize();
                 if (size <= 0) break;
 
-                mRecvBuffer.EnsureWritableBytes(size);
-
-                var n = mKCP.Recv(mRecvBuffer.RawBuffer, mRecvBuffer.WriterIndex, size);
-                if (n > 0) mRecvBuffer.WriterIndex += n;
+                mKCP.Recv(this.buffer);
             }
 
             // 有数据待接收
-            if (mRecvBuffer.ReadableBytes > 0) {
-                if(this.onRcv != null)
+            var readableBuffer = this.buffer.ReadableBuffer;
+            if (readableBuffer.Length > 0)
+            {
+                if (this.onRcv != null)
                 {
-                    var sequence = new ReadOnlySequence<byte>(
-                        mRecvBuffer.RawBuffer, 
-                        mRecvBuffer.ReaderIndex, 
-                        mRecvBuffer.ReadableBytes);
-
-                    this.onRcv(ref sequence);
+                    this.onRcv(ref readableBuffer);
                 }
-                return 0;
             }
 
             return 0;
@@ -114,12 +135,14 @@ namespace System.Net.Sockets
 
         private void OnOutEvent(byte[] buffer, int length)
         {
-            if (this.onSnd != null)
+            //Console.WriteLine("kcp send>>>" + length + ">>>>>>>>>>>>>>" + (this.onSnd == null));
+            if (this.onSnd == null)
             {
-                var sequence = new ReadOnlySequence<byte>(buffer, 0, length);
-
-                this.onSnd(ref sequence);
+                return;
             }
+
+            var sequence = new ReadOnlySequence<byte>(buffer, 0, length);
+            this.onSnd(ref sequence);
         }
 
         public void Update()

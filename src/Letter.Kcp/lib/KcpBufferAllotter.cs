@@ -2,16 +2,16 @@ using System;
 using System.Buffers;
 using System.Collections.Generic;
 
-namespace System.Net.Sockets
+namespace Letter.Kcp.lib__
 {
     sealed class KcpBufferAllotter : IKcpAllotter<KcpBuffer>
     {
         public KcpBufferAllotter(MemoryPool<byte> memoryPool)
         {
-            // this.memoryAllotter = new KcpMemoryBlockAllotter(memoryPool);
+            this.memoryAllotter = new KcpMemoryBlockAllotter(memoryPool);
         }
 
-        // private KcpMemoryBlockAllotter memoryAllotter;
+        private KcpMemoryBlockAllotter memoryAllotter;
         private Stack<KcpBuffer> bufferStack = new Stack<KcpBuffer>();
 
         public KcpBuffer Get()
@@ -21,8 +21,7 @@ namespace System.Net.Sockets
                 return this.bufferStack.Pop();
             }
 
-            // return new KcpBuffer(this.memoryAllotter);
-            return default;
+            return new KcpBuffer(this.memoryAllotter);
         }
 
         public void Put(KcpBuffer item)
@@ -43,7 +42,7 @@ namespace System.Net.Sockets
             }
             
             this.bufferStack.Clear();
-            // this.memoryAllotter.Dispose();
+            this.memoryAllotter.Dispose();
         }
     }
 }

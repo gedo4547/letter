@@ -2,7 +2,7 @@ using System;
 using System.Buffers;
 using System.Collections.Generic;
 
-namespace System.Net.Sockets
+namespace Letter.Kcp.lib__
 {
     class KcpSegmentAllotter : IKcpAllotter<KcpSegment>
     {
@@ -19,7 +19,7 @@ namespace System.Net.Sockets
 
         public KcpSegment Get()
         {
-            if(this.segmentStack.Count > 0)
+            if (this.segmentStack.Count > 0)
             {
                 return this.segmentStack.Pop();
             }
@@ -35,7 +35,7 @@ namespace System.Net.Sockets
                 return;
             }
 
-            segment.reset();
+            segment.Reset();
             this.segmentStack.Push(segment);
         }
 
@@ -47,7 +47,7 @@ namespace System.Net.Sockets
                 KcpBuffer buffer = segment.data;
                 //将buffer放回bufferAllotter，统一管理
                 this.bufferAllotter.Put(buffer);
-                // segment.Dispose();
+                segment.Dispose();
             }
             this.segmentStack.Clear();
             

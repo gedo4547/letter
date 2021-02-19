@@ -4,9 +4,9 @@ using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Buffers.Binary;
 
-namespace System.Net.Sockets
+namespace Letter.Kcp.lib__
 {
-    static class KcpHelper
+    public static class KcpHelper
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static int WriteUInt8(in ReadOnlySequence<byte> sequence, byte value)

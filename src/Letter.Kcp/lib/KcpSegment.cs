@@ -1,9 +1,9 @@
-using System.Collections.Generic;
+using System;
+using System.Buffers;
 
-namespace System.Net.Sockets
+namespace Letter.Kcp.lib__
 {
-    // KCP Segment Definition
-    class KcpSegment 
+    class KcpSegment : IDisposable
     {
         public KcpSegment(bool useLittleEndian, KcpBuffer buffer)
         {
@@ -11,8 +11,6 @@ namespace System.Net.Sockets
             this.useLittleEndian = useLittleEndian;
         }
 
-        private bool useLittleEndian;
-        
         internal UInt32 conv = 0;
         internal UInt32 cmd = 0;
         internal UInt32 frg = 0;
@@ -26,57 +24,42 @@ namespace System.Net.Sockets
         internal UInt32 fastack = 0;
         internal UInt32 acked = 0;
         internal KcpBuffer data;
-        
-        
 
-        private static Stack<KcpSegment> msSegmentPool = new Stack<KcpSegment>(32);
+        private bool useLittleEndian;
 
-        public static KcpSegment Get(int size)
-        {
-            lock (msSegmentPool)
-            {
-                if (msSegmentPool.Count > 0)
-                {
-                    var seg = msSegmentPool.Pop();
-                    seg.data = KcpBuffer.Allocate(size, true);
-                    return seg;
-                }
-            }
-            return new KcpSegment(size);
-        }
-
-        public static void Put(KcpSegment seg)
-        {
-            seg.reset();
-            lock (msSegmentPool) {
-                msSegmentPool.Push(seg);
-            }
-        }
-
-        private KcpSegment(int size)
-        {
-            data = KcpBuffer.Allocate(size, true);
-        }
-
-        // encode a segment into buffer
         internal int encode(byte[] ptr, int offset)
         {
-
             var offset_ = offset;
+            ReadOnlySequence<byte> buffer = new ReadOnlySequence<byte>(ptr);
 
-            // offset += ikcp_encode32u(ptr, offset, conv);
-            // offset += ikcp_encode8u(ptr, offset, (byte)cmd);
-            // offset += ikcp_encode8u(ptr, offset, (byte)frg);
-            // offset += ikcp_encode16u(ptr, offset, (UInt16)wnd);
-            // offset += ikcp_encode32u(ptr, offset, ts);
-            // offset += ikcp_encode32u(ptr, offset, sn);
-            // offset += ikcp_encode32u(ptr, offset, una);
-            // offset += ikcp_encode32u(ptr, offset, (UInt32)data.ReadableBytes);
+            switch (this.useLittleEndian)
+            {
+                case true:
+                    offset += KcpHelper.WriteUInt32_LE(buffer.Slice(offset), conv);
+                    offset += KcpHelper.WriteUInt8(buffer.Slice(offset), (byte)cmd);
+                    offset += KcpHelper.WriteUInt8(buffer.Slice(offset), (byte)frg);
+                    offset += KcpHelper.WriteUInt16_LE(buffer.Slice(offset), (UInt16)wnd);
+                    offset += KcpHelper.WriteUInt32_LE(buffer.Slice(offset), ts);
+                    offset += KcpHelper.WriteUInt32_LE(buffer.Slice(offset), sn);
+                    offset += KcpHelper.WriteUInt32_LE(buffer.Slice(offset), una);
+                    offset += KcpHelper.WriteUInt32_LE(buffer.Slice(offset), (UInt32)data.ReadableLength);
+                    break;
+                case false:
+                    offset += KcpHelper.WriteUInt32_BE(buffer.Slice(offset), conv);
+                    offset += KcpHelper.WriteUInt8(buffer.Slice(offset), (byte)cmd);
+                    offset += KcpHelper.WriteUInt8(buffer.Slice(offset), (byte)frg);
+                    offset += KcpHelper.WriteUInt16_BE(buffer.Slice(offset), (UInt16)wnd);
+                    offset += KcpHelper.WriteUInt32_BE(buffer.Slice(offset), ts);
+                    offset += KcpHelper.WriteUInt32_BE(buffer.Slice(offset), sn);
+                    offset += KcpHelper.WriteUInt32_BE(buffer.Slice(offset), una);
+                    offset += KcpHelper.WriteUInt32_BE(buffer.Slice(offset), (UInt32)data.ReadableLength);
+                    break;
+            }
 
             return offset - offset_;
         }
 
-        internal void reset()
+        internal void Reset()
         {
             conv = 0;
             cmd = 0;
@@ -90,10 +73,16 @@ namespace System.Net.Sockets
             resendts = 0;
             fastack = 0;
             acked = 0;
+            
+            this.data.Reset();
+        }
 
-            data.Clear();
-            data.Dispose();
-            data = null;
+        public void Dispose()
+        {
+            if (this.data != null)
+            {
+                this.data = null;
+            }
         }
     }
 }

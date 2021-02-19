@@ -1,11 +1,12 @@
 using System;
 using System.Collections.Generic;
+using System.Buffers;
 
-namespace System.Net.Sockets
+namespace Letter.Kcp.lib__
 {
-    class Kcp
+    sealed class Kcp : IDisposable
     {
-        public const int IKCP_RTO_NDL = 30;  // no delay min rto
+         public const int IKCP_RTO_NDL = 30;  // no delay min rto
         public const int IKCP_RTO_MIN = 100; // normal min rto
         public const int IKCP_RTO_DEF = 200;
         public const int IKCP_RTO_MAX = 60000;
@@ -29,87 +30,6 @@ namespace System.Net.Sockets
         public const int IKCP_SN_OFFSET = 12;
 
 
-        // encode 8 bits unsigned int
-        public static int ikcp_encode8u(byte[] p, int offset, byte c)
-        {
-            p[0 + offset] = c;
-            return 1;
-        }
-
-        // decode 8 bits unsigned int
-        public static int ikcp_decode8u(byte[] p, int offset, ref byte c)
-        {
-            c = p[0 + offset];
-            return 1;
-        }
-
-        /* encode 16 bits unsigned int (lsb) */
-        public static int ikcp_encode16u(byte[] p, int offset, UInt16 w)
-        {
-            p[0 + offset] = (byte)(w >> 0);
-            p[1 + offset] = (byte)(w >> 8);
-            return 2;
-        }
-
-        /* decode 16 bits unsigned int (lsb) */
-        public static int ikcp_decode16u(byte[] p, int offset, ref UInt16 c)
-        {
-            UInt16 result = 0;
-            result |= (UInt16)p[0 + offset];
-            result |= (UInt16)(p[1 + offset] << 8);
-            c = result;
-            return 2;
-        }
-
-        /* encode 32 bits unsigned int (lsb) */
-        public static int ikcp_encode32u(byte[] p, int offset, UInt32 l)
-        {
-            p[0 + offset] = (byte)(l >> 0);
-            p[1 + offset] = (byte)(l >> 8);
-            p[2 + offset] = (byte)(l >> 16);
-            p[3 + offset] = (byte)(l >> 24);
-            return 4;
-        }
-
-        /* decode 32 bits unsigned int (lsb) */
-        public static int ikcp_decode32u(byte[] p, int offset, ref UInt32 c)
-        {
-            UInt32 result = 0;
-            result |= (UInt32)p[0 + offset];
-            result |= (UInt32)(p[1 + offset] << 8);
-            result |= (UInt32)(p[2 + offset] << 16);
-            result |= (UInt32)(p[3 + offset] << 24);
-            c = result;
-            return 4;
-        }
-
-        static UInt32 _imin_(UInt32 a, UInt32 b)
-        {
-            return a <= b ? a : b;
-        }
-
-        private static DateTime refTime = DateTime.Now;
-
-        private static UInt32 currentMS()
-        {
-            var ts = DateTime.Now.Subtract(refTime);
-            return (UInt32)ts.TotalMilliseconds;
-        }
-
-        static UInt32 _imax_(UInt32 a, UInt32 b)
-        {
-            return a >= b ? a : b;
-        }
-
-        static UInt32 _ibound_(UInt32 lower, UInt32 middle, UInt32 upper)
-        {
-            return _imin_(_imax_(lower, middle), upper);
-        }
-
-        static Int32 _itimediff(UInt32 later, UInt32 earlier)
-        {
-            return ((Int32)(later - earlier));
-        }
 
         internal struct ackItem
         {
@@ -153,12 +73,19 @@ namespace System.Net.Sockets
         public int WaitSnd { get { return snd_buf.Count + snd_queue.Count; } }
 
         // internal time.
-        public UInt32 CurrentMS { get { return currentMS(); } }
+        public UInt32 CurrentMS { get { return KcpHelper.currentMS(); } }
+
+        private bool useLittleEndian;
+        private KcpSegmentAllotter segmentAllotter;
 
         // create a new kcp control object, 'conv' must equal in two endpoint
         // from the same connection.
-        public Kcp(UInt32 conv_, Action<byte[], int> output_)
+        public Kcp(UInt32 conv_, bool littleEndian, MemoryPool<byte> memoryPool, Action<byte[], int> output_)
         {
+            this.useLittleEndian = littleEndian;
+            this.segmentAllotter = new KcpSegmentAllotter(memoryPool, this.useLittleEndian);
+
+
             conv = conv_;
             snd_wnd = IKCP_WND_SND;
             rcv_wnd = IKCP_WND_RCV;
@@ -183,7 +110,7 @@ namespace System.Net.Sockets
 
             var seq = rcv_queue[0];
 
-            if (0 == seq.frg) return seq.data.ReadableBytes;
+            if (0 == seq.frg) return seq.data.ReadableLength;
 
             if (rcv_queue.Count < seq.frg + 1) return -1;
 
@@ -191,7 +118,7 @@ namespace System.Net.Sockets
 
             foreach (var item in rcv_queue)
             {
-                length += item.data.ReadableBytes;
+                length += item.data.ReadableLength;
                 if (0 == item.frg)
                     break;
             }
@@ -202,7 +129,8 @@ namespace System.Net.Sockets
 
         public int Recv(byte[] buffer)
         {
-            return Recv(buffer, 0, buffer.Length);
+            // return Recv(buffer, 0, buffer.Length);
+            return default;
         }
 
         // Receive data from kcp state machine
@@ -212,14 +140,14 @@ namespace System.Net.Sockets
         // Return -1 when there is no readable data.
         //
         // Return -2 if len(buffer) is smaller than kcp.PeekSize().
-        public int Recv(byte[] buffer, int index, int length)
+        public int Recv(KcpBuffer buffer)
         {
             var peekSize = PeekSize();
             if (peekSize < 0)
                 return -1;
 
-            if (peekSize > length)
-                return -2;
+            // if (peekSize > length)
+            //     return -2;
 
             var fast_recover = false;
             if (rcv_queue.Count >= rcv_wnd)
@@ -227,16 +155,20 @@ namespace System.Net.Sockets
 
             // merge fragment.
             var count = 0;
-            var n = index;
+            var n = 0;
             foreach (var seg in rcv_queue)
             {
                 // copy fragment data into buffer.
-                Buffer.BlockCopy(seg.data.RawBuffer, seg.data.ReaderIndex, buffer, n, seg.data.ReadableBytes);
-                n += seg.data.ReadableBytes;
+                var readableBuffer = seg.data.ReadableBuffer;
+                var readableLength = (int)readableBuffer.Length;
+                buffer.WriteBytes(readableBuffer);
+                // readableBuffer.CopyTo(buffer.AsSpan(n, readableLength));
+
+                n += readableLength;
 
                 count++;
                 var fragment = seg.frg;
-                KcpSegment.Put(seg);
+                this.segmentAllotter.Put(seg);
                 if (0 == fragment) break;
             }
 
@@ -275,7 +207,7 @@ namespace System.Net.Sockets
                 probe |= IKCP_ASK_TELL;
             }
 
-            return n - index;
+            return n;
         }
 
         public int Send(byte[] buffer)
@@ -294,9 +226,9 @@ namespace System.Net.Sockets
                 if (n > 0)
                 {
                     var seg = snd_queue[n - 1];
-                    if (seg.data.ReadableBytes < mss)
+                    if (seg.data.ReadableLength < mss)
                     {
-                        var capacity = (int)(mss - seg.data.ReadableBytes);
+                        var capacity = (int)(mss - seg.data.ReadableLength);
                         var writen = Math.Min(capacity, length);
                         seg.data.WriteBytes(buffer, index, writen);
                         index += writen;
@@ -322,7 +254,7 @@ namespace System.Net.Sockets
             {
                 var size = Math.Min(length, (int)mss);
 
-                var seg = KcpSegment.Get(size);
+                var seg = this.segmentAllotter.Get();
                 seg.data.WriteBytes(buffer, index, size);
                 index += size;
                 length -= size;
@@ -362,8 +294,8 @@ namespace System.Net.Sockets
                 }
             }
 
-            var rto = (int)(rx_srtt + _imax_(interval, rx_rttval << 2));
-            rx_rto = _ibound_(rx_minrto, (UInt32)rto, IKCP_RTO_MAX);
+            var rto = (int)(rx_srtt + KcpHelper._imax_(interval, rx_rttval << 2));
+            rx_rto = KcpHelper._ibound_(rx_minrto, (UInt32)rto, IKCP_RTO_MAX);
         }
 
         void shrink_buf()
@@ -377,7 +309,7 @@ namespace System.Net.Sockets
         void parse_ack(UInt32 sn)
         {
 
-            if (_itimediff(sn, snd_una) < 0 || _itimediff(sn, snd_nxt) >= 0) return;
+            if (KcpHelper._itimediff(sn, snd_una) < 0 || KcpHelper._itimediff(sn, snd_nxt) >= 0) return;
 
             foreach (var seg in snd_buf)
             {
@@ -390,21 +322,21 @@ namespace System.Net.Sockets
                     seg.acked = 1;
                     break;
                 }
-                if (_itimediff(sn, seg.sn) < 0)
+                if (KcpHelper._itimediff(sn, seg.sn) < 0)
                     break;
             }
         }
 
         void parse_fastack(UInt32 sn, UInt32 ts)
         {
-            if (_itimediff(sn, snd_una) < 0 || _itimediff(sn, snd_nxt) >= 0)
+            if (KcpHelper._itimediff(sn, snd_una) < 0 || KcpHelper._itimediff(sn, snd_nxt) >= 0)
                 return;
 
             foreach (var seg in snd_buf)
             {
-                if (_itimediff(sn, seg.sn) < 0)
+                if (KcpHelper._itimediff(sn, seg.sn) < 0)
                     break;
-                else if (sn != seg.sn && _itimediff(seg.ts, ts) <= 0)
+                else if (sn != seg.sn && KcpHelper._itimediff(seg.ts, ts) <= 0)
                     seg.fastack++;
             }
         }
@@ -414,9 +346,9 @@ namespace System.Net.Sockets
             var count = 0;
             foreach (var seg in snd_buf)
             {
-                if (_itimediff(una, seg.sn) > 0) {
+                if (KcpHelper._itimediff(una, seg.sn) > 0) {
                     count++;
-                    KcpSegment.Put(seg);
+                    this.segmentAllotter.Put(seg);
                 }
                 else
                     break;
@@ -434,7 +366,7 @@ namespace System.Net.Sockets
         bool parse_data(KcpSegment newseg)
         {
             var sn = newseg.sn;
-            if (_itimediff(sn, rcv_nxt + rcv_wnd) >= 0 || _itimediff(sn, rcv_nxt) < 0)
+            if (KcpHelper._itimediff(sn, rcv_nxt + rcv_wnd) >= 0 || KcpHelper._itimediff(sn, rcv_nxt) < 0)
                 return true;
 
             var n = rcv_buf.Count - 1;
@@ -449,7 +381,7 @@ namespace System.Net.Sockets
                     break;
                 }
 
-                if (_itimediff(sn, seg.sn) > 0)
+                if (KcpHelper._itimediff(sn, seg.sn) > 0)
                 {
                     insert_idx = i + 1;
                     break;
@@ -515,18 +447,36 @@ namespace System.Net.Sockets
                 byte frg = 0;
 
                 if (size - (offset - index) < IKCP_OVERHEAD) break;
+                var buffer = new ReadOnlySequence<byte>(data);
+                if(useLittleEndian)
+                {
+                    offset += KcpHelper.ReadUInt32_LE(buffer.Slice(offset), ref conv_);
 
-                offset += ikcp_decode32u(data, offset, ref conv_);
+                    if (conv != conv_) return -1;
 
-                if (conv != conv_) return -1;
+                    offset += KcpHelper.ReadUInt8(buffer.Slice(offset), ref cmd);
+                    offset += KcpHelper.ReadUInt8(buffer.Slice(offset), ref frg);
+                    offset += KcpHelper.ReadUInt16_LE(buffer.Slice(offset), ref wnd);
+                    offset += KcpHelper.ReadUInt32_LE(buffer.Slice(offset), ref ts);
+                    offset += KcpHelper.ReadUInt32_LE(buffer.Slice(offset), ref sn);
+                    offset += KcpHelper.ReadUInt32_LE(buffer.Slice(offset), ref una);
+                    offset += KcpHelper.ReadUInt32_LE(buffer.Slice(offset), ref length);
+                }
+                else
+                {
+                    offset += KcpHelper.ReadUInt32_BE(buffer.Slice(offset), ref conv_);
 
-                offset += ikcp_decode8u(data, offset, ref cmd);
-                offset += ikcp_decode8u(data, offset, ref frg);
-                offset += ikcp_decode16u(data, offset, ref wnd);
-                offset += ikcp_decode32u(data, offset, ref ts);
-                offset += ikcp_decode32u(data, offset, ref sn);
-                offset += ikcp_decode32u(data, offset, ref una);
-                offset += ikcp_decode32u(data, offset, ref length);
+                    if (conv != conv_) return -1;
+
+                    offset += KcpHelper.ReadUInt8(buffer.Slice(offset), ref cmd);
+                    offset += KcpHelper.ReadUInt8(buffer.Slice(offset), ref frg);
+                    offset += KcpHelper.ReadUInt16_BE(buffer.Slice(offset), ref wnd);
+                    offset += KcpHelper.ReadUInt32_BE(buffer.Slice(offset), ref ts);
+                    offset += KcpHelper.ReadUInt32_BE(buffer.Slice(offset), ref sn);
+                    offset += KcpHelper.ReadUInt32_BE(buffer.Slice(offset), ref una);
+                    offset += KcpHelper.ReadUInt32_BE(buffer.Slice(offset), ref length);
+                }
+                
 
                 if (size - (offset - index) < length) return -2;
 
@@ -560,12 +510,12 @@ namespace System.Net.Sockets
                 else if (IKCP_CMD_PUSH == cmd)
                 {
                     var repeat = true;
-                    if (_itimediff(sn, rcv_nxt + rcv_wnd) < 0)
+                    if (KcpHelper._itimediff(sn, rcv_nxt + rcv_wnd) < 0)
                     {
                         ack_push(sn, ts);
-                        if (_itimediff(sn, rcv_nxt) >= 0)
+                        if (KcpHelper._itimediff(sn, rcv_nxt) >= 0)
                         {
-                            var seg = KcpSegment.Get((int)length);
+                            var seg = this.segmentAllotter.Get();
                             seg.conv = conv_;
                             seg.cmd = (UInt32)cmd;
                             seg.frg = (UInt32)frg;
@@ -601,17 +551,17 @@ namespace System.Net.Sockets
             // ignore the FEC packet
             if (flag != 0 && regular)
             {
-                var current = currentMS();
-                if (_itimediff(current, latest) >= 0)
+                var current = KcpHelper.currentMS();
+                if (KcpHelper._itimediff(current, latest) >= 0)
                 {
-                    update_ack(_itimediff(current, latest));
+                    update_ack(KcpHelper._itimediff(current, latest));
                 }
             }
 
             // cwnd update when packet arrived
             if (nocwnd == 0)
             {
-                if (_itimediff(snd_una, s_una) > 0)
+                if (KcpHelper._itimediff(snd_una, s_una) > 0)
                 {
                     if (cwnd < rmt_wnd)
                     {
@@ -664,7 +614,7 @@ namespace System.Net.Sockets
         // flush pending data
         public UInt32 Flush(bool ackOnly)
         {
-            var seg = KcpSegment.Get(32);
+            var seg = this.segmentAllotter.Get();
             seg.conv = conv;
             seg.cmd = IKCP_CMD_ACK;
             seg.wnd = (UInt32)wnd_unused();
@@ -672,29 +622,29 @@ namespace System.Net.Sockets
 
             var writeIndex = reserved;
 
-            Action<int> makeSpace = (space) =>
+            void makeSpace(int space)
             {
                 if (writeIndex + space > mtu)
                 {
                     output(buffer, writeIndex);
                     writeIndex = reserved;
                 }
-            };
+            }
 
-            Action flushBuffer = () =>
+            void flushBuffer()
             {
                 if (writeIndex > reserved)
                 {
                     output(buffer, writeIndex);
                 }
-            };
+            }
 
             // flush acknowledges
             for (var i = 0; i < acklist.Count; i++)
             {
                 makeSpace(Kcp.IKCP_OVERHEAD);
                 var ack = acklist[i];
-                if ( _itimediff(ack.sn, rcv_nxt) >=0 || acklist.Count - 1 == i)
+                if ( KcpHelper._itimediff(ack.sn, rcv_nxt) >=0 || acklist.Count - 1 == i)
                 {
                     seg.sn = ack.sn;
                     seg.ts = ack.ts;
@@ -707,6 +657,7 @@ namespace System.Net.Sockets
             if (ackOnly)
             {
                 flushBuffer();
+                this.segmentAllotter.Put(seg);
                 return interval;
             }
 
@@ -714,7 +665,7 @@ namespace System.Net.Sockets
             // probe window size (if remote window size equals zero)
             if (0 == rmt_wnd)
             {
-                current = currentMS();
+                current = KcpHelper.currentMS();
                 if (0 == probe_wait)
                 {
                     probe_wait = IKCP_PROBE_INIT;
@@ -722,7 +673,7 @@ namespace System.Net.Sockets
                 }
                 else
                 {
-                    if (_itimediff(current, ts_probe) >= 0)
+                    if (KcpHelper._itimediff(current, ts_probe) >= 0)
                     {
                         if (probe_wait < IKCP_PROBE_INIT)
                             probe_wait = IKCP_PROBE_INIT;
@@ -758,15 +709,15 @@ namespace System.Net.Sockets
             probe = 0;
 
             // calculate window size
-            var cwnd_ = _imin_(snd_wnd, rmt_wnd);
+            var cwnd_ = KcpHelper._imin_(snd_wnd, rmt_wnd);
             if (0 == nocwnd)
-                cwnd_ = _imin_(cwnd, cwnd_);
+                cwnd_ = KcpHelper._imin_(cwnd, cwnd_);
 
             // sliding window, controlled by snd_nxt && sna_una+cwnd
             var newSegsCount = 0;
             for (var k = 0; k < snd_queue.Count; k++)
             {
-                if (_itimediff(snd_nxt, snd_una + cwnd_) >= 0)
+                if (KcpHelper._itimediff(snd_nxt, snd_una + cwnd_) >= 0)
                     break;
 
                 var newseg = snd_queue[k];
@@ -788,7 +739,7 @@ namespace System.Net.Sockets
             if (fastresend <= 0) resent = 0xffffffff;
 
             // check for retransmissions
-            current = currentMS();
+            current = KcpHelper.currentMS();
             UInt64 change = 0; UInt64 lostSegs = 0; UInt64 fastRetransSegs = 0; UInt64 earlyRetransSegs = 0;
             var minrto = (Int32)interval;
 
@@ -822,7 +773,7 @@ namespace System.Net.Sockets
                     change++;
                     earlyRetransSegs++;
                 }
-                else if (_itimediff(current, segment.resendts) >= 0) // RTO
+                else if (KcpHelper._itimediff(current, segment.resendts) >= 0) // RTO
                 {
                     needsend = true;
                     if (nodelay == 0)
@@ -842,11 +793,15 @@ namespace System.Net.Sockets
                     segment.wnd = seg.wnd;
                     segment.una = seg.una;
 
-                    var need = IKCP_OVERHEAD + segment.data.ReadableBytes;
+                    var need = IKCP_OVERHEAD + segment.data.ReadableLength;
                     makeSpace(need);
                     writeIndex += segment.encode(buffer, writeIndex);
-                    Buffer.BlockCopy(segment.data.RawBuffer, segment.data.ReaderIndex, buffer, writeIndex, segment.data.ReadableBytes);
-                    writeIndex += segment.data.ReadableBytes;
+
+                    var readableBuffer = segment.data.ReadableBuffer;
+                    var readableLength = (int)readableBuffer.Length;
+                    readableBuffer.CopyTo(buffer.AsSpan(writeIndex, readableLength));
+
+                    writeIndex += readableLength;
 
                     if (segment.xmit >= dead_link)
                     {
@@ -855,7 +810,7 @@ namespace System.Net.Sockets
                 }
 
                 // get the nearest rto
-                var _rto = _itimediff(segment.resendts, current);
+                var _rto = KcpHelper._itimediff(segment.resendts, current);
                 if (_rto > 0 && _rto < minrto)
                 {
                     minrto = _rto;
@@ -896,7 +851,7 @@ namespace System.Net.Sockets
                     incr = mss;
                 }
             }
-
+            this.segmentAllotter.Put(seg);
             return (UInt32)minrto;
         }
 
@@ -905,7 +860,7 @@ namespace System.Net.Sockets
         // 'current' - current timestamp in millisec.
         public void Update()
         {
-            var current = currentMS();
+            var current = KcpHelper.currentMS();
 
             if (0 == updated)
             {
@@ -913,18 +868,18 @@ namespace System.Net.Sockets
                 ts_flush = current;
             }
 
-            var slap = _itimediff(current, ts_flush);
+            var slap = KcpHelper._itimediff(current, ts_flush);
 
             if (slap >= 10000 || slap < -10000)
             {
                 ts_flush = current;
                 slap = 0;
             }
-
+            //Console.WriteLine("slap>>>>" + slap);
             if (slap >= 0)
             {
                 ts_flush += interval;
-                if (_itimediff(current, ts_flush) >= 0)
+                if (KcpHelper._itimediff(current, ts_flush) >= 0)
                     ts_flush = current + interval;
                 Flush(false);
             }
@@ -939,7 +894,7 @@ namespace System.Net.Sockets
         // or optimize ikcp_update when handling massive kcp connections)
         public UInt32 Check()
         {
-            var current = currentMS();
+            var current = KcpHelper.currentMS();
 
             var ts_flush_ = ts_flush;
             var tm_flush_ = 0x7fffffff;
@@ -949,17 +904,17 @@ namespace System.Net.Sockets
             if (updated == 0)
                 return current;
 
-            if (_itimediff(current, ts_flush_) >= 10000 || _itimediff(current, ts_flush_) < -10000)
+            if (KcpHelper._itimediff(current, ts_flush_) >= 10000 || KcpHelper._itimediff(current, ts_flush_) < -10000)
                 ts_flush_ = current;
 
-            if (_itimediff(current, ts_flush_) >= 0)
+            if (KcpHelper._itimediff(current, ts_flush_) >= 0)
                 return current;
 
-            tm_flush_ = (int)_itimediff(ts_flush_, current);
+            tm_flush_ = (int)KcpHelper._itimediff(ts_flush_, current);
 
             foreach (var seg in snd_buf)
             {
-                var diff = _itimediff(seg.resendts, current);
+                var diff = KcpHelper._itimediff(seg.resendts, current);
                 if (diff <= 0)
                     return current;
                 if (diff < tm_packet)
@@ -1053,5 +1008,27 @@ namespace System.Net.Sockets
         {
             stream = enabled ? 1 : 0;
         }
+
+        public void Dispose()
+        {
+            foreach (var item in this.snd_queue)
+                this.segmentAllotter.Put(item);
+            foreach (var item  in this.rcv_queue)
+                this.segmentAllotter.Put(item);
+            foreach (var item in this.snd_buf)
+                this.segmentAllotter.Put(item);
+            foreach (var item in this.rcv_buf)
+                this.segmentAllotter.Put(item);
+            
+            this.snd_queue.Clear();
+            this.rcv_queue.Clear();
+            this.snd_buf.Clear();
+            this.rcv_buf.Clear();
+            
+            this.acklist.Clear();
+            
+            this.segmentAllotter.Dispose();
+        }
     }
+    
 }

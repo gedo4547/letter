@@ -7,9 +7,10 @@ using System.Threading.Tasks;
 using System.Collections.Generic;
 
 using Letter.IO;
-using Letter.IO.Kcplib;
+//using Letter.IO.Kcplib;
 
 using Letter.Udp;
+using Letter.Kcp.lib__;
 
 namespace Letter.Kcp
 {
@@ -28,7 +29,7 @@ namespace Letter.Kcp
             this.Pipeline = pipeline;
             this.closable = closable;
 
-            this.kcpKit = new KcpKit(conv);
+            //this.kcpKit = new KcpKit(conv);
 
             if(options.Mtu != null)
                 this.kcpKit.SettingMtu(options.Mtu.Value);
@@ -120,7 +121,7 @@ namespace Letter.Kcp
                 {
                     var item = this.rcvQueue.Peek();
                     var seg = item.GetReadableMemory().GetBinaryArray();
-                    var opencode = this.kcpKit.Recv(seg.Array, seg.Offset, seg.Count);
+                    var opencode = 0;// this.kcpKit.Recv(seg.Array, seg.Offset, seg.Count);
 
                     if(opencode < 0) break;
 
@@ -135,7 +136,7 @@ namespace Letter.Kcp
                 {
                     var item = this.sndQueue.Peek();
                     var seg = item.GetReadableMemory().GetBinaryArray();
-                    var opencode = this.kcpKit.Send(seg.Array, seg.Offset, seg.Count);
+                    var opencode = 0;//this.kcpKit.Send(seg.Array, seg.Offset, seg.Count);
 
                     if(opencode == 0) break;
 
