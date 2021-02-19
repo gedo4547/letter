@@ -57,11 +57,24 @@ namespace Letter.Kcp.lib__
         {
             return this.mKCP.ReserveBytes(reservedSize);
         }
+
+        public bool TryRcv(byte[] data, int index, int length, bool regular = true)
+        {
+            var transfer = this.Recv(data, index, length, regular);
+            return transfer == 0;
+        }
+
+        public bool TrySnd(byte[] data, int index, int length)
+        {
+            var transfer =  this.Send(data, index, length);
+            return transfer > 0;
+        }
         
-        public int Send(byte[] data, int index, int length)
+        private int Send(byte[] data, int index, int length)
         {
             var waitsnd = mKCP.WaitSnd;
-            if (waitsnd < mKCP.SndWnd && waitsnd < mKCP.RmtWnd) {
+            if (waitsnd < mKCP.SndWnd && waitsnd < mKCP.RmtWnd) 
+            {
 
                 var sendBytes = 0;
                 do {
@@ -89,7 +102,7 @@ namespace Letter.Kcp.lib__
         /// <param name="length"></param>
         /// <param name="regular">普通包(非向前纠正的包)</param>
         /// <returns></returns>
-        public int Recv(byte[] data, int index, int length, bool regular = true)
+        private int Recv(byte[] data, int index, int length, bool regular = true)
         {
             var inputN = mKCP.Input(data, index, length, regular, AckNoDelay);
             if (inputN < 0) 

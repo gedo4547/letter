@@ -26,6 +26,15 @@ namespace kcp_lab_test
         private ConcurrentQueue<Memory<byte>> recv_queue = new ConcurrentQueue<Memory<byte>>();
         private ConcurrentQueue<Memory<byte>> send_queue = new ConcurrentQueue<Memory<byte>>();
 
+        public void Debug()
+        {
+            System.Text.StringBuilder sb = new System.Text.StringBuilder();
+            sb.AppendLine("等待发送的包：：" + send_queue.Count);
+            sb.AppendLine("已经收到的包：：" + recv_queue.Count);
+
+            Console.WriteLine(sb.ToString());
+        }
+
         public void SetRcvEvent(RefAction rcv)
         {
             this._kcpKit.onRcv += rcv;
@@ -39,16 +48,15 @@ namespace kcp_lab_test
         public void Recv(Memory<byte> data)
         {
             this.recv_queue.Enqueue(data);
-            this._kcpKit.SetNextTime(KcpHelper.currentMS());
+            
         }
 
         int num;
         public void Send(Memory<byte> data)
         {
             num++;
-            Console.WriteLine("Send>>"+num);
+            //Console.WriteLine("Send>>" + num);
             this.send_queue.Enqueue(data);
-            this._kcpKit.SetNextTime(KcpHelper.currentMS());
         }
 
         public void Update()
@@ -61,10 +69,14 @@ namespace kcp_lab_test
                 {
                     this.recv_queue.TryPeek(out var item);
                     var seg = item.GetBinaryArray();
-                    var length = this._kcpKit.Recv(seg.Array, 0, seg.Count);
-                    if (length < 0)
+                    if (this._kcpKit.TryRcv(seg.Array, 0, seg.Count))
                     {
                         this.recv_queue.TryDequeue(out _);
+                        this._kcpKit.SetNextTime(KcpHelper.currentMS());
+                    }
+                    else
+                    {
+                        break;
                     }
                 }
 
@@ -72,12 +84,19 @@ namespace kcp_lab_test
                 {
                     this.send_queue.TryPeek(out var item);
                     var seg = item.GetBinaryArray();
-                    //Console.WriteLine(">>>>>>>>");
-                    var length = this._kcpKit.Send(seg.Array, 0, seg.Count);
-                    if (length != 0)
+
+                    System.Text.StringBuilder sb = new System.Text.StringBuilder();
+                    if (this._kcpKit.TrySnd(seg.Array, 0, seg.Count))
                     {
                         this.send_queue.TryDequeue(out _);
+                        this._kcpKit.SetNextTime(KcpHelper.currentMS());
                     }
+                    else
+                    {
+                        break;
+                    }
+
+                    //Console.WriteLine(sb.ToString());
                 }
 
                 this._kcpKit.Update();

@@ -71,7 +71,7 @@ namespace kcp_lab_test
                 }
                 else if (str == "d")
                 {
-                    //unit1.Debug();
+                    unit1.Debug();
                     //unit2.Debug();
                 }
 
@@ -91,7 +91,7 @@ namespace kcp_lab_test
         
         private static void OnSndEvent(ref ReadOnlySequence<byte> sequence, int type)
         {
-            Console.WriteLine($"{type}>snd>>" + sequence.Length);
+            //Console.WriteLine($"{type}>snd>>" + sequence.Length);
             byte[] bytes = new byte[sequence.Length];
             sequence.CopyTo(bytes);
 
