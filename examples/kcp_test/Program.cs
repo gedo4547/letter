@@ -14,7 +14,6 @@ namespace kcp_test
         {
             //System.Array.Copy
             KcpDefaultScheduler thread = new KcpDefaultScheduler();
-            KcpHelpr.SettingKcpBinaryOrder(System.Buffers.Binary.BinaryOrder.BigEndian);
             
             var bootstrap = KcpFactory.Bootstrap();
             bootstrap.ConfigurationGlobalThread(thread);
@@ -61,7 +60,7 @@ namespace kcp_test
                     {
                         var session = sessions[i];
                         // session.UnsafeSendAsync(s_address, bytes);
-                        session.SafeSendAsync(bytes);
+                        session.SendSafeAsync(bytes);
                     }
                 }
 

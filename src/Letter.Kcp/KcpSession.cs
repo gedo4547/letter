@@ -107,23 +107,20 @@ namespace Letter.Kcp
                 }
             }
 
-            lock (this.snd_sync)
+            while (this.sndQueue.Count > 0)
             {
-                while(this.sndQueue.Count > 0)
-                {
-                    this.sndQueue.TryPeek(out var item);
-                    var seg = item.GetReadableMemory().GetBinaryArray();
+                this.sndQueue.TryPeek(out var item);
+                var seg = item.GetReadableMemory().GetBinaryArray();
 
-                    if (!this.kcpKit.TrySnd(seg.Array, seg.Offset, seg.Count))
-                    {
-                        break;
-                    }
-                    else
-                    {
-                        this.sndQueue.TryDequeue(out _);
-                        this.sndPool.Push(item);
-                        this.kcpKit.MarkTime();
-                    }
+                if (!this.kcpKit.TrySnd(seg.Array, seg.Offset, seg.Count))
+                {
+                    break;
+                }
+                else
+                {
+                    this.sndQueue.TryDequeue(out _);
+                    this.sndPool.Push(item);
+                    this.kcpKit.MarkTime();
                 }
             }
 
@@ -168,7 +165,7 @@ namespace Letter.Kcp
             }
         }
 
-        public void SafeSendAsync(object o)
+        public void SendSafeAsync(object o)
         {
             lock (this.snd_sync)
             {
@@ -191,7 +188,7 @@ namespace Letter.Kcp
             }
         }
 
-        public void UnsafeSendAsync(EndPoint remoteAddress, object o)
+        public void SendUnsafeAsync(object o)
         {
             lock (this.snd_sync)
             {
@@ -203,7 +200,6 @@ namespace Letter.Kcp
                 try
                 {
                     this.writerUdpMemory.Clear();
-                    this.writerUdpMemory.Token = remoteAddress;
                     //conv使用kcp的序列写入，保证与kcp一致
                     var span = this.writerUdpMemory.GetWritableSpan(4);
                     KcpHelpr.GetOperators().WriteUInt32(span, this.Conv);
@@ -237,8 +233,7 @@ namespace Letter.Kcp
             }
             else if(memory.Flag == MemoryFlag.Udp)
             {
-                var remoteAddress = memory.Token as EndPoint;
-                this.udpSession.Write(remoteAddress, memory);
+                this.udpSession.Write(this.RemoteAddress, memory);
                 this.udpSession.FlushAsync().NoAwait();
             }
         }
