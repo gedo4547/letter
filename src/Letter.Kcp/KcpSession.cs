@@ -238,25 +238,18 @@ namespace Letter.Kcp
             }
         }
 
-        int num1 = 0;
         private WrappedMemory sndMemory = new WrappedMemory(MemoryFlag.Kcp);
-        public void Output(IMemoryOwner<byte> buffer, int avalidLength)
-        {
-            System.Threading.Interlocked.Increment(ref num1);
-
-            Console.WriteLine("kcp发送>>>" + avalidLength+"             num::"+num1);
-            if (avalidLength < 1) return;
-            
-            this.sndMemory.SettingMemory(buffer, avalidLength);
-            this.udpSession.Write(this.RemoteAddress, sndMemory);
-            this.udpSession.FlushAsync().NoAwait();
-        }
 
         private void OnKcpSndEvent(ref ReadOnlySequence<byte> memory)
         {
             if (memory.Length < 1) return;
 
-
+            int length = (int)memory.Length;
+            var writableMemory = this.sndMemory.GetWritableMemory(length);
+            memory.CopyTo(writableMemory.Span);
+            this.sndMemory.WriterAdvance(length);
+            this.udpSession.Write(this.RemoteAddress, this.sndMemory);
+            this.udpSession.FlushAsync().NoAwait();
         }
 
         public void OnUdpMessageException(Exception ex)
