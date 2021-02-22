@@ -10,7 +10,6 @@ namespace System.Net
         public KcpKit(uint conv, bool littleEndian, MemoryPool<byte> memoryPool)
         {
             this.mKCP = new Kcp(conv, littleEndian, memoryPool, this.OnOutEvent);
-
             this._allotter = new KcpMemoryBlockAllotter(memoryPool);
             this.buffer = new KcpBuffer(this._allotter);
         }

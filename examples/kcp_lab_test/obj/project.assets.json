@@ -133,7 +133,7 @@
         "/usr/local/share/dotnet/sdk/NuGetFallbackFolder"
       ],
       "configFilePaths": [
-        "/Users/guanyedong/.config/NuGet/NuGet.Config"
+        "/Users/guanyedong/.nuget/NuGet/NuGet.Config"
       ],
       "originalTargetFrameworks": [
         "net5.0"

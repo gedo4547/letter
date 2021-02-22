@@ -7,24 +7,21 @@ namespace kcp_lab_test
 {
     public class KcpUnit
     {
-        public KcpUnit(MemoryPool<byte> memoryPool)
+        public KcpUnit(uint conv, MemoryPool<byte> memoryPool)
         {
-            this._kcpKit = new KcpKit(1, true, memoryPool);
+            this.Conv = conv;
+            this._kcpKit = new KcpKit(conv, true, memoryPool);
             this._kcpKit.SettingNoDelay(1, 10, 2, 1);
-            this._kcpKit.WriteDelay = true;
+            this._kcpKit.WriteDelay = false;
             this._kcpKit.SettingStreamMode(true);
-
-            System.Threading.Thread thread = new System.Threading.Thread(()=> 
-            {
-                this.Update();
-            });
-            thread.Start();
         }
 
         private KcpKit _kcpKit;
 
         private ConcurrentQueue<Memory<byte>> recv_queue = new ConcurrentQueue<Memory<byte>>();
         private ConcurrentQueue<Memory<byte>> send_queue = new ConcurrentQueue<Memory<byte>>();
+
+        public uint Conv { get; private set; }
 
         public void Debug()
         {

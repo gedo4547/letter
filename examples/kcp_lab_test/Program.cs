@@ -35,16 +35,17 @@ namespace kcp_lab_test
             //MyStruct my = new MyStruct(span);
 
             var memoryPool = SlabMemoryPoolFactory.Create(new MemoryPoolOptions(4096, 32));
-            for (int i = 0; i < 1000; i++)
+            for (int i = 0; i < 1; i++)
             {
-                var unit1 = new KcpUnit(memoryPool);
-                unit1.SetRcvEvent((ref ReadOnlySequence<byte> sequence) => { OnRcvEvent(ref sequence, 1); });
-                unit1.SetSndEvent((ref ReadOnlySequence<byte> sequence) => { OnSndEvent(ref sequence, 1); });
+                uint conv = (uint)i;
+                var unit1 = new KcpUnit(conv, memoryPool);
+                unit1.SetRcvEvent((ref ReadOnlySequence<byte> sequence) => { OnRcvEvent(ref sequence, 1, unit1.Conv); });
+                unit1.SetSndEvent((ref ReadOnlySequence<byte> sequence) => { OnSndEvent(ref sequence, 1, unit1.Conv); });
                 units_1.Add(unit1);
 
-                var unit2 = new KcpUnit(memoryPool);
-                unit2.SetRcvEvent((ref ReadOnlySequence<byte> sequence) => { OnRcvEvent(ref sequence, 2); });
-                unit2.SetSndEvent((ref ReadOnlySequence<byte> sequence) => { OnSndEvent(ref sequence, 2); });
+                var unit2 = new KcpUnit(conv, memoryPool);
+                unit2.SetRcvEvent((ref ReadOnlySequence<byte> sequence) => { OnRcvEvent(ref sequence, 2, unit1.Conv); });
+                unit2.SetSndEvent((ref ReadOnlySequence<byte> sequence) => { OnSndEvent(ref sequence, 2, unit1.Conv); });
                 units_2.Add(unit2);
             }
 
@@ -83,11 +84,20 @@ namespace kcp_lab_test
                         Interlocked.Increment(ref num);
                         if (use_buffer)
                         {
-                            unit1.Send(buffer);
+                            int count1 = units_1.Count;
+                            for (int j = 0; j < count1; j++)
+                            {
+                                units_1[j].Send(buffer);
+                            }
                         }
                         else
                         {
-                            unit1.Send(System.Text.Encoding.UTF8.GetBytes($"nihao {i}"));
+                            var bytes = System.Text.Encoding.UTF8.GetBytes($"nihao {i}");
+                            int count1 = units_1.Count;
+                            for (int j = 0; j < count1; j++)
+                            {
+                                units_1[j].Send(bytes);
+                            }
                         }
                     }
                 }
@@ -98,11 +108,20 @@ namespace kcp_lab_test
                         Interlocked.Increment(ref num);
                         if (use_buffer)
                         {
-                            unit1.Send(buffer);
+                            int count1 = units_1.Count;
+                            for (int j = 0; j < count1; j++)
+                            {
+                                units_1[j].Send(buffer);
+                            }
                         }
                         else
                         {
-                            unit1.Send(System.Text.Encoding.UTF8.GetBytes($"nihao {i}"));
+                            var bytes = System.Text.Encoding.UTF8.GetBytes($"nihao {i}");
+                            int count1 = units_1.Count;
+                            for (int j = 0; j < count1; j++)
+                            {
+                                units_1[j].Send(bytes);
+                            }
                         }
                     }
                 }
@@ -120,7 +139,7 @@ namespace kcp_lab_test
             }
         }
         
-        private static void OnRcvEvent(ref ReadOnlySequence<byte> sequence, int type)
+        private static void OnRcvEvent(ref ReadOnlySequence<byte> sequence, int type, uint conv)
         {
             StringBuilder sb = new StringBuilder();
             foreach (var item in sequence)
@@ -128,10 +147,10 @@ namespace kcp_lab_test
                 sb.Append(Encoding.UTF8.GetString(item.Span));
             }
             
-            Console.WriteLine($"{type}>rcv>>" + sb.ToString());
+            Console.WriteLine($"{type}>{conv}>>rcv>>" + sb.ToString()+">>time:"+DateTime.Now);
         }
         
-        private static void OnSndEvent(ref ReadOnlySequence<byte> sequence, int type)
+        private static void OnSndEvent(ref ReadOnlySequence<byte> sequence, int type, uint conv)
         {
             //Console.WriteLine($"{type}>snd>>" + sequence.Length);
             byte[] bytes = new byte[sequence.Length];
@@ -139,11 +158,11 @@ namespace kcp_lab_test
 
             if (type == 1)
             {
-                unit2.Recv(bytes);
+                units_2[(int)conv].Recv(bytes);
             }
             else if (type == 2)
             {
-                unit1.Recv(bytes);
+                units_1[(int)conv].Recv(bytes);
             }
         }
     }
