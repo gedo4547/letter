@@ -1,10 +1,20 @@
 ﻿using System;
 using System.Buffers;
+using System.Collections.Generic;
+using System.Diagnostics;
 using System.Text;
 using System.Threading;
 
 namespace kcp_lab_test
 {
+    readonly ref struct MyStruct
+    {
+        public MyStruct(Span<byte> span)
+        {
+            this.span = span;
+        }
+        private readonly Span<byte> span;
+    }
     class Program
     {
         static KcpUnit unit1; 
@@ -13,20 +23,51 @@ namespace kcp_lab_test
         private static int num = 0;
 
         private static bool use_buffer = false;
+        private static bool isRun = true;
+        private static List<KcpUnit> units_1 = new List<KcpUnit>();
+        private static List<KcpUnit> units_2 = new List<KcpUnit>();
 
-        static void Main(string[] args)
+        static unsafe void Main(string[] args)
         {
             Console.Title = "kcp_lib1111111111111111111111111111111";
+            Console.WriteLine(Process.GetCurrentProcess().Id);
+            //Span<byte> span = stackalloc byte[32];
+            //MyStruct my = new MyStruct(span);
 
-            
-            
-            unit1 = new KcpUnit(SlabMemoryPoolFactory.Create(new MemoryPoolOptions(4096, 32)));
-            unit1.SetRcvEvent((ref ReadOnlySequence<byte> sequence) => { OnRcvEvent(ref sequence, 1); });
-            unit1.SetSndEvent((ref ReadOnlySequence<byte> sequence) => { OnSndEvent(ref sequence, 1); });
+            var memoryPool = SlabMemoryPoolFactory.Create(new MemoryPoolOptions(4096, 32));
+            for (int i = 0; i < 1000; i++)
+            {
+                var unit1 = new KcpUnit(memoryPool);
+                unit1.SetRcvEvent((ref ReadOnlySequence<byte> sequence) => { OnRcvEvent(ref sequence, 1); });
+                unit1.SetSndEvent((ref ReadOnlySequence<byte> sequence) => { OnSndEvent(ref sequence, 1); });
+                units_1.Add(unit1);
 
-            unit2 = new KcpUnit(SlabMemoryPoolFactory.Create(new MemoryPoolOptions(4096, 32)));
-            unit2.SetRcvEvent((ref ReadOnlySequence<byte> sequence) => { OnRcvEvent(ref sequence, 2); });
-            unit2.SetSndEvent((ref ReadOnlySequence<byte> sequence) => { OnSndEvent(ref sequence, 2); });
+                var unit2 = new KcpUnit(memoryPool);
+                unit2.SetRcvEvent((ref ReadOnlySequence<byte> sequence) => { OnRcvEvent(ref sequence, 2); });
+                unit2.SetSndEvent((ref ReadOnlySequence<byte> sequence) => { OnSndEvent(ref sequence, 2); });
+                units_2.Add(unit2);
+            }
+
+            Thread thread = new Thread(() =>
+            {
+                while (isRun)
+                {
+                    Thread.Sleep(1);
+
+                    int count1 = units_1.Count;
+                    for (int  i= 0;  i< count1; i++)
+                    {
+                        units_1[i].Update();
+                    }
+
+                    int count2 = units_2.Count;
+                    for (int i = 0; i < count2; i++)
+                    {
+                        units_2[i].Update();
+                    }
+                }
+            });
+            thread.Start();
 
 
             byte[] buffer = System.Text.Encoding.UTF8.GetBytes(common.Message.data_1024);
@@ -67,6 +108,7 @@ namespace kcp_lab_test
                 }
                 else if (str == "s")
                 {
+                    isRun = false;
                     return;
                 }
                 else if (str == "d")

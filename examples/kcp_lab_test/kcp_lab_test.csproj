@@ -5,6 +5,16 @@
         <TargetFramework>net5.0</TargetFramework>
     </PropertyGroup>
 
+    <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+      <WarningLevel>4</WarningLevel>
+      <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+      <RunWithWarnings>true</RunWithWarnings>
+      <LangVersion>8.0</LangVersion>
+    </PropertyGroup>
+    <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+      <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+      <LangVersion>8.0</LangVersion>
+    </PropertyGroup>
     <ItemGroup>
       <ProjectReference Include="..\..\src\Letter.Kcp\Letter.Kcp.csproj" />
       <ProjectReference Include="..\common\common.csproj" />

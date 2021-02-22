@@ -1,32 +1,29 @@
 {
   "format": 1,
   "restore": {
-    "F:\\letter-github\\examples\\kcp_lab_test\\kcp_lab_test.csproj": {}
+    "/Users/guanyedong/Projects/letter-github/examples/kcp_lab_test/kcp_lab_test.csproj": {}
   },
   "projects": {
-    "F:\\letter-github\\examples\\common\\common.csproj": {
+    "/Users/guanyedong/Projects/letter-github/examples/common/common.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "F:\\letter-github\\examples\\common\\common.csproj",
+        "projectUniqueName": "/Users/guanyedong/Projects/letter-github/examples/common/common.csproj",
         "projectName": "common",
-        "projectPath": "F:\\letter-github\\examples\\common\\common.csproj",
-        "packagesPath": "C:\\Users\\pc\\.nuget\\packages\\",
-        "outputPath": "F:\\letter-github\\examples\\common\\obj\\",
+        "projectPath": "/Users/guanyedong/Projects/letter-github/examples/common/common.csproj",
+        "packagesPath": "/Users/guanyedong/.nuget/packages/",
+        "outputPath": "/Users/guanyedong/Projects/letter-github/examples/common/obj/",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
-          "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
+          "/usr/local/share/dotnet/sdk/NuGetFallbackFolder"
         ],
         "configFilePaths": [
-          "C:\\Users\\pc\\AppData\\Roaming\\NuGet\\NuGet.Config",
-          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+          "/Users/guanyedong/.config/NuGet/NuGet.Config"
         ],
         "originalTargetFrameworks": [
           "netstandard2.0"
         ],
         "sources": {
-          "D:\\NuGetPackages\\": {},
-          "https://api.nuget.org/v3/index.json": {},
-          "https://nuget.cdn.azure.cn/v3/index.json": {}
+          "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
           "netstandard2.0": {
@@ -61,43 +58,40 @@
           ],
           "assetTargetFallback": true,
           "warn": true,
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\5.0.101\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/5.0.102/RuntimeIdentifierGraph.json"
         }
       }
     },
-    "F:\\letter-github\\examples\\kcp_lab_test\\kcp_lab_test.csproj": {
+    "/Users/guanyedong/Projects/letter-github/examples/kcp_lab_test/kcp_lab_test.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "F:\\letter-github\\examples\\kcp_lab_test\\kcp_lab_test.csproj",
+        "projectUniqueName": "/Users/guanyedong/Projects/letter-github/examples/kcp_lab_test/kcp_lab_test.csproj",
         "projectName": "kcp_lab_test",
-        "projectPath": "F:\\letter-github\\examples\\kcp_lab_test\\kcp_lab_test.csproj",
-        "packagesPath": "C:\\Users\\pc\\.nuget\\packages\\",
-        "outputPath": "F:\\letter-github\\examples\\kcp_lab_test\\obj\\",
+        "projectPath": "/Users/guanyedong/Projects/letter-github/examples/kcp_lab_test/kcp_lab_test.csproj",
+        "packagesPath": "/Users/guanyedong/.nuget/packages/",
+        "outputPath": "/Users/guanyedong/Projects/letter-github/examples/kcp_lab_test/obj/",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
-          "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
+          "/usr/local/share/dotnet/sdk/NuGetFallbackFolder"
         ],
         "configFilePaths": [
-          "C:\\Users\\pc\\AppData\\Roaming\\NuGet\\NuGet.Config",
-          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+          "/Users/guanyedong/.config/NuGet/NuGet.Config"
         ],
         "originalTargetFrameworks": [
           "net5.0"
         ],
         "sources": {
-          "D:\\NuGetPackages\\": {},
-          "https://api.nuget.org/v3/index.json": {},
-          "https://nuget.cdn.azure.cn/v3/index.json": {}
+          "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
           "net5.0": {
             "targetAlias": "net5.0",
             "projectReferences": {
-              "F:\\letter-github\\examples\\common\\common.csproj": {
-                "projectPath": "F:\\letter-github\\examples\\common\\common.csproj"
+              "/Users/guanyedong/Projects/letter-github/examples/common/common.csproj": {
+                "projectPath": "/Users/guanyedong/Projects/letter-github/examples/common/common.csproj"
               },
-              "F:\\letter-github\\src\\Letter.Kcp\\Letter.Kcp.csproj": {
-                "projectPath": "F:\\letter-github\\src\\Letter.Kcp\\Letter.Kcp.csproj"
+              "/Users/guanyedong/Projects/letter-github/src/Letter.Kcp/Letter.Kcp.csproj": {
+                "projectPath": "/Users/guanyedong/Projects/letter-github/src/Letter.Kcp/Letter.Kcp.csproj"
               }
             }
           }
@@ -126,35 +120,32 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\5.0.101\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/5.0.102/RuntimeIdentifierGraph.json"
         }
       }
     },
-    "F:\\letter-github\\src\\Letter.IO\\Letter.IO.csproj": {
+    "/Users/guanyedong/Projects/letter-github/src/Letter.IO/Letter.IO.csproj": {
       "version": "0.0.0.1",
       "restore": {
-        "projectUniqueName": "F:\\letter-github\\src\\Letter.IO\\Letter.IO.csproj",
+        "projectUniqueName": "/Users/guanyedong/Projects/letter-github/src/Letter.IO/Letter.IO.csproj",
         "projectName": "Letter.IO",
-        "projectPath": "F:\\letter-github\\src\\Letter.IO\\Letter.IO.csproj",
-        "packagesPath": "C:\\Users\\pc\\.nuget\\packages\\",
-        "outputPath": "F:\\letter-github\\src\\Letter.IO\\obj\\",
+        "projectPath": "/Users/guanyedong/Projects/letter-github/src/Letter.IO/Letter.IO.csproj",
+        "packagesPath": "/Users/guanyedong/.nuget/packages/",
+        "outputPath": "/Users/guanyedong/Projects/letter-github/src/Letter.IO/obj/",
         "projectStyle": "PackageReference",
         "crossTargeting": true,
         "fallbackFolders": [
-          "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
+          "/usr/local/share/dotnet/sdk/NuGetFallbackFolder"
         ],
         "configFilePaths": [
-          "C:\\Users\\pc\\AppData\\Roaming\\NuGet\\NuGet.Config",
-          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+          "/Users/guanyedong/.config/NuGet/NuGet.Config"
         ],
         "originalTargetFrameworks": [
           "net5.0",
           "netstandard2.0"
         ],
         "sources": {
-          "D:\\NuGetPackages\\": {},
-          "https://api.nuget.org/v3/index.json": {},
-          "https://nuget.cdn.azure.cn/v3/index.json": {}
+          "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
           "net5.0": {
@@ -196,7 +187,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\5.0.101\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/5.0.102/RuntimeIdentifierGraph.json"
         },
         "netstandard2.0": {
           "targetAlias": "netstandard2.0",
@@ -222,50 +213,47 @@
           ],
           "assetTargetFallback": true,
           "warn": true,
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\5.0.101\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/5.0.102/RuntimeIdentifierGraph.json"
         }
       }
     },
-    "F:\\letter-github\\src\\Letter.Kcp\\Letter.Kcp.csproj": {
+    "/Users/guanyedong/Projects/letter-github/src/Letter.Kcp/Letter.Kcp.csproj": {
       "version": "0.0.0.1",
       "restore": {
-        "projectUniqueName": "F:\\letter-github\\src\\Letter.Kcp\\Letter.Kcp.csproj",
+        "projectUniqueName": "/Users/guanyedong/Projects/letter-github/src/Letter.Kcp/Letter.Kcp.csproj",
         "projectName": "Letter.Kcp",
-        "projectPath": "F:\\letter-github\\src\\Letter.Kcp\\Letter.Kcp.csproj",
-        "packagesPath": "C:\\Users\\pc\\.nuget\\packages\\",
-        "outputPath": "F:\\letter-github\\src\\Letter.Kcp\\obj\\",
+        "projectPath": "/Users/guanyedong/Projects/letter-github/src/Letter.Kcp/Letter.Kcp.csproj",
+        "packagesPath": "/Users/guanyedong/.nuget/packages/",
+        "outputPath": "/Users/guanyedong/Projects/letter-github/src/Letter.Kcp/obj/",
         "projectStyle": "PackageReference",
         "crossTargeting": true,
         "fallbackFolders": [
-          "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
+          "/usr/local/share/dotnet/sdk/NuGetFallbackFolder"
         ],
         "configFilePaths": [
-          "C:\\Users\\pc\\AppData\\Roaming\\NuGet\\NuGet.Config",
-          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+          "/Users/guanyedong/.config/NuGet/NuGet.Config"
         ],
         "originalTargetFrameworks": [
           "net5.0",
           "netstandard2.0"
         ],
         "sources": {
-          "D:\\NuGetPackages\\": {},
-          "https://api.nuget.org/v3/index.json": {},
-          "https://nuget.cdn.azure.cn/v3/index.json": {}
+          "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
           "net5.0": {
             "targetAlias": "net5.0",
             "projectReferences": {
-              "F:\\letter-github\\src\\Letter.Udp\\Letter.Udp.csproj": {
-                "projectPath": "F:\\letter-github\\src\\Letter.Udp\\Letter.Udp.csproj"
+              "/Users/guanyedong/Projects/letter-github/src/Letter.Udp/Letter.Udp.csproj": {
+                "projectPath": "/Users/guanyedong/Projects/letter-github/src/Letter.Udp/Letter.Udp.csproj"
               }
             }
           },
           "netstandard2.0": {
             "targetAlias": "netstandard2.0",
             "projectReferences": {
-              "F:\\letter-github\\src\\Letter.Udp\\Letter.Udp.csproj": {
-                "projectPath": "F:\\letter-github\\src\\Letter.Udp\\Letter.Udp.csproj"
+              "/Users/guanyedong/Projects/letter-github/src/Letter.Udp/Letter.Udp.csproj": {
+                "projectPath": "/Users/guanyedong/Projects/letter-github/src/Letter.Udp/Letter.Udp.csproj"
               }
             }
           }
@@ -294,7 +282,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\5.0.101\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/5.0.102/RuntimeIdentifierGraph.json"
         },
         "netstandard2.0": {
           "targetAlias": "netstandard2.0",
@@ -316,50 +304,47 @@
           ],
           "assetTargetFallback": true,
           "warn": true,
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\5.0.101\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/5.0.102/RuntimeIdentifierGraph.json"
         }
       }
     },
-    "F:\\letter-github\\src\\Letter.Udp\\Letter.Udp.csproj": {
+    "/Users/guanyedong/Projects/letter-github/src/Letter.Udp/Letter.Udp.csproj": {
       "version": "0.0.0.1",
       "restore": {
-        "projectUniqueName": "F:\\letter-github\\src\\Letter.Udp\\Letter.Udp.csproj",
+        "projectUniqueName": "/Users/guanyedong/Projects/letter-github/src/Letter.Udp/Letter.Udp.csproj",
         "projectName": "Letter.Udp",
-        "projectPath": "F:\\letter-github\\src\\Letter.Udp\\Letter.Udp.csproj",
-        "packagesPath": "C:\\Users\\pc\\.nuget\\packages\\",
-        "outputPath": "F:\\letter-github\\src\\Letter.Udp\\obj\\",
+        "projectPath": "/Users/guanyedong/Projects/letter-github/src/Letter.Udp/Letter.Udp.csproj",
+        "packagesPath": "/Users/guanyedong/.nuget/packages/",
+        "outputPath": "/Users/guanyedong/Projects/letter-github/src/Letter.Udp/obj/",
         "projectStyle": "PackageReference",
         "crossTargeting": true,
         "fallbackFolders": [
-          "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
+          "/usr/local/share/dotnet/sdk/NuGetFallbackFolder"
         ],
         "configFilePaths": [
-          "C:\\Users\\pc\\AppData\\Roaming\\NuGet\\NuGet.Config",
-          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+          "/Users/guanyedong/.config/NuGet/NuGet.Config"
         ],
         "originalTargetFrameworks": [
           "net5.0",
           "netstandard2.0"
         ],
         "sources": {
-          "D:\\NuGetPackages\\": {},
-          "https://api.nuget.org/v3/index.json": {},
-          "https://nuget.cdn.azure.cn/v3/index.json": {}
+          "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
           "net5.0": {
             "targetAlias": "net5.0",
             "projectReferences": {
-              "F:\\letter-github\\src\\Letter.IO\\Letter.IO.csproj": {
-                "projectPath": "F:\\letter-github\\src\\Letter.IO\\Letter.IO.csproj"
+              "/Users/guanyedong/Projects/letter-github/src/Letter.IO/Letter.IO.csproj": {
+                "projectPath": "/Users/guanyedong/Projects/letter-github/src/Letter.IO/Letter.IO.csproj"
               }
             }
           },
           "netstandard2.0": {
             "targetAlias": "netstandard2.0",
             "projectReferences": {
-              "F:\\letter-github\\src\\Letter.IO\\Letter.IO.csproj": {
-                "projectPath": "F:\\letter-github\\src\\Letter.IO\\Letter.IO.csproj"
+              "/Users/guanyedong/Projects/letter-github/src/Letter.IO/Letter.IO.csproj": {
+                "projectPath": "/Users/guanyedong/Projects/letter-github/src/Letter.IO/Letter.IO.csproj"
               }
             }
           }
@@ -388,7 +373,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\5.0.101\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/5.0.102/RuntimeIdentifierGraph.json"
         },
         "netstandard2.0": {
           "targetAlias": "netstandard2.0",
@@ -410,7 +395,7 @@
           ],
           "assetTargetFallback": true,
           "warn": true,
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\5.0.101\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/5.0.102/RuntimeIdentifierGraph.json"
         }
       }
     }

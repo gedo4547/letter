@@ -29,8 +29,8 @@ namespace kcp_lab_test
         public void Debug()
         {
             System.Text.StringBuilder sb = new System.Text.StringBuilder();
-            sb.AppendLine("µÈ´ý·¢ËÍµÄ°ü£º£º" + send_queue.Count);
-            sb.AppendLine("ÒÑ¾­ÊÕµ½µÄ°ü£º£º" + recv_queue.Count);
+            sb.AppendLine("ï¿½È´ï¿½ï¿½ï¿½ï¿½ÍµÄ°ï¿½ï¿½ï¿½ï¿½ï¿½" + send_queue.Count);
+            sb.AppendLine("ï¿½Ñ¾ï¿½ï¿½Õµï¿½ï¿½Ä°ï¿½ï¿½ï¿½ï¿½ï¿½" + recv_queue.Count);
 
             Console.WriteLine(sb.ToString());
         }
@@ -61,47 +61,42 @@ namespace kcp_lab_test
 
         public void Update()
         {
-            while (true)
+            while (this.recv_queue.Count > 0)
             {
-                System.Threading.Thread.Sleep(1);
-
-                while (this.recv_queue.Count > 0)
+                this.recv_queue.TryPeek(out var item);
+                var seg = item.GetBinaryArray();
+                if (this._kcpKit.TryRcv(seg.Array, 0, seg.Count))
                 {
-                    this.recv_queue.TryPeek(out var item);
-                    var seg = item.GetBinaryArray();
-                    if (this._kcpKit.TryRcv(seg.Array, 0, seg.Count))
-                    {
-                        this.recv_queue.TryDequeue(out _);
-                        this._kcpKit.MarkTime();
-                    }
-                    else
-                    {
-                        break;
-                    }
+                    this.recv_queue.TryDequeue(out _);
+                    this._kcpKit.MarkTime();
                 }
-
-                while (this.send_queue.Count > 0)
+                else
                 {
-                    this.send_queue.TryPeek(out var item);
-                    var seg = item.GetBinaryArray();
-
-                    System.Text.StringBuilder sb = new System.Text.StringBuilder();
-                    if (this._kcpKit.TrySnd(seg.Array, 0, seg.Count))
-                    {
-                        this.send_queue.TryDequeue(out _);
-                        this._kcpKit.MarkTime();
-                    }
-                    else
-                    {
-                        break;
-                    }
-
-                    //Console.WriteLine(sb.ToString());
+                    break;
                 }
-
-                this._kcpKit.Update();
             }
-            
+
+            while (this.send_queue.Count > 0)
+            {
+                this.send_queue.TryPeek(out var item);
+                var seg = item.GetBinaryArray();
+
+                System.Text.StringBuilder sb = new System.Text.StringBuilder();
+                if (this._kcpKit.TrySnd(seg.Array, 0, seg.Count))
+                {
+                    this.send_queue.TryDequeue(out _);
+                    this._kcpKit.MarkTime();
+                }
+                else
+                {
+                    break;
+                }
+
+                //Console.WriteLine(sb.ToString());
+            }
+
+            this._kcpKit.Update();
+
         }
     }
 }
