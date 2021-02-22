@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Buffers;
+using System.Collections.Generic;
 using System.Text;
 using System.Threading;
 
@@ -14,19 +15,51 @@ namespace kcp_lab_test
 
         private static bool use_buffer = false;
 
+        private static bool isRun = true;
+        private static List<KcpUnit> units_1 = new List<KcpUnit>();
+        private static List<KcpUnit> units_2 = new List<KcpUnit>();
+
         static void Main(string[] args)
         {
             Console.Title = "kcp_lib1111111111111111111111111111111";
+            var memoryPool = SlabMemoryPoolFactory.Create(new MemoryPoolOptions(4096, 32));
 
-            
-            
-            unit1 = new KcpUnit(SlabMemoryPoolFactory.Create(new MemoryPoolOptions(4096, 32)));
-            unit1.SetRcvEvent((ref ReadOnlySequence<byte> sequence) => { OnRcvEvent(ref sequence, 1); });
-            unit1.SetSndEvent((ref ReadOnlySequence<byte> sequence) => { OnSndEvent(ref sequence, 1); });
+            for (int i = 0; i < 5000; i++)
+            {
+                uint conv = (uint)i;
+                var t_unit1 = new KcpUnit(conv);
+                t_unit1.SetRcvEvent((ref Memory<byte> memory) => { OnRcvEvent(ref memory, 1); });
+                t_unit1.SetSndEvent((ref Memory<byte> memory) => { OnSndEvent(ref memory, 1); });
+                units_1.Add(t_unit1);
 
-            unit2 = new KcpUnit(SlabMemoryPoolFactory.Create(new MemoryPoolOptions(4096, 32)));
-            unit2.SetRcvEvent((ref ReadOnlySequence<byte> sequence) => { OnRcvEvent(ref sequence, 2); });
-            unit2.SetSndEvent((ref ReadOnlySequence<byte> sequence) => { OnSndEvent(ref sequence, 2); });
+                var t_unit2 = new KcpUnit(conv);
+                t_unit2.SetRcvEvent((ref Memory<byte> memory) => { OnRcvEvent(ref memory, 2); });
+                t_unit2.SetSndEvent((ref Memory<byte> memory) => { OnSndEvent(ref memory, 2); });
+                units_2.Add(t_unit2);
+            }
+
+            Thread thread = new Thread(() =>
+            {
+
+                while (isRun)
+                {
+                    Thread.Sleep(5);
+
+                    int units1Count = units_1.Count;
+                    for (int i = 0; i < units1Count; i++)
+                    {
+                        units_1[i].Update();
+                    }
+
+                    int units2Count = units_2.Count;
+                    for (int i = 0; i < units2Count; i++)
+                    {
+                        units_2[i].Update();
+                    }
+                }
+
+            });
+            thread.Start();
 
 
             byte[] buffer = System.Text.Encoding.UTF8.GetBytes(common.Message.data_1024);
@@ -67,6 +100,7 @@ namespace kcp_lab_test
                 }
                 else if (str == "s")
                 {
+                    isRun = false;
                     return;
                 }
                 else if (str == "d")
@@ -78,22 +112,16 @@ namespace kcp_lab_test
             }
         }
         
-        private static void OnRcvEvent(ref ReadOnlySequence<byte> sequence, int type)
-        {
-            StringBuilder sb = new StringBuilder();
-            foreach (var item in sequence)
-            {
-                sb.Append(Encoding.UTF8.GetString(item.Span));
-            }
-            
-            Console.WriteLine($"{type}>rcv>>" + sb.ToString());
+        private static void OnRcvEvent(ref Memory<byte> memory, int type)
+        {            
+            Console.WriteLine($"{type}>rcv>>" + Encoding.UTF8.GetString(memory.Span));
         }
         
-        private static void OnSndEvent(ref ReadOnlySequence<byte> sequence, int type)
+        private static void OnSndEvent(ref Memory<byte> memory, int type)
         {
             //Console.WriteLine($"{type}>snd>>" + sequence.Length);
-            byte[] bytes = new byte[sequence.Length];
-            sequence.CopyTo(bytes);
+            byte[] bytes = new byte[memory.Length];
+            memory.CopyTo(bytes);
 
             if (type == 1)
             {
