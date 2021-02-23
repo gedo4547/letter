@@ -7,6 +7,11 @@ using System.Threading.Tasks;
 
 namespace kcp_test
 {
+    class MMM
+    {
+        
+    }
+
     class M
     {
         public static List<IKcpSession> sessions = new List<IKcpSession>();

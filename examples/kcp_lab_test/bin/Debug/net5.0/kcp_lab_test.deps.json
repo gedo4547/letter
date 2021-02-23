@@ -8,7 +8,7 @@
     ".NETCoreApp,Version=v5.0": {
       "kcp_lab_test/1.0.0": {
         "dependencies": {
-          "Letter.Kcp": "0.0.0.1",
+          "Letter.Kcp": "0.1.0",
           "common": "1.0.0"
         },
         "runtime": {
@@ -28,7 +28,7 @@
           "common.dll": {}
         }
       },
-      "Letter.IO/0.0.0.1": {
+      "Letter.IO/0.1.0": {
         "dependencies": {
           "System.IO.Pipelines": "5.0.1"
         },
@@ -36,17 +36,17 @@
           "Letter.IO.dll": {}
         }
       },
-      "Letter.Kcp/0.0.0.1": {
+      "Letter.Kcp/0.1.0": {
         "dependencies": {
-          "Letter.Udp": "0.0.0.1"
+          "Letter.Udp": "0.1.0"
         },
         "runtime": {
           "Letter.Kcp.dll": {}
         }
       },
-      "Letter.Udp/0.0.0.1": {
+      "Letter.Udp/0.1.0": {
         "dependencies": {
-          "Letter.IO": "0.0.0.1"
+          "Letter.IO": "0.1.0"
         },
         "runtime": {
           "Letter.Udp.dll": {}
@@ -72,17 +72,17 @@
       "serviceable": false,
       "sha512": ""
     },
-    "Letter.IO/0.0.0.1": {
+    "Letter.IO/0.1.0": {
       "type": "project",
       "serviceable": false,
       "sha512": ""
     },
-    "Letter.Kcp/0.0.0.1": {
+    "Letter.Kcp/0.1.0": {
       "type": "project",
       "serviceable": false,
       "sha512": ""
     },
-    "Letter.Udp/0.0.0.1": {
+    "Letter.Udp/0.1.0": {
       "type": "project",
       "serviceable": false,
       "sha512": ""

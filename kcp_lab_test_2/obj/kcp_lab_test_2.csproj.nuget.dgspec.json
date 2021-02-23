@@ -131,7 +131,7 @@
       }
     },
     "F:\\letter-github\\src\\Letter.IO\\Letter.IO.csproj": {
-      "version": "0.0.0.1",
+      "version": "0.1.0",
       "restore": {
         "projectUniqueName": "F:\\letter-github\\src\\Letter.IO\\Letter.IO.csproj",
         "projectName": "Letter.IO",
@@ -227,7 +227,7 @@
       }
     },
     "F:\\letter-github\\src\\Letter.Kcp\\Letter.Kcp.csproj": {
-      "version": "0.0.0.1",
+      "version": "0.1.0",
       "restore": {
         "projectUniqueName": "F:\\letter-github\\src\\Letter.Kcp\\Letter.Kcp.csproj",
         "projectName": "Letter.Kcp",
@@ -321,7 +321,7 @@
       }
     },
     "F:\\letter-github\\src\\Letter.Udp\\Letter.Udp.csproj": {
-      "version": "0.0.0.1",
+      "version": "0.1.0",
       "restore": {
         "projectUniqueName": "F:\\letter-github\\src\\Letter.Udp\\Letter.Udp.csproj",
         "projectName": "Letter.Udp",

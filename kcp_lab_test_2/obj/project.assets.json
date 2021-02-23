@@ -21,7 +21,7 @@
           "bin/placeholder/common.dll": {}
         }
       },
-      "Letter.IO/0.0.0.1": {
+      "Letter.IO/0.1.0": {
         "type": "project",
         "framework": ".NETStandard,Version=v2.0",
         "dependencies": {
@@ -34,11 +34,11 @@
           "bin/placeholder/Letter.IO.dll": {}
         }
       },
-      "Letter.Kcp/0.0.0.1": {
+      "Letter.Kcp/0.1.0": {
         "type": "project",
         "framework": ".NETStandard,Version=v2.0",
         "dependencies": {
-          "Letter.Udp": "0.0.0.1"
+          "Letter.Udp": "0.1.0"
         },
         "compile": {
           "bin/placeholder/Letter.Kcp.dll": {}
@@ -47,11 +47,11 @@
           "bin/placeholder/Letter.Kcp.dll": {}
         }
       },
-      "Letter.Udp/0.0.0.1": {
+      "Letter.Udp/0.1.0": {
         "type": "project",
         "framework": ".NETStandard,Version=v2.0",
         "dependencies": {
-          "Letter.IO": "0.0.0.1"
+          "Letter.IO": "0.1.0"
         },
         "compile": {
           "bin/placeholder/Letter.Udp.dll": {}
@@ -94,17 +94,17 @@
       "path": "../examples/common/common.csproj",
       "msbuildProject": "../examples/common/common.csproj"
     },
-    "Letter.IO/0.0.0.1": {
+    "Letter.IO/0.1.0": {
       "type": "project",
       "path": "../src/Letter.IO/Letter.IO.csproj",
       "msbuildProject": "../src/Letter.IO/Letter.IO.csproj"
     },
-    "Letter.Kcp/0.0.0.1": {
+    "Letter.Kcp/0.1.0": {
       "type": "project",
       "path": "../src/Letter.Kcp/Letter.Kcp.csproj",
       "msbuildProject": "../src/Letter.Kcp/Letter.Kcp.csproj"
     },
-    "Letter.Udp/0.0.0.1": {
+    "Letter.Udp/0.1.0": {
       "type": "project",
       "path": "../src/Letter.Udp/Letter.Udp.csproj",
       "msbuildProject": "../src/Letter.Udp/Letter.Udp.csproj"
@@ -112,7 +112,7 @@
   },
   "projectFileDependencyGroups": {
     ".NETCoreApp,Version=v3.1": [
-      "Letter.Kcp >= 0.0.0.1",
+      "Letter.Kcp >= 0.1.0",
       "common >= 1.0.0"
     ]
   },
