@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text;
 using System.Threading;
+using System.Linq;
 
 namespace kcp_lab_test
 {
@@ -35,7 +36,7 @@ namespace kcp_lab_test
             //MyStruct my = new MyStruct(span);
 
             var memoryPool = SlabMemoryPoolFactory.Create(new MemoryPoolOptions(4096, 32));
-            for (int i = 0; i < 1; i++)
+            for (int i = 0; i < 5000; i++)
             {
                 uint conv = (uint)i;
                 var unit1 = new KcpUnit(conv, memoryPool);
@@ -44,8 +45,8 @@ namespace kcp_lab_test
                 units_1.Add(unit1);
 
                 var unit2 = new KcpUnit(conv, memoryPool);
-                unit2.SetRcvEvent((ref ReadOnlySequence<byte> sequence) => { OnRcvEvent(ref sequence, 2, unit1.Conv); });
-                unit2.SetSndEvent((ref ReadOnlySequence<byte> sequence) => { OnSndEvent(ref sequence, 2, unit1.Conv); });
+                unit2.SetRcvEvent((ref ReadOnlySequence<byte> sequence) => { OnRcvEvent(ref sequence, 2, unit2.Conv); });
+                unit2.SetSndEvent((ref ReadOnlySequence<byte> sequence) => { OnSndEvent(ref sequence, 2, unit2.Conv); });
                 units_2.Add(unit2);
             }
 
@@ -71,12 +72,12 @@ namespace kcp_lab_test
             thread.Start();
 
 
-            byte[] buffer = System.Text.Encoding.UTF8.GetBytes(common.Message.data_1024);
+            byte[] buffer = Encoding.UTF8.GetBytes(common.Message.data_1024);
             while (true)
             {
                 // System.Threading.Thread.Sleep(1);
                 string str = Console.ReadLine();
-
+                Console.Clear();
                 if (int.TryParse(str, out var length))
                 {
                     for (int i = 0; i < length; i++)
@@ -92,7 +93,7 @@ namespace kcp_lab_test
                         }
                         else
                         {
-                            var bytes = System.Text.Encoding.UTF8.GetBytes($"nihao {i}");
+                            var bytes = System.Text.Encoding.UTF8.GetBytes($"nihao {i}-----{num}");
                             int count1 = units_1.Count;
                             for (int j = 0; j < count1; j++)
                             {
@@ -130,10 +131,31 @@ namespace kcp_lab_test
                     isRun = false;
                     return;
                 }
-                else if (str == "d")
+                else
                 {
-                    unit1.Debug();
-                    //unit2.Debug();
+                    //d-type-index
+                    if (str.Contains("d"))
+                    {
+                        var arr = str.Split('-');
+                        var type = int.Parse(arr[1]);
+                        var index = int.Parse(arr[2]);
+                        if (type == 1)
+                        {
+                            for (int i = index; i < units_1.Count; i++)
+                            {
+                                units_1[i].Debug();
+                            }
+                        }
+
+                        if (type == 2)
+                        {
+                            for (int i = index; i < units_2.Count; i++)
+                            {
+                                units_2[i].Debug();
+                            }
+                        }
+                       
+                    }
                 }
 
             }

@@ -9,6 +9,8 @@ namespace kcp_lab_test2
     {
         public KcpUnit(uint conv)
         {
+            this.Conv = conv;
+
             this._kcpKit = new KcpKit(conv);
             this._kcpKit.SettingNoDelay(1, 10, 2, 1);
             this._kcpKit.WriteDelay = false;
@@ -21,6 +23,12 @@ namespace kcp_lab_test2
 
         private ConcurrentQueue<Memory<byte>> recv_queue = new ConcurrentQueue<Memory<byte>>();
         private ConcurrentQueue<Memory<byte>> send_queue = new ConcurrentQueue<Memory<byte>>();
+
+        public uint Conv
+        {
+            get;
+            private set;
+        }
 
         public void Debug()
         {

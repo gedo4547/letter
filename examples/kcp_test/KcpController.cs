@@ -55,7 +55,7 @@ namespace kcp_test
             var buffer = reader.ReadBuffer((int)reader.Length);
             //频道号
             var convSpan = buffer.Slice(buffer.Start, 4).First.Span;
-            var conv = KcpHelpr.GetOperators().ReadUInt32(convSpan);
+            var conv = base.OrderOperators.ReadUInt32(convSpan);
             if (!this.sessions.ContainsKey(conv)) return;
             
             var kcpSession = this.sessions[conv];
@@ -71,7 +71,6 @@ namespace kcp_test
 
         public override void OnUdpMessageOutput(IUdpSession session, ref WrappedWriter writer, WrappedArgs args)
         {
-            
             IWrappedMemory memory = args.Value as IWrappedMemory;
             if(memory.Flag == MemoryFlag.Kcp)
             {
@@ -103,7 +102,5 @@ namespace kcp_test
 
             this.sessions.Clear();
         }
-
-        
     }
 }

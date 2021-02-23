@@ -25,11 +25,14 @@ namespace kcp_lab_test
 
         public void Debug()
         {
-            System.Text.StringBuilder sb = new System.Text.StringBuilder();
-            sb.AppendLine("�ȴ����͵İ�����" + send_queue.Count);
-            sb.AppendLine("�Ѿ��յ��İ�����" + recv_queue.Count);
-
-            Console.WriteLine(sb.ToString());
+            if (send_queue.Count > 0 || recv_queue.Count > 0)
+            {
+                System.Text.StringBuilder sb = new System.Text.StringBuilder();
+                sb.AppendLine("频道：" + this.Conv);
+                sb.AppendLine("等待发送：" + send_queue.Count);
+                sb.AppendLine("等待读取：" + recv_queue.Count);
+                Console.WriteLine(sb.ToString());
+            }
         }
 
         public void SetRcvEvent(RefAction rcv)

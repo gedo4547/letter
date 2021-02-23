@@ -21,7 +21,7 @@ namespace kcp_test
             await bootstrap.BuildAsync();
             
             //server
-            var s_channel = await bootstrap.CreateChannelAsync();
+            IKcpChannel s_channel = await bootstrap.CreateChannelAsync();
             s_channel.ConfigurationSelfFilter((pipeline) =>
             {
                 pipeline.Add(new KcpFilter_S("server"));
@@ -59,8 +59,8 @@ namespace kcp_test
                     for (int i = 0; i < sessions.Count; i++)
                     {
                         var session = sessions[i];
-                        //session.SendUnsafeAsync(bytes);
-                        session.SendSafeAsync(bytes);
+                        session.SendUnsafeAsync(bytes);
+                        //session.SendSafeAsync(bytes);
                     }
                 }
 

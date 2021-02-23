@@ -28,13 +28,13 @@ namespace kcp_lab_test2
             {
                 uint conv = (uint)i;
                 var t_unit1 = new KcpUnit(conv);
-                t_unit1.SetRcvEvent((ref Memory<byte> memory) => { OnRcvEvent(ref memory, 1); });
-                t_unit1.SetSndEvent((ref Memory<byte> memory) => { OnSndEvent(ref memory, 1); });
+                t_unit1.SetRcvEvent((ref Memory<byte> memory) => { OnRcvEvent(ref memory, 1, t_unit1.Conv); });
+                t_unit1.SetSndEvent((ref Memory<byte> memory) => { OnSndEvent(ref memory, 1, t_unit1.Conv); });
                 units_1.Add(t_unit1);
 
                 var t_unit2 = new KcpUnit(conv);
-                t_unit2.SetRcvEvent((ref Memory<byte> memory) => { OnRcvEvent(ref memory, 2); });
-                t_unit2.SetSndEvent((ref Memory<byte> memory) => { OnSndEvent(ref memory, 2); });
+                t_unit2.SetRcvEvent((ref Memory<byte> memory) => { OnRcvEvent(ref memory, 2, t_unit2.Conv); });
+                t_unit2.SetSndEvent((ref Memory<byte> memory) => { OnSndEvent(ref memory, 2, t_unit2.Conv); });
                 units_2.Add(t_unit2);
             }
 
@@ -43,7 +43,7 @@ namespace kcp_lab_test2
 
                 while (isRun)
                 {
-                    Thread.Sleep(5);
+                    Thread.Sleep(1);
 
                     int units1Count = units_1.Count;
                     for (int i = 0; i < units1Count; i++)
@@ -62,12 +62,12 @@ namespace kcp_lab_test2
             thread.Start();
 
 
-            byte[] buffer = System.Text.Encoding.UTF8.GetBytes(common.Message.data_1024);
+            byte[] buffer = Encoding.UTF8.GetBytes(common.Message.data_1024);
             while (true)
             {
                 // System.Threading.Thread.Sleep(1);
                 string str = Console.ReadLine();
-
+                Console.Clear();
                 if (int.TryParse(str, out var length))
                 {
                     for (int i = 0; i < length; i++)
@@ -75,11 +75,20 @@ namespace kcp_lab_test2
                         Interlocked.Increment(ref num);
                         if (use_buffer)
                         {
-                            unit1.Send(buffer);
+                            int count1 = units_1.Count;
+                            for (int j = 0; j < count1; j++)
+                            {
+                                units_1[j].Send(buffer);
+                            }
                         }
                         else
                         {
-                            unit1.Send(System.Text.Encoding.UTF8.GetBytes($"nihao {i}"));
+                            var bytes = System.Text.Encoding.UTF8.GetBytes($"nihao {i}-----{num}");
+                            int count1 = units_1.Count;
+                            for (int j = 0; j < count1; j++)
+                            {
+                                units_1[j].Send(bytes);
+                            }
                         }
                     }
                 }
@@ -90,11 +99,20 @@ namespace kcp_lab_test2
                         Interlocked.Increment(ref num);
                         if (use_buffer)
                         {
-                            unit1.Send(buffer);
+                            int count1 = units_1.Count;
+                            for (int j = 0; j < count1; j++)
+                            {
+                                units_1[j].Send(buffer);
+                            }
                         }
                         else
                         {
-                            unit1.Send(System.Text.Encoding.UTF8.GetBytes($"nihao {i}"));
+                            var bytes = System.Text.Encoding.UTF8.GetBytes($"nihao {i}");
+                            int count1 = units_1.Count;
+                            for (int j = 0; j < count1; j++)
+                            {
+                                units_1[j].Send(bytes);
+                            }
                         }
                     }
                 }
@@ -112,24 +130,25 @@ namespace kcp_lab_test2
             }
         }
 
-        private static void OnRcvEvent(ref Memory<byte> memory, int type)
+        private static void OnRcvEvent(ref Memory<byte> memory, int type, uint conv)
         {
-            Console.WriteLine($"{type}>rcv>>" + Encoding.UTF8.GetString(memory.Span));
+            Console.WriteLine($"{type}>{conv}>>rcv>>" + Encoding.UTF8.GetString(memory.Span) + ">>time:" + DateTime.Now);
         }
 
-        private static void OnSndEvent(ref Memory<byte> memory, int type)
+        private static void OnSndEvent(ref Memory<byte> memory, int type, uint conv)
         {
+            //Console.WriteLine($"{type}>snd>>" + sequence.Length);
             //Console.WriteLine($"{type}>snd>>" + sequence.Length);
             byte[] bytes = new byte[memory.Length];
             memory.CopyTo(bytes);
 
             if (type == 1)
             {
-                unit2.Recv(bytes);
+                units_2[(int)conv].Recv(bytes);
             }
             else if (type == 2)
             {
-                unit1.Recv(bytes);
+                units_1[(int)conv].Recv(bytes);
             }
         }
     }

@@ -13,22 +13,19 @@ namespace Letter.Kcp
 {
     public abstract class AKcpController : IKcpClosable, IDisposable
     {
-        public AKcpController()
-        {
-            var order = KcpHelpr.GetKcpBinaryOrder();
-            this.binaryOrderOperators = KcpHelpr.GetOperators();
-        }
-
         private IKcpSessionBuilder creator;
         private IBinaryOrderOperators binaryOrderOperators;
 
         [EditorBrowsable(EditorBrowsableState.Never)]
         internal void SetCreator(IKcpSessionBuilder creator)
         {
-            if(this.creator != null)
-                throw new Exception("Invalid assignment");
-
             this.creator = creator;
+        }
+
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        internal void SetOperators(IBinaryOrderOperators binaryOrderOperators)
+        {
+            this.binaryOrderOperators = binaryOrderOperators;
         }
 
         protected bool IsActivate 

@@ -1,5 +1,6 @@
-﻿using System.Runtime.CompilerServices;
-using System.Net;
+﻿using System.Net;
+using System.Runtime.CompilerServices;
+
 using Letter.Kcp;
 
 namespace System
@@ -18,6 +19,7 @@ namespace System
             kcp.SettingWndSize(config.sndwnd, config.rcvwnd);
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void SettingMtu(this KcpKit kcp, int? mtu)
         {
             if (mtu == null) return;
@@ -25,6 +27,7 @@ namespace System
             kcp.SettingMtu(mtu.Value);
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void SettingStreamMode(this KcpKit kcp, bool? enabled)
         {
             if (enabled == null) return;
@@ -32,6 +35,7 @@ namespace System
             kcp.SettingStreamMode(enabled.Value);
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void SettingReservedSize(this KcpKit kcp, int? reservedSize)
         {
             if (reservedSize == null) return;

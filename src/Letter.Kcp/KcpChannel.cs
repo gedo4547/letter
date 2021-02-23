@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Buffers.Binary;
 using System.IO.Pipelines;
 using System.Net;
 using System.Threading.Tasks;
@@ -20,6 +21,9 @@ namespace Letter.Kcp
             this.scheduler = scheduler;
             this.channel = channel;
             this.channel.ConfigurationSelfFilter((pipeline) => { pipeline.Add(this); });
+
+            this.orderOperators = BinaryOrderOperatorsFactory.GetOperators(options.Order);
+
             this.scheduler.Register(this);
         }
 
@@ -27,7 +31,8 @@ namespace Letter.Kcp
         private IUdpSession session;
         
         private IKcpScheduler scheduler;
-        
+        private IBinaryOrderOperators orderOperators;
+
         private bool isStop = false;
         private bool isInvalid = false;
         private AKcpController controller;
@@ -46,6 +51,7 @@ namespace Letter.Kcp
 
             this.controller = controller;
             this.controller.SetCreator(this);
+            this.controller.SetOperators(orderOperators);
 
             return controller;
         }

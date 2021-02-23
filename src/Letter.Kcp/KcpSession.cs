@@ -41,6 +41,7 @@ namespace Letter.Kcp
             this.rcvPool = new WrappedMemoryPool(this.MemoryPool, MemoryFlag.Kcp);
             this.sndPool = new WrappedMemoryPool(this.MemoryPool, MemoryFlag.Kcp);
 
+            this.sndMemory = new WrappedMemory(this.MemoryPool.Rent(), MemoryFlag.Kcp);
             this.readerUdpMemory = new WrappedMemory(this.MemoryPool.Rent(), MemoryFlag.Udp);
             this.writerUdpMemory = new WrappedMemory(this.MemoryPool.Rent(), MemoryFlag.Udp);
 
@@ -102,7 +103,7 @@ namespace Letter.Kcp
                 else
                 {
                     this.rcvQueue.TryDequeue(out _);
-                    this.sndPool.Push(item);
+                    this.rcvPool.Push(item);
                     this.kcpKit.MarkTime();
                 }
             }
@@ -110,14 +111,15 @@ namespace Letter.Kcp
             while (this.sndQueue.Count > 0)
             {
                 this.sndQueue.TryPeek(out var item);
-                var seg = item.GetReadableMemory().GetBinaryArray();
-
+                var readableMemory = item.GetReadableMemory();
+                var seg = readableMemory.GetBinaryArray();
                 if (!this.kcpKit.TrySnd(seg.Array, seg.Offset, seg.Count))
                 {
                     break;
                 }
                 else
                 {
+                    //Console.WriteLine("kcp.send完成");
                     this.sndQueue.TryDequeue(out _);
                     this.sndPool.Push(item);
                     this.kcpKit.MarkTime();
@@ -202,7 +204,7 @@ namespace Letter.Kcp
                     this.writerUdpMemory.Clear();
                     //conv使用kcp的序列写入，保证与kcp一致
                     var span = this.writerUdpMemory.GetWritableSpan(4);
-                    KcpHelpr.GetOperators().WriteUInt32(span, this.Conv);
+                    this.kcpOperators.WriteUInt32(span, this.Conv);
                     writerUdpMemory.WriterAdvance(4);
 
                     var writer = new WrappedWriter(this.writerUdpMemory, this.Order, this.writerFlushDelegate);
@@ -225,10 +227,12 @@ namespace Letter.Kcp
             if (memory.Flag == MemoryFlag.Kcp)
             {
                 var readableMemory = memory.GetReadableMemory();
+               
                 if (readableMemory.Length < 1)
                 {
                     return;
                 }
+                //Console.WriteLine("kcp数据写入完成》》" + readableMemory.Length);
                 this.sndQueue.Enqueue(memory);
             }
             else if(memory.Flag == MemoryFlag.Udp)
@@ -238,16 +242,19 @@ namespace Letter.Kcp
             }
         }
 
-        private WrappedMemory sndMemory = new WrappedMemory(MemoryFlag.Kcp);
+        private WrappedMemory sndMemory;
 
         private void OnKcpSndEvent(ref ReadOnlySequence<byte> memory)
         {
+            //Console.WriteLine("kcp通知消息发送>>"+memory.Length);
             if (memory.Length < 1) return;
 
             int length = (int)memory.Length;
+            sndMemory.Clear();
             var writableMemory = this.sndMemory.GetWritableMemory(length);
             memory.CopyTo(writableMemory.Span);
             this.sndMemory.WriterAdvance(length);
+
             this.udpSession.Write(this.RemoteAddress, this.sndMemory);
             this.udpSession.FlushAsync().NoAwait();
         }
