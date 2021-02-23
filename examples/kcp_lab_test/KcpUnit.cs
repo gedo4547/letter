@@ -1,20 +1,19 @@
 using System;
 using System.Buffers;
 using System.Collections.Concurrent;
-using Letter.IO.Kcplib;
+using System.Net;
 
 namespace kcp_lab_test
 {
     public class KcpUnit
     {
-        public KcpUnit(uint conv)
+        public KcpUnit(uint conv, MemoryPool<byte> memoryPool)
         {
-            this._kcpKit = new KcpKit(conv);
+            this.Conv = conv;
+            this._kcpKit = new KcpKit(conv, true, memoryPool);
             this._kcpKit.SettingNoDelay(1, 10, 2, 1);
             this._kcpKit.WriteDelay = false;
             this._kcpKit.SettingStreamMode(true);
-
-           
         }
 
         private KcpKit _kcpKit;
@@ -22,11 +21,13 @@ namespace kcp_lab_test
         private ConcurrentQueue<Memory<byte>> recv_queue = new ConcurrentQueue<Memory<byte>>();
         private ConcurrentQueue<Memory<byte>> send_queue = new ConcurrentQueue<Memory<byte>>();
 
+        public uint Conv { get; private set; }
+
         public void Debug()
         {
             System.Text.StringBuilder sb = new System.Text.StringBuilder();
-            sb.AppendLine("µÈ´ý·¢ËÍµÄ°ü£º£º" + send_queue.Count);
-            sb.AppendLine("ÒÑ¾­ÊÕµ½µÄ°ü£º£º" + recv_queue.Count);
+            sb.AppendLine("ï¿½È´ï¿½ï¿½ï¿½ï¿½ÍµÄ°ï¿½ï¿½ï¿½ï¿½ï¿½" + send_queue.Count);
+            sb.AppendLine("ï¿½Ñ¾ï¿½ï¿½Õµï¿½ï¿½Ä°ï¿½ï¿½ï¿½ï¿½ï¿½" + recv_queue.Count);
 
             Console.WriteLine(sb.ToString());
         }
@@ -76,6 +77,8 @@ namespace kcp_lab_test
             {
                 this.send_queue.TryPeek(out var item);
                 var seg = item.GetBinaryArray();
+
+                System.Text.StringBuilder sb = new System.Text.StringBuilder();
                 if (this._kcpKit.TrySnd(seg.Array, 0, seg.Count))
                 {
                     this.send_queue.TryDequeue(out _);

@@ -614,7 +614,11 @@ namespace System.Net
         // flush pending data
         public UInt32 Flush(bool ackOnly)
         {
-            var seg = this.segmentAllotter.Get();
+            var seg = new KcpValueSegment(this.littleEndian);
+
+
+
+            //var seg = this.segmentAllotter.Get();
             seg.conv = conv;
             seg.cmd = IKCP_CMD_ACK;
             seg.wnd = (UInt32)wnd_unused();
@@ -657,7 +661,7 @@ namespace System.Net
             if (ackOnly)
             {
                 flushBuffer();
-                this.segmentAllotter.Put(seg);
+                //this.segmentAllotter.Put(seg);
                 return interval;
             }
 
@@ -851,7 +855,7 @@ namespace System.Net
                     incr = mss;
                 }
             }
-            this.segmentAllotter.Put(seg);
+            //this.segmentAllotter.Put(seg);
             return (UInt32)minrto;
         }
 
