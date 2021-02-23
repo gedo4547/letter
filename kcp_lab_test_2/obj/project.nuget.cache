@@ -1,0 +1,10 @@
+{
+  "version": 2,
+  "dgSpecHash": "AT5o1LxyHcOrcO1nZk/f4hE76s1P0fjYzQhMXVIUmBFI5PjIk0VPOlL/PRVPG8krVcP4MP0yqzUFaruUZKHOqw==",
+  "success": true,
+  "projectFilePath": "F:\\letter-github\\kcp_lab_test_2\\kcp_lab_test_2.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\pc\\.nuget\\packages\\system.io.pipelines\\5.0.1\\system.io.pipelines.5.0.1.nupkg.sha512"
+  ],
+  "logs": []
+}
