@@ -31,14 +31,14 @@ namespace udp_text
         {
             long length = reader.Length;
             var buffer = reader.ReadBuffer((int)length);
-            string str= System.Text.Encoding.UTF8.GetString(buffer.FirstSpan);
+            //string str= System.Text.Encoding.UTF8.GetString(buffer.FirstSpan);
 
-            Console.WriteLine($"{nameof(UdpFilter_2)}.{nameof(OnTransportRead)}>>LoaclAddress:{session.LocalAddress}    remoteAddress:{session.RcvAddress}>>" + str);
+            //Console.WriteLine($"{nameof(UdpFilter_2)}.{nameof(OnTransportRead)}>>LoaclAddress:{session.LocalAddress}    remoteAddress:{session.RcvAddress}>>" + str);
         }
         
         public void OnTransportWrite(IUdpSession session, ref WrappedWriter writer, WrappedArgs args)
         {
-            Console.WriteLine($"{nameof(UdpFilter_2)}.{nameof(OnTransportWrite)}");
+            //Console.WriteLine($"{nameof(UdpFilter_2)}.{nameof(OnTransportWrite)}");
             var buffer = args.Value as byte[];
             writer.Write(buffer);
         }

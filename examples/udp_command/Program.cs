@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Net;
 using System.Threading.Tasks;
+using common;
 using Letter.Udp;
 
 namespace udp_text
@@ -12,6 +13,8 @@ namespace udp_text
         
         static async Task Main(string[] args)
         {
+            _ = new PerformanceCounterListener();
+
             IUdpBootstrap bootstrap = UdpFactory.Bootstrap();
             bootstrap.ConfigurationGlobalOptions(options => { });
             bootstrap.ConfigurationGlobalFilter((pipeline) =>
@@ -27,14 +30,15 @@ namespace udp_text
             await c_channel.StartAsync(c_p);
             int count = 0;
             byte[] com = System.Text.Encoding.UTF8.GetBytes("send::::::::");
+            byte[] countBytes = System.Text.Encoding.UTF8.GetBytes($"{count}___1");
             while (true)
             {
                 string str = Console.ReadLine();
-                if (str == "send")
+                if (str == "")
                 {
                     for (int i = 0; i < 1000; i++)
                     {
-                        byte[] countBytes = System.Text.Encoding.UTF8.GetBytes($"{count}___{i}");
+                       
                         M.session.Write(Program.s_p, com);
                         M.session.Write(Program.s_p, countBytes);
                         await M.session.FlushAsync();

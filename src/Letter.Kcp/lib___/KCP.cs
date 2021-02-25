@@ -758,7 +758,7 @@ namespace Letter.IO.Kcplib
 
             var writeIndex = reserved;
 
-            Action<int> makeSpace = (space) =>
+            void makeSpace(int space)
             {
                 if (writeIndex + space > mtu)
                 {
@@ -767,7 +767,7 @@ namespace Letter.IO.Kcplib
                 }
             };
 
-            Action flushBuffer = () =>
+            void flushBuffer()
             {
                 if (writeIndex > reserved)
                 {

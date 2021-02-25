@@ -1,5 +1,6 @@
 ﻿using System.Net;
 using System.Threading.Tasks;
+using common;
 using Letter.Kcp;
 
 namespace kcp_test
@@ -12,6 +13,8 @@ namespace kcp_test
         
         static async Task Main(string[] args)
         {
+            //_ = new PerformanceCounterListener();
+
             //System.Array.Copy
             KcpDefaultScheduler thread = new KcpDefaultScheduler();
             

@@ -32,8 +32,9 @@ namespace kcp_test
         {
             int length = (int)reader.Length;
             var buffer = reader.ReadBuffer(length);
-            string str = System.Text.Encoding.UTF8.GetString(buffer.FirstSpan);
-            Console.WriteLine($"频道：{session.Conv}，收到消息：{str}" );
+
+            //string str = System.Text.Encoding.UTF8.GetString(buffer.FirstSpan);
+            //Console.WriteLine($"频道：{session.Conv}，收到消息：{str}" );
         }
 
         public void OnTransportWrite(IKcpSession session, ref WrappedWriter writer, WrappedArgs args)
