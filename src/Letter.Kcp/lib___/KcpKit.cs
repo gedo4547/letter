@@ -1,5 +1,4 @@
 using System;
-using Letter.Kcp.lib___;
 
 namespace Letter.IO.Kcplib
 {
@@ -10,7 +9,7 @@ namespace Letter.IO.Kcplib
         
         public KcpKit(uint conv)
         {
-            this.mKCP = new KCP(conv, this.OnOutEvent);
+            this.mKCP = new KCP(conv, true, this.OnOutEvent);
 
             this.mRecvBuffer = ByteBuffer.Allocate(1024 * 32);
             this.mRecvBuffer.Clear();

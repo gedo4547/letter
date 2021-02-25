@@ -129,9 +129,11 @@ namespace Letter.IO.Kcplib
             internal UInt32 acked = 0;
             internal ByteBuffer data;
 
+            private bool littleEndian;
+
             private static Stack<Segment> msSegmentPool = new Stack<Segment>(32);
 
-            public static Segment Get(int size)
+            public static Segment Get(bool littleEndian, int size)
             {
                 lock (msSegmentPool)
                 {
@@ -142,7 +144,7 @@ namespace Letter.IO.Kcplib
                         return seg;
                     }
                 }
-                return new Segment(size);
+                return new Segment(littleEndian, size);
             }
 
             public static void Put(Segment seg)
@@ -153,25 +155,41 @@ namespace Letter.IO.Kcplib
                 }
             }
 
-            private Segment(int size)
+            private Segment(bool littleEndian, int size)
             {
+                this.littleEndian = littleEndian;
                 data = ByteBuffer.Allocate(size, true);
             }
 
             // encode a segment into buffer
             internal int encode(byte[] ptr, int offset)
             {
-
                 var offset_ = offset;
+                Span<byte> buffer = new Span<byte>(ptr);
 
-                offset += ikcp_encode32u(ptr, offset, conv);
-                offset += ikcp_encode8u(ptr, offset, (byte)cmd);
-                offset += ikcp_encode8u(ptr, offset, (byte)frg);
-                offset += ikcp_encode16u(ptr, offset, (UInt16)wnd);
-                offset += ikcp_encode32u(ptr, offset, ts);
-                offset += ikcp_encode32u(ptr, offset, sn);
-                offset += ikcp_encode32u(ptr, offset, una);
-                offset += ikcp_encode32u(ptr, offset, (UInt32)data.ReadableBytes);
+                switch (this.littleEndian)
+                {
+                    case true:
+                        offset += KcpHelper.WriteUInt32_LE(buffer.Slice(offset), conv);
+                        offset += KcpHelper.WriteUInt8(buffer.Slice(offset), (byte)cmd);
+                        offset += KcpHelper.WriteUInt8(buffer.Slice(offset), (byte)frg);
+                        offset += KcpHelper.WriteUInt16_LE(buffer.Slice(offset), (ushort)wnd);
+                        offset += KcpHelper.WriteUInt32_LE(buffer.Slice(offset), ts);
+                        offset += KcpHelper.WriteUInt32_LE(buffer.Slice(offset), sn);
+                        offset += KcpHelper.WriteUInt32_LE(buffer.Slice(offset), una);
+                        offset += KcpHelper.WriteUInt32_LE(buffer.Slice(offset), (UInt32)data.ReadableBytes);
+                        break;
+                    case false:
+                        offset += KcpHelper.WriteUInt32_BE(buffer.Slice(offset), conv);
+                        offset += KcpHelper.WriteUInt8(buffer.Slice(offset), (byte)cmd);
+                        offset += KcpHelper.WriteUInt8(buffer.Slice(offset), (byte)frg);
+                        offset += KcpHelper.WriteUInt16_BE(buffer.Slice(offset), (ushort)wnd);
+                        offset += KcpHelper.WriteUInt32_BE(buffer.Slice(offset), ts);
+                        offset += KcpHelper.WriteUInt32_BE(buffer.Slice(offset), sn);
+                        offset += KcpHelper.WriteUInt32_BE(buffer.Slice(offset), una);
+                        offset += KcpHelper.WriteUInt32_BE(buffer.Slice(offset), (UInt32)data.ReadableBytes);
+                        break;
+                }
 
                 return offset - offset_;
             }
@@ -241,9 +259,11 @@ namespace Letter.IO.Kcplib
         // internal time.
         public UInt32 CurrentMS { get { return currentMS(); } }
 
+        private bool littleEndian;
+
         // create a new kcp control object, 'conv' must equal in two endpoint
         // from the same connection.
-        public KCP(UInt32 conv_, Action<byte[], int> output_)
+        public KCP(UInt32 conv_, bool littleEndian, Action<byte[], int> output_)
         {
             conv = conv_;
             snd_wnd = IKCP_WND_SND;
@@ -316,8 +336,14 @@ namespace Letter.IO.Kcplib
             var n = index;
             foreach (var seg in rcv_queue)
             {
+                int readerIndex = seg.data.ReaderIndex;
+                int readableLength = seg.data.ReadableBytes;
+                Span<byte> srcSpan = new Span<byte>(seg.data.RawBuffer, readerIndex, readableLength);
+                Span<byte> dstSpan = new Span<byte>(buffer, n, readableLength);
+                srcSpan.CopyTo(dstSpan);
+
                 // copy fragment data into buffer.
-                Buffer.BlockCopy(seg.data.RawBuffer, seg.data.ReaderIndex, buffer, n, seg.data.ReadableBytes);
+                // Buffer.BlockCopy(seg.data.RawBuffer, seg.data.ReaderIndex, buffer, n, seg.data.ReadableBytes);
                 n += seg.data.ReadableBytes;
 
                 count++;
@@ -408,7 +434,7 @@ namespace Letter.IO.Kcplib
             {
                 var size = Math.Min(length, (int)mss);
 
-                var seg = Segment.Get(size);
+                var seg = Segment.Get(this.littleEndian, size);
                 seg.data.WriteBytes(buffer, index, size);
                 index += size;
                 length -= size;
@@ -590,33 +616,19 @@ namespace Letter.IO.Kcplib
 
             while (true)
             {
-                UInt32 ts = 0;
-                UInt32 sn = 0;
-                UInt32 length = 0;
-                UInt32 una = 0;
-                UInt32 conv_ = 0;
-
-                UInt16 wnd = 0;
-                byte cmd = 0;
-                byte frg = 0;
+                KcpTrait trait = new KcpTrait();
+                trait.littleEndian = this.littleEndian;
 
                 if (size - (offset - index) < IKCP_OVERHEAD) break;
 
-                offset += ikcp_decode32u(data, offset, ref conv_);
+                if(!trait.decode(conv, data, ref offset))
+                {
+                    return -1;
+                }
 
-                if (conv != conv_) return -1;
+                if (size - (offset - index) < trait.length) return -2;
 
-                offset += ikcp_decode8u(data, offset, ref cmd);
-                offset += ikcp_decode8u(data, offset, ref frg);
-                offset += ikcp_decode16u(data, offset, ref wnd);
-                offset += ikcp_decode32u(data, offset, ref ts);
-                offset += ikcp_decode32u(data, offset, ref sn);
-                offset += ikcp_decode32u(data, offset, ref una);
-                offset += ikcp_decode32u(data, offset, ref length);
-
-                if (size - (offset - index) < length) return -2;
-
-                switch (cmd)
+                switch (trait.cmd)
                 {
                     case IKCP_CMD_PUSH:
                     case IKCP_CMD_ACK:
@@ -630,47 +642,47 @@ namespace Letter.IO.Kcplib
                 // only trust window updates from regular packets. i.e: latest update
                 if (regular)
                 {
-                    rmt_wnd = wnd;
+                    rmt_wnd = trait.wnd;
                 }
 
-                parse_una(una);
+                parse_una(trait.una);
                 shrink_buf();
 
-                if (IKCP_CMD_ACK == cmd)
+                if (IKCP_CMD_ACK == trait.cmd)
                 {
-                    parse_ack(sn);
-                    parse_fastack(sn, ts);
+                    parse_ack(trait.sn);
+                    parse_fastack(trait.sn, trait.ts);
                     flag |= 1;
-                    latest = ts;
+                    latest = trait.ts;
                 }
-                else if (IKCP_CMD_PUSH == cmd)
+                else if (IKCP_CMD_PUSH == trait.cmd)
                 {
                     var repeat = true;
-                    if (_itimediff(sn, rcv_nxt + rcv_wnd) < 0)
+                    if (_itimediff(trait.sn, rcv_nxt + rcv_wnd) < 0)
                     {
-                        ack_push(sn, ts);
-                        if (_itimediff(sn, rcv_nxt) >= 0)
+                        ack_push(trait.sn, trait.ts);
+                        if (_itimediff(trait.sn, rcv_nxt) >= 0)
                         {
-                            var seg = Segment.Get((int)length);
-                            seg.conv = conv_;
-                            seg.cmd = (UInt32)cmd;
-                            seg.frg = (UInt32)frg;
-                            seg.wnd = (UInt32)wnd;
-                            seg.ts = ts;
-                            seg.sn = sn;
-                            seg.una = una;
-                            seg.data.WriteBytes(data, offset, (int)length);
+                            var seg = Segment.Get(this.littleEndian, (int)trait.length);
+                            seg.conv = trait.conv;
+                            seg.cmd = (UInt32)trait.cmd;
+                            seg.frg = (UInt32)trait.frg;
+                            seg.wnd = (UInt32)trait.wnd;
+                            seg.ts = trait.ts;
+                            seg.sn = trait.sn;
+                            seg.una = trait.una;
+                            seg.data.WriteBytes(data, offset, (int)trait.length);
                             repeat = parse_data(seg);
                         }
                     }
                 }
-                else if (IKCP_CMD_WASK == cmd)
+                else if (IKCP_CMD_WASK == trait.cmd)
                 {
                     // ready to send back IKCP_CMD_WINS in Ikcp_flush
                     // tell remote my window size
                     probe |= IKCP_ASK_TELL;
                 }
-                else if (IKCP_CMD_WINS == cmd)
+                else if (IKCP_CMD_WINS == trait.cmd)
                 {
                     // do nothing
                 }
@@ -680,7 +692,7 @@ namespace Letter.IO.Kcplib
                 }
 
                 inSegs++;
-                offset += (int)length;
+                offset += (int)trait.length;
             }
 
             // update rtt with the latest ts
@@ -750,11 +762,13 @@ namespace Letter.IO.Kcplib
         // flush pending data
         public UInt32 Flush(bool ackOnly)
         {
-            var seg = Segment.Get(32);
-            seg.conv = conv;
-            seg.cmd = IKCP_CMD_ACK;
-            seg.wnd = (UInt32)wnd_unused();
-            seg.una = rcv_nxt;
+            KcpTrait trait = new KcpTrait();
+
+            trait.littleEndian = this.littleEndian;
+            trait.conv = conv;
+            trait.cmd = IKCP_CMD_ACK;
+            trait.wnd = wnd_unused();
+            trait.una = rcv_nxt;
 
             var writeIndex = reserved;
 
@@ -782,9 +796,9 @@ namespace Letter.IO.Kcplib
                 var ack = acklist[i];
                 if ( _itimediff(ack.sn, rcv_nxt) >=0 || acklist.Count - 1 == i)
                 {
-                    seg.sn = ack.sn;
-                    seg.ts = ack.ts;
-                    writeIndex += seg.encode(buffer, writeIndex);
+                    trait.sn = ack.sn;
+                    trait.ts = ack.ts;
+                    writeIndex += trait.encode(buffer, writeIndex);
                 }
             }
             acklist.Clear();
@@ -829,16 +843,16 @@ namespace Letter.IO.Kcplib
             // flush window probing commands
             if ((probe & IKCP_ASK_SEND) != 0)
             {
-                seg.cmd = IKCP_CMD_WASK;
+                trait.cmd = IKCP_CMD_WASK;
                 makeSpace(IKCP_OVERHEAD);
-                writeIndex += seg.encode(buffer, writeIndex);
+                writeIndex += trait.encode(buffer, writeIndex);
             }
 
             if ((probe & IKCP_ASK_TELL) != 0)
             {
-                seg.cmd = IKCP_CMD_WINS;
+                trait.cmd = IKCP_CMD_WINS;
                 makeSpace(IKCP_OVERHEAD);
-                writeIndex += seg.encode(buffer, writeIndex);
+                writeIndex += trait.encode(buffer, writeIndex);
             }
 
             probe = 0;
@@ -925,13 +939,20 @@ namespace Letter.IO.Kcplib
                     current = CurrentMS;
                     segment.xmit++;
                     segment.ts = current;
-                    segment.wnd = seg.wnd;
-                    segment.una = seg.una;
+                    segment.wnd = trait.wnd;
+                    segment.una = trait.una;
 
                     var need = IKCP_OVERHEAD + segment.data.ReadableBytes;
                     makeSpace(need);
                     writeIndex += segment.encode(buffer, writeIndex);
-                    Buffer.BlockCopy(segment.data.RawBuffer, segment.data.ReaderIndex, buffer, writeIndex, segment.data.ReadableBytes);
+
+                    int readerIndex = segment.data.ReaderIndex;
+                    int readableLength = segment.data.ReadableBytes;
+                    Span<byte> srcSpan = new Span<byte>(segment.data.RawBuffer, readerIndex, readableLength);
+                    Span<byte> dstSpan = new Span<byte>(buffer, writeIndex, readableLength);
+                    srcSpan.CopyTo(dstSpan);
+
+                    // Buffer.BlockCopy(segment.data.RawBuffer, segment.data.ReaderIndex, buffer, writeIndex, segment.data.ReadableBytes);
                     writeIndex += segment.data.ReadableBytes;
 
                     if (segment.xmit >= dead_link)

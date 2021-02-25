@@ -3,7 +3,7 @@ using System.Buffers.Binary;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
-namespace Letter.Kcp.lib___
+namespace Letter.IO.Kcplib
 {
     static class KcpHelper
     {

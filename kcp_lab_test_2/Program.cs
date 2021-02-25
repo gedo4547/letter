@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Buffers;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Text;
 using System.Threading;
+using System.Linq;
 
 namespace kcp_lab_test2
 {
@@ -22,7 +24,9 @@ namespace kcp_lab_test2
         static void Main(string[] args)
         {
             Console.Title = "kcp_lib1111111111111111111111111111111";
-            var memoryPool = SlabMemoryPoolFactory.Create(new MemoryPoolOptions(4096, 32));
+            Console.WriteLine(Process.GetCurrentProcess().Id);
+
+            // var memoryPool = SlabMemoryPoolFactory.Create(new MemoryPoolOptions(4096, 32));
 
             for (int i = 0; i < 5000; i++)
             {
