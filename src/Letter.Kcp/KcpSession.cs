@@ -167,7 +167,7 @@ namespace Letter.Kcp
             }
         }
 
-        public void SendSafeAsync(object o)
+        public void SendReliableAsync(object o)
         {
             lock (this.snd_sync)
             {
@@ -190,7 +190,7 @@ namespace Letter.Kcp
             }
         }
 
-        public void SendUnsafeAsync(object o)
+        public void SendUnreliableAsync(object o)
         {
             lock (this.snd_sync)
             {

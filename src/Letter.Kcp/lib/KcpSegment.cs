@@ -30,7 +30,7 @@ namespace System.Net
         internal int encode(byte[] ptr, int offset)
         {
             var offset_ = offset;
-            ReadOnlySequence<byte> buffer = new ReadOnlySequence<byte>(ptr);
+            Span<byte> buffer = ptr;
 
             switch (this.useLittleEndian)
             {

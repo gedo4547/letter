@@ -62,7 +62,7 @@ namespace kcp_test
                     for (int i = 0; i < sessions.Count; i++)
                     {
                         var session = sessions[i];
-                        session.SendUnsafeAsync(bytes);
+                        session.SendUnreliableAsync(bytes);
                         //session.SendSafeAsync(bytes);
                     }
                 }

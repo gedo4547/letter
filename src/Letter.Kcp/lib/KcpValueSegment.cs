@@ -5,70 +5,82 @@ namespace System.Net
 {
     ref struct KcpValueSegment
     {
-        public KcpValueSegment(bool littleEndian)
-        {
-            this.conv = 0;
-            this.cmd = 0;
-            this.frg = 0;
-            this.wnd = 0;
-            this.ts = 0;
-            this.sn = 0;
-            this.una = 0;
-            this.rto = 0;
-            this.xmit = 0;
-            this.resendts = 0;
-            this.fastack = 0;
-            this.acked = 0;
+        public UInt32 conv;
+        public byte cmd;
+        public byte frg;
+        public UInt16 wnd;
+        public UInt32 ts;
+        public UInt32 sn;
+        public UInt32 una;
+        public UInt32 length;
 
-            //this.data = data;
-            this.littleEndian = littleEndian;
-        }
-
-        internal UInt32 conv;
-        internal UInt32 cmd;
-        internal UInt32 frg;
-        internal UInt32 wnd;
-        internal UInt32 ts;
-        internal UInt32 sn;
-        internal UInt32 una;
-        internal UInt32 rto;
-        internal UInt32 xmit;
-        internal UInt32 resendts;
-        internal UInt32 fastack;
-        internal UInt32 acked;
-
-        internal bool littleEndian;
+        public bool littleEndian;
 
         internal int encode(byte[] ptr, int offset)
         {
             var offset_ = offset;
-            ReadOnlySequence<byte> buffer = new ReadOnlySequence<byte>(ptr);
+            Span<byte> buffer = new Span<byte>(ptr);
 
             switch (this.littleEndian)
             {
                 case true:
                     offset += KcpHelper.WriteUInt32_LE(buffer.Slice(offset), conv);
-                    offset += KcpHelper.WriteUInt8(buffer.Slice(offset), (byte)cmd);
-                    offset += KcpHelper.WriteUInt8(buffer.Slice(offset), (byte)frg);
-                    offset += KcpHelper.WriteUInt16_LE(buffer.Slice(offset), (UInt16)wnd);
+                    offset += KcpHelper.WriteUInt8(buffer.Slice(offset), cmd);
+                    offset += KcpHelper.WriteUInt8(buffer.Slice(offset), frg);
+                    offset += KcpHelper.WriteUInt16_LE(buffer.Slice(offset), wnd);
                     offset += KcpHelper.WriteUInt32_LE(buffer.Slice(offset), ts);
                     offset += KcpHelper.WriteUInt32_LE(buffer.Slice(offset), sn);
                     offset += KcpHelper.WriteUInt32_LE(buffer.Slice(offset), una);
-                    offset += KcpHelper.WriteUInt32_LE(buffer.Slice(offset), (UInt32)0);
+                    offset += KcpHelper.WriteUInt32_LE(buffer.Slice(offset), length);
                     break;
                 case false:
                     offset += KcpHelper.WriteUInt32_BE(buffer.Slice(offset), conv);
-                    offset += KcpHelper.WriteUInt8(buffer.Slice(offset), (byte)cmd);
-                    offset += KcpHelper.WriteUInt8(buffer.Slice(offset), (byte)frg);
-                    offset += KcpHelper.WriteUInt16_BE(buffer.Slice(offset), (UInt16)wnd);
+                    offset += KcpHelper.WriteUInt8(buffer.Slice(offset), cmd);
+                    offset += KcpHelper.WriteUInt8(buffer.Slice(offset), frg);
+                    offset += KcpHelper.WriteUInt16_BE(buffer.Slice(offset), wnd);
                     offset += KcpHelper.WriteUInt32_BE(buffer.Slice(offset), ts);
                     offset += KcpHelper.WriteUInt32_BE(buffer.Slice(offset), sn);
                     offset += KcpHelper.WriteUInt32_BE(buffer.Slice(offset), una);
-                    offset += KcpHelper.WriteUInt32_BE(buffer.Slice(offset), (UInt32)0);
+                    offset += KcpHelper.WriteUInt32_BE(buffer.Slice(offset), length);
                     break;
             }
 
             return offset - offset_;
+        }
+
+        internal bool decode(uint conv, byte[] data, ref int offset)
+        {
+            var buffer = new Span<byte>(data);
+            if (littleEndian)
+            {
+                offset += KcpHelper.ReadUInt32_LE(buffer.Slice(offset), ref conv);
+
+                if (conv != this.conv) return false;
+
+                offset += KcpHelper.ReadUInt8(buffer.Slice(offset), ref cmd);
+                offset += KcpHelper.ReadUInt8(buffer.Slice(offset), ref frg);
+                offset += KcpHelper.ReadUInt16_LE(buffer.Slice(offset), ref wnd);
+                offset += KcpHelper.ReadUInt32_LE(buffer.Slice(offset), ref ts);
+                offset += KcpHelper.ReadUInt32_LE(buffer.Slice(offset), ref sn);
+                offset += KcpHelper.ReadUInt32_LE(buffer.Slice(offset), ref una);
+                offset += KcpHelper.ReadUInt32_LE(buffer.Slice(offset), ref length);
+            }
+            else
+            {
+                offset += KcpHelper.ReadUInt32_BE(buffer.Slice(offset), ref conv);
+
+                if (conv != this.conv) return false;
+
+                offset += KcpHelper.ReadUInt8(buffer.Slice(offset), ref cmd);
+                offset += KcpHelper.ReadUInt8(buffer.Slice(offset), ref frg);
+                offset += KcpHelper.ReadUInt16_BE(buffer.Slice(offset), ref wnd);
+                offset += KcpHelper.ReadUInt32_BE(buffer.Slice(offset), ref ts);
+                offset += KcpHelper.ReadUInt32_BE(buffer.Slice(offset), ref sn);
+                offset += KcpHelper.ReadUInt32_BE(buffer.Slice(offset), ref una);
+                offset += KcpHelper.ReadUInt32_BE(buffer.Slice(offset), ref length);
+            }
+
+            return true;
         }
     }
 }

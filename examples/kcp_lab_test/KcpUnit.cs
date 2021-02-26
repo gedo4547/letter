@@ -11,6 +11,7 @@ namespace kcp_lab_test
         {
             this.Conv = conv;
             this._kcpKit = new KcpKit(conv, true, memoryPool);
+            this._kcpKit.SettingMtu(1400);
             this._kcpKit.SettingNoDelay(1, 10, 2, 1);
             this._kcpKit.WriteDelay = false;
             this._kcpKit.SettingStreamMode(true);
@@ -81,7 +82,7 @@ namespace kcp_lab_test
                 this.send_queue.TryPeek(out var item);
                 var seg = item.GetBinaryArray();
 
-                System.Text.StringBuilder sb = new System.Text.StringBuilder();
+                //System.Text.StringBuilder sb = new System.Text.StringBuilder();
                 if (this._kcpKit.TrySnd(seg.Array, 0, seg.Count))
                 {
                     this.send_queue.TryDequeue(out _);

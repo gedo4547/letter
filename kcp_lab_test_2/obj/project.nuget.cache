@@ -1,10 +1,10 @@
 {
   "version": 2,
-  "dgSpecHash": "C7beYi2w+rWqcrpQxn/HodVZ1MVEKrIig0T2aWRGLyQYeNg58e4o7ejYAaahireUASwwCT1apKTZfcf/cj52Iw==",
+  "dgSpecHash": "13VsV8buOzRj5uF85ybofvflOsqPrtWJEW5v9WsRSLeRvAxE3w3P4q3NPlayREwPqjhaZK0c8Ojpx7kfBjXiUA==",
   "success": true,
-  "projectFilePath": "/Users/guanyedong/Projects/letter-github/kcp_lab_test_2/kcp_lab_test_2.csproj",
+  "projectFilePath": "F:\\letter-github\\kcp_lab_test_2\\kcp_lab_test_2.csproj",
   "expectedPackageFiles": [
-    "/Users/guanyedong/.nuget/packages/system.io.pipelines/5.0.1/system.io.pipelines.5.0.1.nupkg.sha512"
+    "C:\\Users\\pc\\.nuget\\packages\\system.io.pipelines\\5.0.1\\system.io.pipelines.5.0.1.nupkg.sha512"
   ],
   "logs": []
 }

@@ -5,6 +5,7 @@ using System.Diagnostics;
 using System.Text;
 using System.Threading;
 using System.Linq;
+using common;
 
 namespace kcp_lab_test
 {
@@ -32,8 +33,8 @@ namespace kcp_lab_test
         {
             Console.Title = "kcp_lib1111111111111111111111111111111";
             Console.WriteLine(Process.GetCurrentProcess().Id);
-            //Span<byte> span = stackalloc byte[32];
-            //MyStruct my = new MyStruct(span);
+
+            _ = new PerformanceCounterListener();
 
             var memoryPool = SlabMemoryPoolFactory.Create(new MemoryPoolOptions(4096, 32));
             for (int i = 0; i < 5000; i++)
@@ -169,7 +170,7 @@ namespace kcp_lab_test
                 sb.Append(Encoding.UTF8.GetString(item.Span));
             }
             
-            Console.WriteLine($"{type}>{conv}>>rcv>>" + sb.ToString()+">>time:"+DateTime.Now);
+            Console.WriteLine($"{type}>{conv}>>rcv>>" + sb.ToString());
         }
         
         private static void OnSndEvent(ref ReadOnlySequence<byte> sequence, int type, uint conv)

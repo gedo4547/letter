@@ -143,16 +143,16 @@ namespace kcp_lab_test2
         {
             //Console.WriteLine($"{type}>snd>>" + sequence.Length);
             //Console.WriteLine($"{type}>snd>>" + sequence.Length);
-            byte[] bytes = new byte[memory.Length];
-            memory.CopyTo(bytes);
-
+            //byte[] bytes = new byte[memory.Length];
+            //memory.CopyTo(bytes);
+            //var seg = memory.GetBinaryArray();
             if (type == 1)
             {
-                units_2[(int)conv].Recv(bytes);
+                units_2[(int)conv].Recv(memory);
             }
             else if (type == 2)
             {
-                units_1[(int)conv].Recv(bytes);
+                units_1[(int)conv].Recv(memory);
             }
         }
     }

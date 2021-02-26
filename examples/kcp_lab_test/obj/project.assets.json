@@ -117,39 +117,42 @@
     ]
   },
   "packageFolders": {
-    "/Users/guanyedong/.nuget/packages/": {},
-    "/usr/local/share/dotnet/sdk/NuGetFallbackFolder": {}
+    "C:\\Users\\pc\\.nuget\\packages\\": {},
+    "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "/Users/guanyedong/Projects/letter-github/examples/kcp_lab_test/kcp_lab_test.csproj",
+      "projectUniqueName": "F:\\letter-github\\examples\\kcp_lab_test\\kcp_lab_test.csproj",
       "projectName": "kcp_lab_test",
-      "projectPath": "/Users/guanyedong/Projects/letter-github/examples/kcp_lab_test/kcp_lab_test.csproj",
-      "packagesPath": "/Users/guanyedong/.nuget/packages/",
-      "outputPath": "/Users/guanyedong/Projects/letter-github/examples/kcp_lab_test/obj/",
+      "projectPath": "F:\\letter-github\\examples\\kcp_lab_test\\kcp_lab_test.csproj",
+      "packagesPath": "C:\\Users\\pc\\.nuget\\packages\\",
+      "outputPath": "F:\\letter-github\\examples\\kcp_lab_test\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
-        "/usr/local/share/dotnet/sdk/NuGetFallbackFolder"
+        "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
       ],
       "configFilePaths": [
-        "/Users/guanyedong/.nuget/NuGet/NuGet.Config"
+        "C:\\Users\\pc\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "originalTargetFrameworks": [
         "net5.0"
       ],
       "sources": {
-        "https://api.nuget.org/v3/index.json": {}
+        "D:\\NuGetPackages\\": {},
+        "https://api.nuget.org/v3/index.json": {},
+        "https://nuget.cdn.azure.cn/v3/index.json": {}
       },
       "frameworks": {
         "net5.0": {
           "targetAlias": "net5.0",
           "projectReferences": {
-            "/Users/guanyedong/Projects/letter-github/examples/common/common.csproj": {
-              "projectPath": "/Users/guanyedong/Projects/letter-github/examples/common/common.csproj"
+            "F:\\letter-github\\examples\\common\\common.csproj": {
+              "projectPath": "F:\\letter-github\\examples\\common\\common.csproj"
             },
-            "/Users/guanyedong/Projects/letter-github/src/Letter.Kcp/Letter.Kcp.csproj": {
-              "projectPath": "/Users/guanyedong/Projects/letter-github/src/Letter.Kcp/Letter.Kcp.csproj"
+            "F:\\letter-github\\src\\Letter.Kcp\\Letter.Kcp.csproj": {
+              "projectPath": "F:\\letter-github\\src\\Letter.Kcp\\Letter.Kcp.csproj"
             }
           }
         }
@@ -178,7 +181,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/5.0.103/RuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\5.0.101\\RuntimeIdentifierGraph.json"
       }
     }
   }

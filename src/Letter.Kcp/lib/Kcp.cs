@@ -436,51 +436,19 @@ namespace System.Net
 
             while (true)
             {
-                UInt32 ts = 0;
-                UInt32 sn = 0;
-                UInt32 length = 0;
-                UInt32 una = 0;
-                UInt32 conv_ = 0;
-
-                UInt16 wnd = 0;
-                byte cmd = 0;
-                byte frg = 0;
+                KcpValueSegment data1 = new KcpValueSegment();
+                data1.littleEndian = this.littleEndian;
 
                 if (size - (offset - index) < IKCP_OVERHEAD) break;
-                var buffer = new ReadOnlySequence<byte>(data);
-                if(littleEndian)
+
+                if (!data1.decode(this.conv, data, ref offset))
                 {
-                    offset += KcpHelper.ReadUInt32_LE(buffer.Slice(offset), ref conv_);
-
-                    if (conv != conv_) return -1;
-
-                    offset += KcpHelper.ReadUInt8(buffer.Slice(offset), ref cmd);
-                    offset += KcpHelper.ReadUInt8(buffer.Slice(offset), ref frg);
-                    offset += KcpHelper.ReadUInt16_LE(buffer.Slice(offset), ref wnd);
-                    offset += KcpHelper.ReadUInt32_LE(buffer.Slice(offset), ref ts);
-                    offset += KcpHelper.ReadUInt32_LE(buffer.Slice(offset), ref sn);
-                    offset += KcpHelper.ReadUInt32_LE(buffer.Slice(offset), ref una);
-                    offset += KcpHelper.ReadUInt32_LE(buffer.Slice(offset), ref length);
+                    return -1;
                 }
-                else
-                {
-                    offset += KcpHelper.ReadUInt32_BE(buffer.Slice(offset), ref conv_);
 
-                    if (conv != conv_) return -1;
+                if (size - (offset - index) < data1.length) return -2;
 
-                    offset += KcpHelper.ReadUInt8(buffer.Slice(offset), ref cmd);
-                    offset += KcpHelper.ReadUInt8(buffer.Slice(offset), ref frg);
-                    offset += KcpHelper.ReadUInt16_BE(buffer.Slice(offset), ref wnd);
-                    offset += KcpHelper.ReadUInt32_BE(buffer.Slice(offset), ref ts);
-                    offset += KcpHelper.ReadUInt32_BE(buffer.Slice(offset), ref sn);
-                    offset += KcpHelper.ReadUInt32_BE(buffer.Slice(offset), ref una);
-                    offset += KcpHelper.ReadUInt32_BE(buffer.Slice(offset), ref length);
-                }
-                
-
-                if (size - (offset - index) < length) return -2;
-
-                switch (cmd)
+                switch (data1.cmd)
                 {
                     case IKCP_CMD_PUSH:
                     case IKCP_CMD_ACK:
@@ -494,47 +462,47 @@ namespace System.Net
                 // only trust window updates from regular packets. i.e: latest update
                 if (regular)
                 {
-                    rmt_wnd = wnd;
+                    rmt_wnd = data1.wnd;
                 }
 
-                parse_una(una);
+                parse_una(data1.una);
                 shrink_buf();
 
-                if (IKCP_CMD_ACK == cmd)
+                if (IKCP_CMD_ACK == data1.cmd)
                 {
-                    parse_ack(sn);
-                    parse_fastack(sn, ts);
+                    parse_ack(data1.sn);
+                    parse_fastack(data1.sn, data1.ts);
                     flag |= 1;
-                    latest = ts;
+                    latest = data1.ts;
                 }
-                else if (IKCP_CMD_PUSH == cmd)
+                else if (IKCP_CMD_PUSH == data1.cmd)
                 {
                     var repeat = true;
-                    if (KcpHelper._itimediff(sn, rcv_nxt + rcv_wnd) < 0)
+                    if (KcpHelper._itimediff(data1.sn, rcv_nxt + rcv_wnd) < 0)
                     {
-                        ack_push(sn, ts);
-                        if (KcpHelper._itimediff(sn, rcv_nxt) >= 0)
+                        ack_push(data1.sn, data1.ts);
+                        if (KcpHelper._itimediff(data1.sn, rcv_nxt) >= 0)
                         {
                             var seg = this.segmentAllotter.Get();
-                            seg.conv = conv_;
-                            seg.cmd = (UInt32)cmd;
-                            seg.frg = (UInt32)frg;
-                            seg.wnd = (UInt32)wnd;
-                            seg.ts = ts;
-                            seg.sn = sn;
-                            seg.una = una;
-                            seg.data.WriteBytes(data, offset, (int)length);
+                            seg.conv = data1.conv;
+                            seg.cmd = (UInt32)data1.cmd;
+                            seg.frg = (UInt32)data1.frg;
+                            seg.wnd = (UInt32)data1.wnd;
+                            seg.ts = data1.ts;
+                            seg.sn = data1.sn;
+                            seg.una = data1.una;
+                            seg.data.WriteBytes(data, offset, (int)data1.length);
                             repeat = parse_data(seg);
                         }
                     }
                 }
-                else if (IKCP_CMD_WASK == cmd)
+                else if (IKCP_CMD_WASK == data1.cmd)
                 {
                     // ready to send back IKCP_CMD_WINS in Ikcp_flush
                     // tell remote my window size
                     probe |= IKCP_ASK_TELL;
                 }
-                else if (IKCP_CMD_WINS == cmd)
+                else if (IKCP_CMD_WINS == data1.cmd)
                 {
                     // do nothing
                 }
@@ -544,7 +512,7 @@ namespace System.Net
                 }
 
                 inSegs++;
-                offset += (int)length;
+                offset += (int)data1.length;
             }
 
             // update rtt with the latest ts
@@ -614,14 +582,12 @@ namespace System.Net
         // flush pending data
         public UInt32 Flush(bool ackOnly)
         {
-            var seg = new KcpValueSegment(this.littleEndian);
+            var seg = new KcpValueSegment();
+            seg.littleEndian = this.littleEndian;
 
-
-
-            //var seg = this.segmentAllotter.Get();
             seg.conv = conv;
             seg.cmd = IKCP_CMD_ACK;
-            seg.wnd = (UInt32)wnd_unused();
+            seg.wnd = wnd_unused();
             seg.una = rcv_nxt;
 
             var writeIndex = reserved;
