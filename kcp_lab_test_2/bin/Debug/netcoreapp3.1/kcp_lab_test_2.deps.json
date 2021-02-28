@@ -15,6 +15,14 @@
           "kcp_lab_test_2.dll": {}
         }
       },
+      "Microsoft.IO.RecyclableMemoryStream/1.4.0": {
+        "runtime": {
+          "lib/netcoreapp2.1/Microsoft.IO.RecyclableMemoryStream.dll": {
+            "assemblyVersion": "1.4.0.0",
+            "fileVersion": "1.4.0.0"
+          }
+        }
+      },
       "System.IO.Pipelines/5.0.1": {
         "runtime": {
           "lib/netcoreapp3.0/System.IO.Pipelines.dll": {
@@ -38,7 +46,8 @@
       },
       "Letter.Kcp/0.1.0": {
         "dependencies": {
-          "Letter.Udp": "0.1.0"
+          "Letter.Udp": "0.1.0",
+          "Microsoft.IO.RecyclableMemoryStream": "1.4.0"
         },
         "runtime": {
           "Letter.Kcp.dll": {}
@@ -59,6 +68,13 @@
       "type": "project",
       "serviceable": false,
       "sha512": ""
+    },
+    "Microsoft.IO.RecyclableMemoryStream/1.4.0": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-nyIMLK5l817HX2kURSanT+5ney8ja47FLlkjHHHq+fTb1EW3cS1C223pkSDkeGrjqhPYWwPZf63CcUam35hpCQ==",
+      "path": "microsoft.io.recyclablememorystream/1.4.0",
+      "hashPath": "microsoft.io.recyclablememorystream.1.4.0.nupkg.sha512"
     },
     "System.IO.Pipelines/5.0.1": {
       "type": "package",

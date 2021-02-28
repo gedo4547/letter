@@ -2,8 +2,7 @@ using System;
 
 namespace Letter.IO.Kcplib
 {
-    //KcpTrait
-    ref struct KcpTrait
+    ref struct Feature
     {
         internal UInt32 conv;
         internal byte cmd;
@@ -48,14 +47,14 @@ namespace Letter.IO.Kcplib
             return offset - offset_;
         }
 
-        internal bool decode(uint conv, byte[] data, ref int offset)
+        internal bool decode(uint currentConv, byte[] data, ref int offset)
         {
             var buffer = new Span<byte>(data);
             if(littleEndian)
             {
                 offset += KcpHelper.ReadUInt32_LE(buffer.Slice(offset), ref conv);
 
-                if (conv != this.conv) return false;
+                if (currentConv != this.conv) return false;
 
                 offset += KcpHelper.ReadUInt8(buffer.Slice(offset), ref cmd);
                 offset += KcpHelper.ReadUInt8(buffer.Slice(offset), ref frg);
@@ -69,7 +68,7 @@ namespace Letter.IO.Kcplib
             {
                 offset += KcpHelper.ReadUInt32_BE(buffer.Slice(offset), ref conv);
 
-                if (conv != this.conv) return false;
+                if (currentConv != this.conv) return false;
 
                 offset += KcpHelper.ReadUInt8(buffer.Slice(offset), ref cmd);
                 offset += KcpHelper.ReadUInt8(buffer.Slice(offset), ref frg);

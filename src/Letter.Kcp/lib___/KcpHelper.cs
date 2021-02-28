@@ -10,9 +10,11 @@ namespace Letter.IO.Kcplib
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static int WriteUInt8(in Span<byte> span, byte value)
         {
+            const int length = 1;
+
             MemoryMarshal.Write<byte>(span, ref value);
 
-            return 1;
+            return length;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -59,9 +61,11 @@ namespace Letter.IO.Kcplib
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static int ReadUInt8(in Span<byte> span, ref byte value)
         {
+            const int length = 1;
+
             value = span[0];
 
-            return 1;
+            return length;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

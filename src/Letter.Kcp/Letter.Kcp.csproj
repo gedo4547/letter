@@ -31,5 +31,8 @@
     <ItemGroup>
       <ProjectReference Include="..\Letter.Udp\Letter.Udp.csproj" />
     </ItemGroup>
+    <ItemGroup>
+      <PackageReference Include="Microsoft.IO.RecyclableMemoryStream" Version="1.4.0" />
+    </ItemGroup>
 
 </Project>
