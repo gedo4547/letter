@@ -4,7 +4,7 @@ using System.Runtime.CompilerServices;
 
 namespace System.Net
 {
-    sealed class KcpMemoryBlock : ASegment
+    sealed class MemoryBlock : ASegment
     {
         private IMemoryOwner<byte> memoryOwner;
 

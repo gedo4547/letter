@@ -35,8 +35,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "kcp_test", "examples\kcp_te
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "kcp_lab_test", "examples\kcp_lab_test\kcp_lab_test.csproj", "{F6B20843-A404-4B7B-9BF4-B413A278A2F4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "kcp_lab_test_2", "kcp_lab_test_2\kcp_lab_test_2.csproj", "{787ED73D-296A-493F-AB10-B5F559B6017E}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -95,10 +93,6 @@ Global
 		{F6B20843-A404-4B7B-9BF4-B413A278A2F4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F6B20843-A404-4B7B-9BF4-B413A278A2F4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F6B20843-A404-4B7B-9BF4-B413A278A2F4}.Release|Any CPU.Build.0 = Release|Any CPU
-		{787ED73D-296A-493F-AB10-B5F559B6017E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{787ED73D-296A-493F-AB10-B5F559B6017E}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{787ED73D-296A-493F-AB10-B5F559B6017E}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{787ED73D-296A-493F-AB10-B5F559B6017E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -118,7 +112,6 @@ Global
 		{02E22AF3-53C0-4304-A10E-2235EE186261} = {89C69379-1DA5-40B6-B34E-91D1EBCDF8C7}
 		{F3FD98B2-A8A8-4AB7-ABCC-F0BADAE20AB6} = {89C69379-1DA5-40B6-B34E-91D1EBCDF8C7}
 		{F6B20843-A404-4B7B-9BF4-B413A278A2F4} = {89C69379-1DA5-40B6-B34E-91D1EBCDF8C7}
-		{787ED73D-296A-493F-AB10-B5F559B6017E} = {89C69379-1DA5-40B6-B34E-91D1EBCDF8C7}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {88FE7350-47D0-48BE-9A66-E83D0B53A398}

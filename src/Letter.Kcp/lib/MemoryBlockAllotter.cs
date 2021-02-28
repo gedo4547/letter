@@ -4,31 +4,31 @@ using System.Collections.Generic;
 
 namespace System.Net
 {
-    sealed class KcpMemoryBlockAllotter : IKcpAllotter<KcpMemoryBlock>
+    sealed class MemoryBlockAllotter : IAllotter<MemoryBlock>
     {
-        public KcpMemoryBlockAllotter(MemoryPool<byte> memoryPool)
+        public MemoryBlockAllotter(MemoryPool<byte> memoryPool)
         {
             this.memoryPool = memoryPool;
         }
 
         private MemoryPool<byte> memoryPool;
         
-        private Stack<KcpMemoryBlock> memoryBlockStack = new Stack<KcpMemoryBlock>();
+        private Stack<MemoryBlock> memoryBlockStack = new Stack<MemoryBlock>();
 
-        public KcpMemoryBlock Get()
+        public MemoryBlock Get()
         {
             if(this.memoryBlockStack.Count > 0)
             {
                 return this.memoryBlockStack.Pop();
             }
             
-            var memoryBlock = new KcpMemoryBlock();
+            var memoryBlock = new MemoryBlock();
             memoryBlock.SetMemoryBlock(memoryPool.Rent());
 
             return memoryBlock;
         }
 
-        public void Put(KcpMemoryBlock item)
+        public void Put(MemoryBlock item)
         {
             if(item == null)
             {

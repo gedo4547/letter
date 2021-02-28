@@ -1,12 +1,10 @@
-using System;
-using System.Buffers;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Buffers.Binary;
 
 namespace System.Net
 {
-    static class KcpHelper
+    static class Helper
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static int WriteUInt8(in Span<byte> span, byte value)

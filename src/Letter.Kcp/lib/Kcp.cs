@@ -52,10 +52,10 @@ namespace System.Net
         Int32 fastresend;
         Int32 nocwnd; Int32 stream;
 
-        List<KcpSegment> snd_queue = new List<KcpSegment>(16);
-        List<KcpSegment> rcv_queue = new List<KcpSegment>(16);
-        List<KcpSegment> snd_buf = new List<KcpSegment>(16);
-        List<KcpSegment> rcv_buf = new List<KcpSegment>(16);
+        List<Segment> snd_queue = new List<Segment>(16);
+        List<Segment> rcv_queue = new List<Segment>(16);
+        List<Segment> snd_buf = new List<Segment>(16);
+        List<Segment> rcv_buf = new List<Segment>(16);
 
         List<ackItem> acklist = new List<ackItem>(16);
 
@@ -73,17 +73,17 @@ namespace System.Net
         public int WaitSnd { get { return snd_buf.Count + snd_queue.Count; } }
 
         // internal time.
-        public UInt32 CurrentMS { get { return KcpHelper.currentMS(); } }
+        public UInt32 CurrentMS { get { return Helper.currentMS(); } }
 
         private bool littleEndian;
-        private KcpSegmentAllotter segmentAllotter;
+        private SegmentAllotter segmentAllotter;
 
         // create a new kcp control object, 'conv' must equal in two endpoint
         // from the same connection.
         public Kcp(UInt32 conv_, bool littleEndian, MemoryPool<byte> memoryPool, Action<byte[], int> output_)
         {
             this.littleEndian = littleEndian;
-            this.segmentAllotter = new KcpSegmentAllotter(memoryPool, this.littleEndian);
+            this.segmentAllotter = new SegmentAllotter(memoryPool, this.littleEndian);
 
 
             conv = conv_;
@@ -140,7 +140,7 @@ namespace System.Net
         // Return -1 when there is no readable data.
         //
         // Return -2 if len(buffer) is smaller than kcp.PeekSize().
-        public int Recv(KcpBuffer buffer)
+        public int Recv(Buffer buffer)
         {
             var peekSize = PeekSize();
             if (peekSize < 0)
@@ -294,8 +294,8 @@ namespace System.Net
                 }
             }
 
-            var rto = (int)(rx_srtt + KcpHelper._imax_(interval, rx_rttval << 2));
-            rx_rto = KcpHelper._ibound_(rx_minrto, (UInt32)rto, IKCP_RTO_MAX);
+            var rto = (int)(rx_srtt + Helper._imax_(interval, rx_rttval << 2));
+            rx_rto = Helper._ibound_(rx_minrto, (UInt32)rto, IKCP_RTO_MAX);
         }
 
         void shrink_buf()
@@ -309,7 +309,7 @@ namespace System.Net
         void parse_ack(UInt32 sn)
         {
 
-            if (KcpHelper._itimediff(sn, snd_una) < 0 || KcpHelper._itimediff(sn, snd_nxt) >= 0) return;
+            if (Helper._itimediff(sn, snd_una) < 0 || Helper._itimediff(sn, snd_nxt) >= 0) return;
 
             foreach (var seg in snd_buf)
             {
@@ -322,21 +322,21 @@ namespace System.Net
                     seg.acked = 1;
                     break;
                 }
-                if (KcpHelper._itimediff(sn, seg.sn) < 0)
+                if (Helper._itimediff(sn, seg.sn) < 0)
                     break;
             }
         }
 
         void parse_fastack(UInt32 sn, UInt32 ts)
         {
-            if (KcpHelper._itimediff(sn, snd_una) < 0 || KcpHelper._itimediff(sn, snd_nxt) >= 0)
+            if (Helper._itimediff(sn, snd_una) < 0 || Helper._itimediff(sn, snd_nxt) >= 0)
                 return;
 
             foreach (var seg in snd_buf)
             {
-                if (KcpHelper._itimediff(sn, seg.sn) < 0)
+                if (Helper._itimediff(sn, seg.sn) < 0)
                     break;
-                else if (sn != seg.sn && KcpHelper._itimediff(seg.ts, ts) <= 0)
+                else if (sn != seg.sn && Helper._itimediff(seg.ts, ts) <= 0)
                     seg.fastack++;
             }
         }
@@ -346,7 +346,7 @@ namespace System.Net
             var count = 0;
             foreach (var seg in snd_buf)
             {
-                if (KcpHelper._itimediff(una, seg.sn) > 0) {
+                if (Helper._itimediff(una, seg.sn) > 0) {
                     count++;
                     this.segmentAllotter.Put(seg);
                 }
@@ -363,10 +363,10 @@ namespace System.Net
             acklist.Add(new ackItem { sn = sn, ts = ts });
         }
 
-        bool parse_data(KcpSegment newseg)
+        bool parse_data(Segment newseg)
         {
             var sn = newseg.sn;
-            if (KcpHelper._itimediff(sn, rcv_nxt + rcv_wnd) >= 0 || KcpHelper._itimediff(sn, rcv_nxt) < 0)
+            if (Helper._itimediff(sn, rcv_nxt + rcv_wnd) >= 0 || Helper._itimediff(sn, rcv_nxt) < 0)
                 return true;
 
             var n = rcv_buf.Count - 1;
@@ -378,10 +378,12 @@ namespace System.Net
                 if (seg.sn == sn)
                 {
                     repeat = true;
+                    //TODO gyd
+                    this.segmentAllotter.Put(newseg);
                     break;
                 }
 
-                if (KcpHelper._itimediff(sn, seg.sn) > 0)
+                if (Helper._itimediff(sn, seg.sn) > 0)
                 {
                     insert_idx = i + 1;
                     break;
@@ -436,8 +438,11 @@ namespace System.Net
 
             while (true)
             {
-                KcpValueSegment data1 = new KcpValueSegment();
-                data1.littleEndian = this.littleEndian;
+                Feature data1 = new Feature()
+                {
+                    littleEndian = this.littleEndian
+                };
+                
 
                 if (size - (offset - index) < IKCP_OVERHEAD) break;
 
@@ -478,16 +483,16 @@ namespace System.Net
                 else if (IKCP_CMD_PUSH == data1.cmd)
                 {
                     var repeat = true;
-                    if (KcpHelper._itimediff(data1.sn, rcv_nxt + rcv_wnd) < 0)
+                    if (Helper._itimediff(data1.sn, rcv_nxt + rcv_wnd) < 0)
                     {
                         ack_push(data1.sn, data1.ts);
-                        if (KcpHelper._itimediff(data1.sn, rcv_nxt) >= 0)
+                        if (Helper._itimediff(data1.sn, rcv_nxt) >= 0)
                         {
                             var seg = this.segmentAllotter.Get();
                             seg.conv = data1.conv;
-                            seg.cmd = (UInt32)data1.cmd;
-                            seg.frg = (UInt32)data1.frg;
-                            seg.wnd = (UInt32)data1.wnd;
+                            seg.cmd = data1.cmd;
+                            seg.frg = data1.frg;
+                            seg.wnd = data1.wnd;
                             seg.ts = data1.ts;
                             seg.sn = data1.sn;
                             seg.una = data1.una;
@@ -519,17 +524,17 @@ namespace System.Net
             // ignore the FEC packet
             if (flag != 0 && regular)
             {
-                var current = KcpHelper.currentMS();
-                if (KcpHelper._itimediff(current, latest) >= 0)
+                var current = Helper.currentMS();
+                if (Helper._itimediff(current, latest) >= 0)
                 {
-                    update_ack(KcpHelper._itimediff(current, latest));
+                    update_ack(Helper._itimediff(current, latest));
                 }
             }
 
             // cwnd update when packet arrived
             if (nocwnd == 0)
             {
-                if (KcpHelper._itimediff(snd_una, s_una) > 0)
+                if (Helper._itimediff(snd_una, s_una) > 0)
                 {
                     if (cwnd < rmt_wnd)
                     {
@@ -582,9 +587,11 @@ namespace System.Net
         // flush pending data
         public UInt32 Flush(bool ackOnly)
         {
-            var seg = new KcpValueSegment();
-            seg.littleEndian = this.littleEndian;
-
+            var seg = new Feature()
+            {
+                littleEndian = this.littleEndian
+            };
+            
             seg.conv = conv;
             seg.cmd = IKCP_CMD_ACK;
             seg.wnd = wnd_unused();
@@ -614,7 +621,7 @@ namespace System.Net
             {
                 makeSpace(Kcp.IKCP_OVERHEAD);
                 var ack = acklist[i];
-                if ( KcpHelper._itimediff(ack.sn, rcv_nxt) >=0 || acklist.Count - 1 == i)
+                if ( Helper._itimediff(ack.sn, rcv_nxt) >=0 || acklist.Count - 1 == i)
                 {
                     seg.sn = ack.sn;
                     seg.ts = ack.ts;
@@ -635,7 +642,7 @@ namespace System.Net
             // probe window size (if remote window size equals zero)
             if (0 == rmt_wnd)
             {
-                current = KcpHelper.currentMS();
+                current = Helper.currentMS();
                 if (0 == probe_wait)
                 {
                     probe_wait = IKCP_PROBE_INIT;
@@ -643,7 +650,7 @@ namespace System.Net
                 }
                 else
                 {
-                    if (KcpHelper._itimediff(current, ts_probe) >= 0)
+                    if (Helper._itimediff(current, ts_probe) >= 0)
                     {
                         if (probe_wait < IKCP_PROBE_INIT)
                             probe_wait = IKCP_PROBE_INIT;
@@ -679,15 +686,15 @@ namespace System.Net
             probe = 0;
 
             // calculate window size
-            var cwnd_ = KcpHelper._imin_(snd_wnd, rmt_wnd);
+            var cwnd_ = Helper._imin_(snd_wnd, rmt_wnd);
             if (0 == nocwnd)
-                cwnd_ = KcpHelper._imin_(cwnd, cwnd_);
+                cwnd_ = Helper._imin_(cwnd, cwnd_);
 
             // sliding window, controlled by snd_nxt && sna_una+cwnd
             var newSegsCount = 0;
             for (var k = 0; k < snd_queue.Count; k++)
             {
-                if (KcpHelper._itimediff(snd_nxt, snd_una + cwnd_) >= 0)
+                if (Helper._itimediff(snd_nxt, snd_una + cwnd_) >= 0)
                     break;
 
                 var newseg = snd_queue[k];
@@ -709,7 +716,7 @@ namespace System.Net
             if (fastresend <= 0) resent = 0xffffffff;
 
             // check for retransmissions
-            current = KcpHelper.currentMS();
+            current = Helper.currentMS();
             UInt64 change = 0; UInt64 lostSegs = 0; UInt64 fastRetransSegs = 0; UInt64 earlyRetransSegs = 0;
             var minrto = (Int32)interval;
 
@@ -743,7 +750,7 @@ namespace System.Net
                     change++;
                     earlyRetransSegs++;
                 }
-                else if (KcpHelper._itimediff(current, segment.resendts) >= 0) // RTO
+                else if (Helper._itimediff(current, segment.resendts) >= 0) // RTO
                 {
                     needsend = true;
                     if (nodelay == 0)
@@ -780,7 +787,7 @@ namespace System.Net
                 }
 
                 // get the nearest rto
-                var _rto = KcpHelper._itimediff(segment.resendts, current);
+                var _rto = Helper._itimediff(segment.resendts, current);
                 if (_rto > 0 && _rto < minrto)
                 {
                     minrto = _rto;
@@ -830,7 +837,7 @@ namespace System.Net
         // 'current' - current timestamp in millisec.
         public void Update()
         {
-            var current = KcpHelper.currentMS();
+            var current = Helper.currentMS();
 
             if (0 == updated)
             {
@@ -838,7 +845,7 @@ namespace System.Net
                 ts_flush = current;
             }
 
-            var slap = KcpHelper._itimediff(current, ts_flush);
+            var slap = Helper._itimediff(current, ts_flush);
 
             if (slap >= 10000 || slap < -10000)
             {
@@ -849,7 +856,7 @@ namespace System.Net
             if (slap >= 0)
             {
                 ts_flush += interval;
-                if (KcpHelper._itimediff(current, ts_flush) >= 0)
+                if (Helper._itimediff(current, ts_flush) >= 0)
                     ts_flush = current + interval;
                 Flush(false);
             }
@@ -864,7 +871,7 @@ namespace System.Net
         // or optimize ikcp_update when handling massive kcp connections)
         public UInt32 Check()
         {
-            var current = KcpHelper.currentMS();
+            var current = Helper.currentMS();
 
             var ts_flush_ = ts_flush;
             var tm_flush_ = 0x7fffffff;
@@ -874,17 +881,17 @@ namespace System.Net
             if (updated == 0)
                 return current;
 
-            if (KcpHelper._itimediff(current, ts_flush_) >= 10000 || KcpHelper._itimediff(current, ts_flush_) < -10000)
+            if (Helper._itimediff(current, ts_flush_) >= 10000 || Helper._itimediff(current, ts_flush_) < -10000)
                 ts_flush_ = current;
 
-            if (KcpHelper._itimediff(current, ts_flush_) >= 0)
+            if (Helper._itimediff(current, ts_flush_) >= 0)
                 return current;
 
-            tm_flush_ = (int)KcpHelper._itimediff(ts_flush_, current);
+            tm_flush_ = (int)Helper._itimediff(ts_flush_, current);
 
             foreach (var seg in snd_buf)
             {
-                var diff = KcpHelper._itimediff(seg.resendts, current);
+                var diff = Helper._itimediff(seg.resendts, current);
                 if (diff <= 0)
                     return current;
                 if (diff < tm_packet)

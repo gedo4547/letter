@@ -2,7 +2,7 @@ using System;
 
 namespace System.Net
 {
-    interface IKcpAllotter<T> : IDisposable
+    interface IAllotter<T> : IDisposable
     {
         T Get();
 

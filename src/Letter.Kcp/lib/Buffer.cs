@@ -1,12 +1,13 @@
 using System;
 using System.Buffers;
+using System.IO.Pipelines;
 using System.Runtime.CompilerServices;
 
 namespace System.Net
 {
-    sealed class KcpBuffer : IDisposable
+    sealed class Buffer : IDisposable
     {
-        public KcpBuffer(KcpMemoryBlockAllotter memoryBlockAllotter)
+        public Buffer(MemoryBlockAllotter memoryBlockAllotter)
         {
             this.memoryBlockAllotter = memoryBlockAllotter;
 
@@ -16,10 +17,10 @@ namespace System.Net
             this.tail = memory;
         }
 
-        private KcpMemoryBlockAllotter memoryBlockAllotter;
+        private MemoryBlockAllotter memoryBlockAllotter;
 
-        private KcpMemoryBlock head = null;
-        private KcpMemoryBlock tail = null;
+        private MemoryBlock head = null;
+        private MemoryBlock tail = null;
 
         public int ReadableLength
         {
@@ -55,7 +56,7 @@ namespace System.Net
 
             while(true)
             {
-                KcpMemoryBlock writableBlock = this.GetWritableMemoryBlock();
+                MemoryBlock writableBlock = this.GetWritableMemoryBlock();
                 int writableLength = writableBlock.WritableLength;
                 var writableMemory = writableBlock.GetWritableMemory(writableLength);
 
@@ -87,7 +88,7 @@ namespace System.Net
             }
         }
 
-        private KcpMemoryBlock GetWritableMemoryBlock()
+        private MemoryBlock GetWritableMemoryBlock()
         {
             return this.tail;
         }
@@ -114,17 +115,17 @@ namespace System.Net
             this.TryClear(this.head);
         }
 
-        private bool TryClear(KcpMemoryBlock startBlock)
+        private bool TryClear(MemoryBlock startBlock)
         {
             if (startBlock == null)
             {
                 return false;
             }
 
-            KcpMemoryBlock block = startBlock;
+            MemoryBlock block = startBlock;
             while (true)
             {
-                KcpMemoryBlock child = block.Next as KcpMemoryBlock;
+                MemoryBlock child = block.Next as MemoryBlock;
                 
                 block.Reset();
                 block.SetNext(null);

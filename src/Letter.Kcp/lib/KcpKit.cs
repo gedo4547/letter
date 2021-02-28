@@ -3,22 +3,24 @@ using System.Buffers;
 
 namespace System.Net
 {
-    public delegate void RefAction(ref ReadOnlySequence<byte> sequence);
+    public delegate void RefAction(uint conv, ref ReadOnlySequence<byte> sequence);
 
     public sealed class KcpKit : IDisposable
     {
         public KcpKit(uint conv, bool littleEndian, MemoryPool<byte> memoryPool)
         {
+            this.conv = conv;
             this.mKCP = new Kcp(conv, littleEndian, memoryPool, this.OnOutEvent);
-            this._allotter = new KcpMemoryBlockAllotter(memoryPool);
-            this.buffer = new KcpBuffer(this._allotter);
+            this._allotter = new MemoryBlockAllotter(memoryPool);
+            this.buffer = new Buffer(this._allotter);
         }
         
+        uint conv;
         private Kcp mKCP;
         private UInt32 mNextUpdateTime = 0;
 
-        private KcpBuffer buffer;
-        private KcpMemoryBlockAllotter _allotter;
+        private Buffer buffer;
+        private MemoryBlockAllotter _allotter;
 
         public RefAction onRcv;
         public RefAction onSnd;
@@ -29,7 +31,7 @@ namespace System.Net
 
         public void MarkTime()
         {
-            this.mNextUpdateTime = KcpHelper.currentMS();
+            this.mNextUpdateTime = Helper.currentMS();
         }
 
         public void SettingNoDelay(int nodelay_, int interval_, int resend_, int nc_)
@@ -117,7 +119,7 @@ namespace System.Net
             {
                 if (this.onRcv != null)
                 {
-                    this.onRcv(ref readableBuffer);
+                    this.onRcv(this.conv, ref readableBuffer);
                 }
             }
 
@@ -132,7 +134,7 @@ namespace System.Net
             }
 
             var sequence = new ReadOnlySequence<byte>(buffer, 0, length);
-            this.onSnd(ref sequence);
+            this.onSnd(this.conv, ref sequence);
         }
 
         public void Update()

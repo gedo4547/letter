@@ -152,7 +152,7 @@ namespace Letter.Kcp
             reader.Flush();
         }
 
-        private void OnKcpRcvEvent(ref ReadOnlySequence<byte> sequence)
+        private void OnKcpRcvEvent(uint conv, ref ReadOnlySequence<byte> sequence)
         {
             try
             {
@@ -244,7 +244,7 @@ namespace Letter.Kcp
 
         private WrappedMemory sndMemory;
 
-        private void OnKcpSndEvent(ref ReadOnlySequence<byte> memory)
+        private void OnKcpSndEvent(uint conv, ref ReadOnlySequence<byte> memory)
         {
             //Console.WriteLine("kcp通知消息发送>>"+memory.Length);
             if (memory.Length < 1) return;

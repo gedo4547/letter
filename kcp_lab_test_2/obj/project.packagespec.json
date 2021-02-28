@@ -1,22 +1,22 @@
 ﻿{
   "version": "1.0.0",
   "restore": {
-    "projectUniqueName": "/Users/guanyedong/Projects/letter-github/examples/kcp_lab_test/kcp_lab_test.csproj",
-    "projectName": "kcp_lab_test",
-    "projectPath": "/Users/guanyedong/Projects/letter-github/examples/kcp_lab_test/kcp_lab_test.csproj",
-    "outputPath": "/Users/guanyedong/Projects/letter-github/examples/kcp_lab_test/obj/",
+    "projectUniqueName": "/Users/guanyedong/Projects/letter-github/kcp_lab_test_2/kcp_lab_test_2.csproj",
+    "projectName": "kcp_lab_test_2",
+    "projectPath": "/Users/guanyedong/Projects/letter-github/kcp_lab_test_2/kcp_lab_test_2.csproj",
+    "outputPath": "/Users/guanyedong/Projects/letter-github/kcp_lab_test_2/obj/",
     "projectStyle": "PackageReference",
     "fallbackFolders": [
       "/usr/local/share/dotnet/sdk/NuGetFallbackFolder"
     ],
     "originalTargetFrameworks": [
-      "net50"
+      "netcoreapp3.1"
     ],
     "sources": {
       "https://api.nuget.org/v3/index.json": {}
     },
     "frameworks": {
-      "netcoreapp5.0": {
+      "netcoreapp3.1": {
         "projectReferences": {
           "/Users/guanyedong/Projects/letter-github/examples/common/common.csproj": {
             "projectPath": "/Users/guanyedong/Projects/letter-github/examples/common/common.csproj"
@@ -34,7 +34,7 @@
     }
   },
   "frameworks": {
-    "netcoreapp5.0": {
+    "netcoreapp3.1": {
       "imports": [
         "net461",
         "net462",

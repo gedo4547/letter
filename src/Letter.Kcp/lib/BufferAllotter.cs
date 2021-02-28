@@ -4,27 +4,27 @@ using System.Collections.Generic;
 
 namespace System.Net
 {
-    sealed class KcpBufferAllotter : IKcpAllotter<KcpBuffer>
+    sealed class BufferAllotter : IAllotter<Buffer>
     {
-        public KcpBufferAllotter(MemoryPool<byte> memoryPool)
+        public BufferAllotter(MemoryPool<byte> memoryPool)
         {
-            this.memoryAllotter = new KcpMemoryBlockAllotter(memoryPool);
+            this.memoryAllotter = new MemoryBlockAllotter(memoryPool);
         }
 
-        private KcpMemoryBlockAllotter memoryAllotter;
-        private Stack<KcpBuffer> bufferStack = new Stack<KcpBuffer>();
+        private MemoryBlockAllotter memoryAllotter;
+        private Stack<Buffer> bufferStack = new Stack<Buffer>();
 
-        public KcpBuffer Get()
+        public Buffer Get()
         {
             if(this.bufferStack.Count > 0)
             {
                 return this.bufferStack.Pop();
             }
 
-            return new KcpBuffer(this.memoryAllotter);
+            return new Buffer(this.memoryAllotter);
         }
 
-        public void Put(KcpBuffer item)
+        public void Put(Buffer item)
         {
             if(item == null)
             {
@@ -36,7 +36,7 @@ namespace System.Net
 
         public void Dispose()
         {
-            foreach (KcpBuffer buffer in this.bufferStack)
+            foreach (Buffer buffer in this.bufferStack)
             {
                 buffer.Dispose();
             }

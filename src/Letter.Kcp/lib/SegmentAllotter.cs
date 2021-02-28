@@ -4,31 +4,31 @@ using System.Collections.Generic;
 
 namespace System.Net
 {
-    class KcpSegmentAllotter : IKcpAllotter<KcpSegment>
+    class SegmentAllotter : IAllotter<Segment>
     {
-        public KcpSegmentAllotter(MemoryPool<byte> memoryPool, bool littleEndian)
+        public SegmentAllotter(MemoryPool<byte> memoryPool, bool littleEndian)
         {
             this.littleEndian = littleEndian;
-            this.bufferAllotter = new KcpBufferAllotter(memoryPool);
+            this.bufferAllotter = new BufferAllotter(memoryPool);
         }
 
         private bool littleEndian;
-        private KcpBufferAllotter bufferAllotter;
+        private BufferAllotter bufferAllotter;
 
-        private Stack<KcpSegment> segmentStack = new Stack<KcpSegment>();
+        private Stack<Segment> segmentStack = new Stack<Segment>();
 
-        public KcpSegment Get()
+        public Segment Get()
         {
             if (this.segmentStack.Count > 0)
             {
                 return this.segmentStack.Pop();
             }
             
-            KcpBuffer buffer = this.bufferAllotter.Get();
-            return new KcpSegment(this.littleEndian, buffer);
+            Buffer buffer = this.bufferAllotter.Get();
+            return new Segment(this.littleEndian, buffer);
         }
 
-        public void Put(KcpSegment segment)
+        public void Put(Segment segment)
         {
             if(segment == null)
             {
@@ -43,8 +43,8 @@ namespace System.Net
         {
             while (this.segmentStack.Count > 0)
             {
-                KcpSegment segment = this.segmentStack.Pop();
-                KcpBuffer buffer = segment.data;
+                Segment segment = this.segmentStack.Pop();
+                Buffer buffer = segment.data;
                 //将buffer放回bufferAllotter，统一管理
                 this.bufferAllotter.Put(buffer);
                 segment.Dispose();
